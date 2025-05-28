@@ -50,13 +50,14 @@ app.use(
   session({
     name: "sid",
     store: new MemoryStore({ checkPeriod: 86400000 }),
-    secret: process.env.SESSION_SECRET || "super-secret-session",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
+      domain: ".primerpcad.com", // ✅ forces cookie to your root domain (including www)
       httpOnly: true,
-      secure: true, // ✅ must be true for HTTPS
-      sameSite: "none", // ✅ required for cross-origin
+      secure: true,               // ✅ required on HTTPS
+      sameSite: "none",           // ✅ required for cross-origin cookies
     },
   })
 );
@@ -144,6 +145,8 @@ app.get("/auth/logout", (req, res) => {
 app.get("/auth/failure", (req, res) => res.send("❌ Discord login failed"));
 
 app.get("/api/auth/me", (req, res) => {
+  console.log("🧪 Cookies received:", req.headers.cookie);
+  console.log("🧪 User on session:", req.user);
   if (!req.user) return res.status(401).json({ message: "Not logged in" });
   res.json(req.user);
 });
