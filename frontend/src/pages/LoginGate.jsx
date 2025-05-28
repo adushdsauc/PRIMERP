@@ -7,15 +7,16 @@ const LoginGate = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Safe redirect once loading is done
     if (!loading && discordId) {
       navigate("/home");
     }
   }, [discordId, loading, navigate]);
 
   const handleLogin = () => {
+    const baseUrl =
+      process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
     try {
-      window.location.href = "http://localhost:8080/auth/discord";
+      window.location.href = `${baseUrl}/auth/discord`;
     } catch (err) {
       console.error("❌ Redirect failed:", err);
     }
