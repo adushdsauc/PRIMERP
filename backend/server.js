@@ -29,6 +29,7 @@ const boloRoutes = require("./routes/bolos");
 const clockRoutes = require("./routes/clock");
 const psoReportRoutes = require("./routes/psoreports");
 const warrantRoutes = require("./routes/warrants");
+const { init } = require("./models/BankAccount");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -124,8 +125,9 @@ app.get(
   "/auth/discord/callback",
   passport.authenticate("discord", { failureRedirect: "/auth/failure" }),
   (req, res) => {
-    console.log("✅ Session established:", req.sessionID);
-    console.log("✅ Logged in user:", req.user);
+    console.log("✅ Callback reached");
+    console.log("✅ User:", req.user);
+    console.log("✅ Session:", req.sessionID);
     res.redirect(`${FRONTEND_URL}/home`);
   }
 );
