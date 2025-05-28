@@ -29,12 +29,14 @@ const boloRoutes = require("./routes/bolos");
 const clockRoutes = require("./routes/clock");
 const psoReportRoutes = require("./routes/psoreports");
 const warrantRoutes = require("./routes/warrants");
-const { init } = require("./models/BankAccount");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8080";
+
+// ✅ Required for Railway & HTTPS proxies (fixes cookie not setting)
+app.set("trust proxy", 1);
 
 // Middleware
 app.use(express.json());
@@ -53,8 +55,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: true, // ✅ must be true for HTTPS
+      sameSite: "none", // ✅ required for cross-origin
     },
   })
 );
@@ -62,7 +64,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Discord OAuth Strategy
+// ✅ Discord OAuth Strategy
 passport.use(
   new DiscordStrategy(
     {
@@ -81,8 +83,8 @@ passport.use(
           const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${profile.id}`, {
             headers: { Authorization: `Bot ${botToken}` },
           });
-
           if (!res.ok) continue;
+
           const member = await res.json();
           if (Array.isArray(member.roles)) {
             allRoles = [...new Set([...allRoles, ...member.roles])];
@@ -118,7 +120,7 @@ passport.use(
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
 
-// 🔐 Auth Routes
+// Auth Routes
 app.get("/auth/discord", passport.authenticate("discord"));
 
 app.get(
@@ -126,8 +128,8 @@ app.get(
   passport.authenticate("discord", { failureRedirect: "/auth/failure" }),
   (req, res) => {
     console.log("✅ Callback reached");
-    console.log("✅ User:", req.user);
     console.log("✅ Session:", req.sessionID);
+    console.log("✅ User:", req.user);
     res.redirect(`${FRONTEND_URL}/home`);
   }
 );
@@ -146,7 +148,7 @@ app.get("/api/auth/me", (req, res) => {
   res.json(req.user);
 });
 
-// API Routes
+// Routes
 app.use("/api/civilians", civilianRoutes);
 app.use("/api/licenses", licenseRoutes);
 app.use("/api/vehicles", vehicleRoutes);
@@ -170,22 +172,14 @@ app.use("/api/clock", clockRoutes);
 app.use("/api/psoreports", psoReportRoutes);
 app.use("/api/warrants", warrantRoutes);
 
-// MongoDB
+// DB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
-    console.log("📂 Using DB:", mongoose.connection.name);
   })
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .catch((err) => console.error("❌ MongoDB error:", err));
 
-// Global Error Logging
-process.on("unhandledRejection", (reason) => {
-  console.error("🧨 Unhandled Promise Rejection:", reason);
-});
-process.on("uncaughtException", (err) => {
-  console.error("🔥 Uncaught Exception:", err);
-});
-
+// Server
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Server live at port ${PORT}`);
 });
