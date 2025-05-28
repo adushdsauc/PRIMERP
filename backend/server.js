@@ -7,10 +7,10 @@ const passport = require("passport");
 const DiscordStrategy = require("passport-discord").Strategy;
 const fetch = require("node-fetch");
 const MemoryStore = require("memorystore")(session);
+const { client } = require("./bot");
 
+// Models and Routes
 const User = require("./models/User");
-
-// Routes
 const civilianRoutes = require("./routes/civilians");
 const licenseRoutes = require("./routes/licenses");
 const vehicleRoutes = require("./routes/vehicles");
@@ -29,7 +29,6 @@ const boloRoutes = require("./routes/bolos");
 const clockRoutes = require("./routes/clock");
 const psoReportRoutes = require("./routes/psoreports");
 const warrantRoutes = require("./routes/warrants");
-const { client } = require("./bot");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -39,13 +38,11 @@ const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8080";
 // Middleware
 app.use(express.json());
 
-// ✅ Proper CORS setup for cookies
 app.use(cors({
   origin: FRONTEND_URL,
   credentials: true,
 }));
 
-// ✅ Secure session config for cross-origin auth
 app.use(
   session({
     name: "sid",
@@ -64,7 +61,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ✅ Discord OAuth Strategy
+// Discord OAuth Strategy
 passport.use(
   new DiscordStrategy(
     {
@@ -75,28 +72,17 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log("👤 OAuth profile ID:", profile.id);
         const guildIds = process.env.DISCORD_GUILD_IDS.split(",");
         const botToken = process.env.DISCORD_BOT_TOKEN;
         let allRoles = [];
 
         for (const guildId of guildIds) {
-          const res = await fetch(
-            `https://discord.com/api/v10/guilds/${guildId}/members/${profile.id}`,
-            {
-              headers: { Authorization: `Bot ${botToken}` },
-            }
-          );
+          const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${profile.id}`, {
+            headers: { Authorization: `Bot ${botToken}` },
+          });
 
-          console.log(`📡 Guild ${guildId} fetch status:`, res.status);
-          if (!res.ok) {
-            const errorText = await res.text();
-            console.log(`❌ Failed to fetch member from ${guildId}:`, errorText);
-            continue;
-          }
-
+          if (!res.ok) continue;
           const member = await res.json();
-          console.log(`✅ Roles from guild ${guildId}:`, member.roles);
           if (Array.isArray(member.roles)) {
             allRoles = [...new Set([...allRoles, ...member.roles])];
           }
@@ -122,7 +108,6 @@ passport.use(
           roles: allRoles,
         });
       } catch (err) {
-        console.error("❌ Discord OAuth error:", err);
         return done(err, null);
       }
     }
@@ -132,30 +117,34 @@ passport.use(
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
 
-// ✅ Auth Routes
+// 🔐 Auth Routes
+app.get("/auth/discord", passport.authenticate("discord"));
+
 app.get(
-  "/auth/discord",
+  "/auth/discord/callback",
   passport.authenticate("discord", { failureRedirect: "/auth/failure" }),
   (req, res) => {
-    console.log("✅ Session after login:", req.session); // 👈 ADD THIS
-    console.log("✅ User:", req.user); // 👈 ADD THIS
+    console.log("✅ Session established:", req.sessionID);
+    console.log("✅ Logged in user:", req.user);
     res.redirect(`${FRONTEND_URL}/home`);
   }
 );
 
-app.get("/auth/failure", (req, res) => res.send("❌ Discord login failed"));
 app.get("/auth/logout", (req, res) => {
   req.logout((err) => {
     if (err) return res.status(500).send("Logout failed.");
     res.redirect(FRONTEND_URL);
   });
 });
+
+app.get("/auth/failure", (req, res) => res.send("❌ Discord login failed"));
+
 app.get("/api/auth/me", (req, res) => {
   if (!req.user) return res.status(401).json({ message: "Not logged in" });
   res.json(req.user);
 });
 
-// ✅ API Routes
+// API Routes
 app.use("/api/civilians", civilianRoutes);
 app.use("/api/licenses", licenseRoutes);
 app.use("/api/vehicles", vehicleRoutes);
@@ -179,18 +168,15 @@ app.use("/api/clock", clockRoutes);
 app.use("/api/psoreports", psoReportRoutes);
 app.use("/api/warrants", warrantRoutes);
 
-// ✅ MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI)
+// MongoDB
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
     console.log("📂 Using DB:", mongoose.connection.name);
   })
-  .catch((err) => {
-    console.error("❌ MongoDB connection error:", err);
-  });
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Error Handling
+// Global Error Logging
 process.on("unhandledRejection", (reason) => {
   console.error("🧨 Unhandled Promise Rejection:", reason);
 });
@@ -198,7 +184,6 @@ process.on("uncaughtException", (err) => {
   console.error("🔥 Uncaught Exception:", err);
 });
 
-// ✅ Start Server
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
