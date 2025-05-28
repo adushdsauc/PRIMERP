@@ -27,23 +27,30 @@ export default function App() {
   const { discordId, loading } = useUser();
   const location = useLocation();
 
+  // 🔐 Force HTTPS if accessed via HTTP (common issue on mobile)
+  useEffect(() => {
+    if (window.location.protocol !== "https:") {
+      window.location.href = "https://" + window.location.hostname + window.location.pathname;
+    }
+  }, []);
+
   useEffect(() => {
     const handleRejection = (event) => {
       const filename = event?.filename || "";
       const stack = event?.reason?.stack || "";
       const message = event?.reason?.message || "";
-  
+
       const isThirdPartyExtension =
         filename.includes("h1-vendors-main-popover") ||
         stack.includes("h1-vendors-main-popover") ||
         filename.includes("PayPal") ||
         stack.includes("PayPal") ||
-        filename.includes("hot-update.js") || // Webpack dev runtime
+        filename.includes("hot-update.js") ||
         navigator.userAgent.includes("PayPalHoney") ||
-        !event.reason; // also covers "➡️ Rejection was undefined"
-  
-      if (isThirdPartyExtension) return; // 🚫 Skip noisy extension junk
-  
+        !event.reason;
+
+      if (isThirdPartyExtension) return;
+
       console.error("🔥 Unhandled Promise Rejection:");
       if (event.reason) {
         console.error("➡️ Reason:", event.reason);
@@ -54,10 +61,10 @@ export default function App() {
         console.error("➡️ Rejection was undefined – possible bug in async code.");
       }
     };
-  
+
     window.addEventListener("unhandledrejection", handleRejection);
     return () => window.removeEventListener("unhandledrejection", handleRejection);
-  }, []);  
+  }, []);
 
   if (loading) {
     return (
