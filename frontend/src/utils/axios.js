@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:8080",
-  withCredentials: true, // ✅ critical for cross-origin session cookies
+  baseURL: "https://primerp-production-6780.up.railway.app",
+  withCredentials: true,
 });
 
 export default api;
