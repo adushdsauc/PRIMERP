@@ -134,7 +134,7 @@ passport.deserializeUser((user, done) => done(null, user));
 
 // ✅ Auth Routes
 app.get(
-  "/auth/discord/callback",
+  "/auth/discord",
   passport.authenticate("discord", { failureRedirect: "/auth/failure" }),
   (req, res) => {
     console.log("✅ Session after login:", req.session); // 👈 ADD THIS
@@ -142,6 +142,7 @@ app.get(
     res.redirect(`${FRONTEND_URL}/home`);
   }
 );
+
 app.get("/auth/failure", (req, res) => res.send("❌ Discord login failed"));
 app.get("/auth/logout", (req, res) => {
   req.logout((err) => {
