@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const router = express.Router();
 const Warrant = require("../models/Warrant");
@@ -5,10 +7,9 @@ const Civilian = require("../models/Civilian");
 const axios = require("axios");
 
 const WEBHOOKS = {
-    Xbox: "https://discord.com/api/webhooks/1376663911549501521/mNJKUyTa3Mq7G7UjfhjpH6kHCVsVifISBJmrnBmiPc8GweGpq6A_XZ_F6yQLLGacNUKE",
-    PlayStation: "https://discord.com/api/webhooks/1376664084145115156/8FFk71HYM-XUMEUlnER-PVZHVcSiFZbmnmpp9x6r7hu-Y-uW93cphyiFJ53wjBhUQMin"
-  };
-  
+  Xbox: process.env.XBOX_WARRANT_WEBHOOK,
+  PlayStation: process.env.PS_WARRANT_WEBHOOK,
+};
   
   router.get("/all", async (req, res) => {
     try {
