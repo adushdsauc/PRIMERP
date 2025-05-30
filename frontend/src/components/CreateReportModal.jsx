@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 import React, { useState, useEffect } from "react";
 import { Dialog, Listbox } from "@headlessui/react";
 import axios from "axios";
