@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 import React, { useState, useEffect } from "react";
 import { Dialog, Listbox } from "@headlessui/react";
 import axios from "axios";
@@ -99,9 +101,9 @@ export default function CreateReportModal({ civilian, onClose }) {
       });
 
       const webhookUrl =
-        platform === "Xbox"
-          ? "https://discord.com/api/webhooks/1376040735538679850/PYcj4WhXFJeF8vzFEPefKV7WwPXCwQkqXTFkzLpi3cm6HzaIjhsaex8lzowDyOiX6GK7"
-          : "https://discord.com/api/webhooks/1376040887452434432/SEEjUKSwoKTTcLx1Bq2nMBESNWz96o10Qr0jyUhsrT_imj-nirgBRPoF4A-MCnaR-F9H";
+      platform === "Xbox"
+        ? process.env.REACT_APP_XBOX_REPORT_WEBHOOK
+        : process.env.REACT_APP_PS_REPORT_WEBHOOK;    
 
       await axios.post(webhookUrl, {
         embeds: [
