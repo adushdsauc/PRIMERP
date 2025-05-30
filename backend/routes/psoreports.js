@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
@@ -6,14 +8,14 @@ const Officer = require("../models/Officer");
 // Platform + ReportType → Webhook map
 const WEBHOOKS = {
   Xbox: {
-    "use-of-force": "https://discord.com/api/webhooks/1376649813176619158/UWSIe2J-gDxxx407YRm-Q6IS7clHbY-rbdbYprm4fKmJAwaRc696IfjnB7hHgZbp-zGp",
-    "10-50": "https://discord.com/api/webhooks/1376649957133783151/1k59w4S2pw0mWc-MQIEYa1YNPoJ3fkwlWg5D7tKKMrXWKtogdx7_Obe_XBxzgMDS8vci",
-    "scene-report": "https://discord.com/api/webhooks/1376650044572303422/rfUp-NnnhtTzoiFTie_p0Bh6RfE7GGhjIui9DK67cowgcEgePx1U0D5sqPTrHc3HAIZd"
+    "use-of-force": process.env.XBOX_USE_OF_FORCE_WEBHOOK,
+    "10-50": process.env.XBOX_10_50_WEBHOOK,
+    "scene-report": process.env.XBOX_SCENE_REPORT_WEBHOOK
   },
   PlayStation: {
-    "use-of-force": "https://discord.com/api/webhooks/1376650332477722686/6ElqUSBBP1ioNUu6Bs-lcr1vhe3hODjYb2ses8gFuNXjVq1nUDIPPzx1q5638x7DeL1c",
-    "10-50": "https://discord.com/api/webhooks/1376650428887859312/CJJ-V9v_N6WNHEdRL170870mk4_zgZBlJu8FaeY4-K5_ADEviWEMGiPwwpPBi5MwKK5V",
-    "scene-report": "https://discord.com/api/webhooks/1376650517031424081/fL2OEs0MR4SCH6H0yvY4Ddajs5PEW7zJSInrW3uizXSTH5QG3wEftoO0Sk8e5zzaiEcv"
+    "use-of-force": process.env.PS_USE_OF_FORCE_WEBHOOK,
+    "10-50": process.env.PS_10_50_WEBHOOK,
+    "scene-report": process.env.PS_SCENE_REPORT_WEBHOOK
   }
 };
 
