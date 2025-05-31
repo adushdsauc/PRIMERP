@@ -74,9 +74,8 @@ const row = new ActionRowBuilder().addComponents(
     .setCustomId(`store_next_${page + 1}`)
     .setLabel("Next Page")
     .setStyle(ButtonStyle.Primary)
-    .setDisabled(page >= totalPages),
-  );
-
+    .setDisabled(page >= totalPages)
+);
   return { embed, row };
 }
 client.once(Events.ClientReady, () => {
