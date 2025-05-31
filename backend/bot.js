@@ -228,7 +228,7 @@ if (interaction.isButton()) {
   }
 }
 
-}
+})
   
   if (interaction.type === InteractionType.ModalSubmit && interaction.customId.startsWith("deny_modal_")) {
     const accountId = interaction.customId.split("deny_modal_")[1];
@@ -345,20 +345,51 @@ if (interaction.isButton()) {
   
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
-if (interaction.commandName === "store") {
-  const items = await StoreItem.find();
-
-  if (items.length === 0) {
-    return interaction.reply({
-      content: "🛒 The store is currently empty.",
-      ephemeral: true,
-    });
+  if (interaction.commandName === "store") {
+    const items = await StoreItem.find();
+  
+    if (items.length === 0) {
+      return interaction.reply({
+        content: "🛒 The store is currently empty.",
+        ephemeral: true,
+      });
+    }
+  
+    const { embed, row } = formatStorePage(items, 1);
+    return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
   }
-
-  const { embed, row } = formatStorePage(items, 1);
-  return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
-}
-  });
+  
+  if (interaction.commandName === "additem") {
+    const name = interaction.options.getString("name");
+    const description = interaction.options.getString("description");
+    const price = interaction.options.getNumber("price");
+    const image = interaction.options.getString("image");
+    const role = interaction.options.getRole("role");
+  
+    const newItem = await StoreItem.create({
+      name,
+      description,
+      price,
+      image,
+      roleRequirement: role ? role.id : null,
+    });
+  
+    const embed = new EmbedBuilder()
+      .setTitle("🛒 New Store Item Added")
+      .addFields(
+        { name: "Name", value: name, inline: true },
+        { name: "Price", value: `$${price}`, inline: true },
+        { name: "Description", value: description }
+      )
+      .setColor("Green")
+      .setTimestamp();
+  
+    if (image) embed.setImage(image);
+    if (role) embed.addFields({ name: "Role Requirement", value: `<@&${role.id}>` });
+  
+    return interaction.reply({ embeds: [embed], ephemeral: true });
+  }
+  
     const name = interaction.options.getString("name");
     const description = interaction.options.getString("description");
     const price = interaction.options.getNumber("price");
@@ -387,7 +418,7 @@ if (interaction.commandName === "store") {
     if (role) embed.addFields({ name: "Role Requirement", value: `<@&${role.id}>` });
   
     return interaction.reply({ embeds: [embed], ephemeral: true });
-  }
+  
   
   if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
     return interaction.reply({ content: "❌ Admins only.", ephemeral: true });
@@ -441,7 +472,7 @@ if (interaction.commandName === "store") {
       .addFields({ name: "Balance", value: `$${amount.toFixed(2)}` });
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
-});
+
 
 const ROLE_MAP = {
   "Standard Driver's License": process.env.ROLE_DRIVER,
