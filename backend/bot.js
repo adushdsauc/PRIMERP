@@ -220,17 +220,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
   }
 if (interaction.isButton()) {
-  const customId = interaction.customId;
+ const customId = interaction.customId;
 
-  if (customId.startsWith("store_prev_") || customId.startsWith("store_next_")) {
-    const items = await StoreItem.find();
-    const [, direction, rawPage] = customId.split("_");
-    let page = parseInt(rawPage);
-    page = direction === "next" ? page + 1 : page - 1;
+    if (customId.startsWith("store_prev_") || customId.startsWith("store_next_")) {
+      const items = await StoreItem.find();
+      const [, direction, rawPage] = customId.split("_");
+      let page = parseInt(rawPage);
+      page = direction === "next" ? page + 1 : page - 1;
 
-    const { embed, row } = formatStorePage(items, page);
-    return interaction.update({ embeds: [embed], components: [row] });
-  }
+const { embed: storeEmbed, row } = formatStorePage(items, 1);
+      return interaction.update({ embeds: [storeEmbed], components: [row] });
+    }
+
 }
   
   if (interaction.type === InteractionType.ModalSubmit && interaction.customId.startsWith("deny_modal_")) {
