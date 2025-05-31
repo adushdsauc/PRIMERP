@@ -228,7 +228,7 @@ if (interaction.isButton()) {
   }
 }
 
-});
+}
   
   if (interaction.type === InteractionType.ModalSubmit && interaction.customId.startsWith("deny_modal_")) {
     const accountId = interaction.customId.split("deny_modal_")[1];
@@ -358,7 +358,7 @@ if (interaction.commandName === "store") {
   const { embed, row } = formatStorePage(items, 1);
   return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
 }
-  
+  });
     const name = interaction.options.getString("name");
     const description = interaction.options.getString("description");
     const price = interaction.options.getNumber("price");
