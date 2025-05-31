@@ -228,7 +228,7 @@ if (interaction.isButton()) {
   }
 }
 
-}
+});
   
   if (interaction.type === InteractionType.ModalSubmit && interaction.customId.startsWith("deny_modal_")) {
     const accountId = interaction.customId.split("deny_modal_")[1];
