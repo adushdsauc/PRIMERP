@@ -46,7 +46,7 @@ const warrantChannels = {
 
 function formatStorePage(items, page = 1, perPage = 5) {
   const totalPages = Math.ceil(items.length / perPage);
-  consfunction formatStorePage(items, page = 1, perPage = 5) {
+function formatStorePage(items, page = 1, perPage = 5) {
   const totalPages = Math.ceil(items.length / perPage);
   const start = (page - 1) * perPage;
   const pageItems = items.slice(start, start + perPage);
