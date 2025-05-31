@@ -226,7 +226,7 @@ if (interaction.isButton()) {
     return interaction.update({ embeds: [embed], components: [row] });
   }
 }
-}
+
 }
   
   if (interaction.type === InteractionType.ModalSubmit && interaction.customId.startsWith("deny_modal_")) {
