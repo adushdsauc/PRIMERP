@@ -43,7 +43,10 @@ const warrantChannels = {
   xbox: "1376269149785034842",
   playstation: "1376268932691787786",
 };
+
 function formatStorePage(items, page = 1, perPage = 5) {
+  const totalPages = Math.ceil(items.length / perPage);
+  consfunction formatStorePage(items, page = 1, perPage = 5) {
   const totalPages = Math.ceil(items.length / perPage);
   const start = (page - 1) * perPage;
   const pageItems = items.slice(start, start + perPage);
@@ -80,7 +83,6 @@ function formatStorePage(items, page = 1, perPage = 5) {
   );
 
   return { embed, row };
-}
 client.once(Events.ClientReady, () => {
   console.log(`✅ Bot logged in as ${client.user.tag}`);
 });
@@ -217,14 +219,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
       return interaction.showModal(modal);
     }
   }
-if (customId.startsWith("store_prev_") || customId.startsWith("store_next_")) {
-  const items = await StoreItem.find();
-  const [, direction, rawPage] = customId.split("_");
-  let page = parseInt(rawPage);
-  page = direction === "next" ? page + 1 : page - 1;
+if (interaction.isButton()) {
+  const customId = interaction.customId;
 
-  const { embed, row } = formatStorePage(items, page);
-  return interaction.update({ embeds: [embed], components: [row] });
+  if (customId.startsWith("store_prev_") || customId.startsWith("store_next_")) {
+    const items = await StoreItem.find();
+    const [, direction, rawPage] = customId.split("_");
+    let page = parseInt(rawPage);
+    page = direction === "next" ? page + 1 : page - 1;
+
+    const { embed, row } = formatStorePage(items, page);
+    return interaction.update({ embeds: [embed], components: [row] });
+  }
 }
   
   if (interaction.type === InteractionType.ModalSubmit && interaction.customId.startsWith("deny_modal_")) {
@@ -355,12 +361,6 @@ if (interaction.commandName === "store") {
 
   const { embed, row } = formatStorePage(items, 1);
   return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
-}
-  
-  if (interaction.commandName === "additem") {
-    if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-      return interaction.reply({ content: "❌ Admins only.", ephemeral: true });
-    }
   
     const name = interaction.options.getString("name");
     const description = interaction.options.getString("description");
