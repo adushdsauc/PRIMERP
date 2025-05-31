@@ -228,7 +228,7 @@ if (interaction.isButton()) {
   }
 }
 
-})
+}
   
   if (interaction.type === InteractionType.ModalSubmit && interaction.customId.startsWith("deny_modal_")) {
     const accountId = interaction.customId.split("deny_modal_")[1];
@@ -277,7 +277,6 @@ if (interaction.isButton()) {
   
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
-  
   if (interaction.commandName === "buy") {
     const name = interaction.options.getString("name");
     const item = await StoreItem.findOne({ name: new RegExp(`^${name}$`, "i") });
@@ -418,8 +417,8 @@ if (interaction.isButton()) {
     if (role) embed.addFields({ name: "Role Requirement", value: `<@&${role.id}>` });
   
     return interaction.reply({ embeds: [embed], ephemeral: true });
-  
-  
+    
+    
   if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
     return interaction.reply({ content: "❌ Admins only.", ephemeral: true });
   }
