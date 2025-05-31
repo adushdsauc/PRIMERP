@@ -377,7 +377,7 @@ if (interaction.commandName === "store") {
       roleRequirement: role ? role.id : null,
     });
   
-    const embed = new EmbedBuilder()
+    const itemembed = new EmbedBuilder()
       .setTitle("🛒 New Store Item Added")
       .addFields(
         { name: "Name", value: name, inline: true },
