@@ -44,14 +44,13 @@ const warrantChannels = {
   playstation: "1376268932691787786",
 };
 
-function formatStorePage(items, page = 1, perPage = 5) {
-  const totalPages = Math.ceil(items.length / perPage);
+// 👇 Add this helper function near the top, after other imports
 function formatStorePage(items, page = 1, perPage = 5) {
   const totalPages = Math.ceil(items.length / perPage);
   const start = (page - 1) * perPage;
   const pageItems = items.slice(start, start + perPage);
 
-  const storeEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setTitle("Store")
     .setDescription("Buy an item with `/buy`\nView details with `/iteminfo`")
     .setColor("Blue")
@@ -83,6 +82,7 @@ function formatStorePage(items, page = 1, perPage = 5) {
   );
 
   return { embed, row };
+}
 client.once(Events.ClientReady, () => {
   console.log(`✅ Bot logged in as ${client.user.tag}`);
 });
