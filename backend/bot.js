@@ -44,7 +44,6 @@ const warrantChannels = {
   playstation: "1376268932691787786",
 };
 
-// 👇 Add this helper function near the top, after other imports
 function formatStorePage(items, page = 1, perPage = 5) {
   const totalPages = Math.ceil(items.length / perPage);
   const start = (page - 1) * perPage;
@@ -64,20 +63,21 @@ function formatStorePage(items, page = 1, perPage = 5) {
     });
   });
 
-const row = new ActionRowBuilder().addComponents(
-  new ButtonBuilder()
-    .setCustomId(`store_prev_${page - 1}`)
-    .setLabel("Previous Page")
-    .setStyle(ButtonStyle.Primary)
-    .setDisabled(page <= 1),
-  new ButtonBuilder()
-    .setCustomId(`store_next_${page + 1}`)
-    .setLabel("Next Page")
-    .setStyle(ButtonStyle.Primary)
-    .setDisabled(page >= totalPages)
-);
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`store_prev_${page - 1}`)
+      .setLabel("Previous Page")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(page <= 1),
+    new ButtonBuilder()
+      .setCustomId(`store_next_${page + 1}`)
+      .setLabel("Next Page")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(page >= totalPages)
+  );
+
   return { embed, row };
-}
+  
 client.once(Events.ClientReady, () => {
   console.log(`✅ Bot logged in as ${client.user.tag}`);
 });
@@ -215,17 +215,17 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
   }
 if (interaction.isButton()) {
- const customId = interaction.customId;
+  const customId = interaction.customId;
 
-    if (customId.startsWith("store_prev_") || customId.startsWith("store_next_")) {
-      const items = await StoreItem.find();
-      const [, direction, rawPage] = customId.split("_");
-      let page = parseInt(rawPage);
-      page = direction === "next" ? page + 1 : page - 1;
+  if (customId.startsWith("store_prev_") || customId.startsWith("store_next_")) {
+    const items = await StoreItem.find();
+    const [, , rawPage] = customId.split("_");
+    const page = parseInt(rawPage);
 
-const { embed: storeEmbed, row } = formatStorePage(items, 1);
-      return interaction.update({ embeds: [storeEmbed], components: [row] });
-    }
+    const { embed, row } = formatStorePage(items, page);
+    return interaction.update({ embeds: [embed], components: [row] });
+  }
+}
 
 }
   
@@ -344,7 +344,6 @@ const { embed: storeEmbed, row } = formatStorePage(items, 1);
   
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
-  
 if (interaction.commandName === "store") {
   const items = await StoreItem.find();
 
