@@ -64,21 +64,17 @@ function formatStorePage(items, page = 1, perPage = 5) {
     });
   });
 
-  const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`store_prev_${page}`)
-      .setLabel("Previous Page")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(page <= 1),
-    new ButtonBuilder()
-      .setCustomId(`store_next_${page}`)
-      .setLabel("Next Page")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(page >= totalPages),
-    new ButtonBuilder()
-      .setLabel("Dashboard")
-      .setStyle(ButtonStyle.Link)
-      .setURL("https://yourdashboard.url")
+const row = new ActionRowBuilder().addComponents(
+  new ButtonBuilder()
+    .setCustomId(`store_prev_${page - 1}`)
+    .setLabel("Previous Page")
+    .setStyle(ButtonStyle.Primary)
+    .setDisabled(page <= 1),
+  new ButtonBuilder()
+    .setCustomId(`store_next_${page + 1}`)
+    .setLabel("Next Page")
+    .setStyle(ButtonStyle.Primary)
+    .setDisabled(page >= totalPages),
   );
 
   return { embed, row };
