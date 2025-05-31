@@ -19,7 +19,16 @@ router.post("/save-test", ensureAuth, async (req, res) => {
   }
 
   try {
-    // Save result
+    console.log("📥 Incoming test submission:", {
+      discordId: user.discordId,
+      username: user.username,
+      licenseType,
+      score,
+      passed,
+      answers
+    });
+
+    // Save test result to database
     const result = await TestResult.create({
       discordId: user.discordId,
       username: user.username,
@@ -29,29 +38,42 @@ router.post("/save-test", ensureAuth, async (req, res) => {
       answers
     });
 
-    // Assign Discord role
+    // Attempt to assign license role if passed
     if (passed) {
-      await assignLicenseRole(user.discordId, licenseType);
+      try {
+        await assignLicenseRole(user.discordId, licenseType);
+        console.log(`✅ Assigned ${licenseType} role to ${user.username}`);
+      } catch (roleErr) {
+        console.error("❌ Failed to assign license role:", roleErr);
+      }
     }
 
-    // Webhook log
+    // Attempt to send log to Discord webhook
     if (DISCORD_WEBHOOK_URL) {
-      await axios.post(DISCORD_WEBHOOK_URL, {
-        embeds: [
-          {
-            title: "📋 DMV Test Submitted",
-            description: `**User:** <@${user.discordId}> (${user.username})\n**License Type:** ${licenseType}\n**Score:** ${score}/10\n**Result:** ${passed ? "✅ Passed" : "❌ Failed"}`,
-            color: passed ? 0x57F287 : 0xED4245,
-            timestamp: new Date().toISOString()
-          }
-        ]
-      });
+      try {
+        await axios.post(DISCORD_WEBHOOK_URL, {
+          embeds: [
+            {
+              title: "📋 DMV Test Submitted",
+              description: `**User:** <@${user.discordId}> (${user.username})\n**License Type:** ${licenseType}\n**Score:** ${score}/10\n**Result:** ${passed ? "✅ Passed" : "❌ Failed"}`,
+              color: passed ? 0x57F287 : 0xED4245,
+              timestamp: new Date().toISOString()
+            }
+          ]
+        });
+      } catch (webhookErr) {
+        console.error("❌ Failed to send Discord webhook:", webhookErr);
+      }
     }
 
     return res.json({ success: true });
   } catch (err) {
-    console.error("Error saving test result:", err);
-    return res.status(500).json({ success: false, message: "Failed to save test" });
+    console.error("❌ Error saving test result:", err.stack || err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to save test result",
+      error: err.message
+    });
   }
 });
 
@@ -82,8 +104,8 @@ router.post("/add-license", ensureAuth, async (req, res) => {
 
     return res.json({ success: true, civilian });
   } catch (err) {
-    console.error("Add license error:", err);
-    return res.status(500).json({ success: false, message: "Server error" });
+    console.error("❌ Add license error:", err.stack || err);
+    return res.status(500).json({ success: false, message: "Server error", error: err.message });
   }
 });
 
