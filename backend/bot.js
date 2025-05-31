@@ -43,7 +43,44 @@ const warrantChannels = {
   xbox: "1376269149785034842",
   playstation: "1376268932691787786",
 };
+function formatStorePage(items, page = 1, perPage = 5) {
+  const totalPages = Math.ceil(items.length / perPage);
+  const start = (page - 1) * perPage;
+  const pageItems = items.slice(start, start + perPage);
 
+  const embed = new EmbedBuilder()
+    .setTitle("Store")
+    .setDescription("Buy an item with `/buy`\nView details with `/iteminfo`")
+    .setColor("Blue")
+    .setFooter({ text: `Page ${page}/${totalPages}` })
+    .setTimestamp();
+
+  pageItems.forEach(item => {
+    embed.addFields({
+      name: `$${item.price.toLocaleString()} – ${item.name}`,
+      value: item.description || "No description provided."
+    });
+  });
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`store_prev_${page}`)
+      .setLabel("Previous Page")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(page <= 1),
+    new ButtonBuilder()
+      .setCustomId(`store_next_${page}`)
+      .setLabel("Next Page")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(page >= totalPages),
+    new ButtonBuilder()
+      .setLabel("Dashboard")
+      .setStyle(ButtonStyle.Link)
+      .setURL("https://yourdashboard.url")
+  );
+
+  return { embed, row };
+}
 client.once(Events.ClientReady, () => {
   console.log(`✅ Bot logged in as ${client.user.tag}`);
 });
@@ -180,7 +217,16 @@ client.on(Events.InteractionCreate, async (interaction) => {
       return interaction.showModal(modal);
     }
   }
+if (customId.startsWith("store_prev_") || customId.startsWith("store_next_")) {
+  const items = await StoreItem.find();
+  const [, direction, rawPage] = customId.split("_");
+  let page = parseInt(rawPage);
+  page = direction === "next" ? page + 1 : page - 1;
 
+  const { embed, row } = formatStorePage(items, page);
+  return interaction.update({ embeds: [embed], components: [row] });
+}
+  
   if (interaction.type === InteractionType.ModalSubmit && interaction.customId.startsWith("deny_modal_")) {
     const accountId = interaction.customId.split("deny_modal_")[1];
     const reason = interaction.fields.getTextInputValue("deny_reason");
@@ -297,34 +343,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
   
-  if (interaction.commandName === "store") {
-    const items = await StoreItem.find();
-  
-    if (items.length === 0) {
-      return interaction.reply({
-        content: "🛒 The store is currently empty.",
-        ephemeral: true,
-      });
-    }
-  
-    const embeds = items.map((item) => {
-      const embed = new EmbedBuilder()
-        .setTitle(item.name)
-        .setDescription(item.description)
-        .addFields({ name: "Price", value: `$${item.price}`, inline: true })
-        .setColor("Blue")
-        .setTimestamp();
-  
-      if (item.image) embed.setImage(item.image);
-      if (item.roleRequirement)
-        embed.addFields({ name: "Role Required", value: `<@&${item.roleRequirement}>` });
-  
-      return embed;
+if (interaction.commandName === "store") {
+  const items = await StoreItem.find();
+
+  if (items.length === 0) {
+    return interaction.reply({
+      content: "🛒 The store is currently empty.",
+      ephemeral: true,
     });
-  
-    // Send as multiple embeds (max 10 embeds per reply)
-    return interaction.reply({ embeds: embeds.slice(0, 10), ephemeral: true });
   }
+
+  const { embed, row } = formatStorePage(items, 1);
+  return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+}
   
   if (interaction.commandName === "additem") {
     if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
