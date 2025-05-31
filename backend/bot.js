@@ -215,7 +215,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
       return interaction.showModal(modal);
     }
   }
-if (interaction.isButton()) {
   const customId = interaction.customId;
 
   if (customId.startsWith("store_prev_") || customId.startsWith("store_next_")) {
@@ -226,9 +225,7 @@ if (interaction.isButton()) {
     const { embed, row } = formatStorePage(items, page);
     return interaction.update({ embeds: [embed], components: [row] });
   }
-}
-
-}
+});
   
   if (interaction.type === InteractionType.ModalSubmit && interaction.customId.startsWith("deny_modal_")) {
     const accountId = interaction.customId.split("deny_modal_")[1];
