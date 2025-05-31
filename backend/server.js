@@ -29,6 +29,7 @@ const boloRoutes = require("./routes/bolos");
 const clockRoutes = require("./routes/clock");
 const psoReportRoutes = require("./routes/psoreports");
 const warrantRoutes = require("./routes/warrants");
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -174,6 +175,7 @@ app.use((req, res, next) => {
 app.use("/api/clock", clockRoutes);
 app.use("/api/psoreports", psoReportRoutes);
 app.use("/api/warrants", warrantRoutes);
+app.use("/admin", adminRoutes);
 
 // DB
 mongoose.connect(process.env.MONGO_URI)
