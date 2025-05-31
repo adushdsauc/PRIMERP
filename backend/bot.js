@@ -77,7 +77,8 @@ function formatStorePage(items, page = 1, perPage = 5) {
   );
 
   return { embed, row };
-  
+}
+
 client.once(Events.ClientReady, () => {
   console.log(`✅ Bot logged in as ${client.user.tag}`);
 });
@@ -356,6 +357,7 @@ if (interaction.commandName === "store") {
 
   const { embed, row } = formatStorePage(items, 1);
   return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+}
   
     const name = interaction.options.getString("name");
     const description = interaction.options.getString("description");
