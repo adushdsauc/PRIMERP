@@ -51,7 +51,7 @@ function formatStorePage(items, page = 1, perPage = 5) {
   const start = (page - 1) * perPage;
   const pageItems = items.slice(start, start + perPage);
 
-  const embed = new EmbedBuilder()
+  const storeEmbed = new EmbedBuilder()
     .setTitle("Store")
     .setDescription("Buy an item with `/buy`\nView details with `/iteminfo`")
     .setColor("Blue")
