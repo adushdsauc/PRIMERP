@@ -178,7 +178,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
             )
           );
         return interaction.showModal(modal);
+        
       }
+      if (customId.startsWith("store_prev_") || customId.startsWith("store_next_")) {
+        const items = await StoreItem.find();
+        const [, , rawPage] = customId.split("_");
+        const page = parseInt(rawPage);
+  
+        const { embed, row } = formatStorePage(items, page);
+        return interaction.update({ embeds: [embed], components: [row] });
+      }
+  
+      return; // ✅ Prevent falling through to other interaction types
     }
     
   if (interaction.type === InteractionType.ModalSubmit && interaction.customId.startsWith("deny_modal_")) {
