@@ -225,7 +225,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const { embed, row } = formatStorePage(items, page);
     return interaction.update({ embeds: [embed], components: [row] });
   }
-});
   
   if (interaction.type === InteractionType.ModalSubmit && interaction.customId.startsWith("deny_modal_")) {
     const accountId = interaction.customId.split("deny_modal_")[1];
@@ -415,7 +414,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   
     return interaction.reply({ embeds: [embed], ephemeral: true });
     
-    
+
   if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
     return interaction.reply({ content: "❌ Admins only.", ephemeral: true });
   }
@@ -703,6 +702,7 @@ async function sendClockEmbed({ officer, discordId, type, duration }) {
   if (user) await user.send({ embeds: [embed] }).catch(() => null);
   if (logChannel) await logChannel.send({ embeds: [embed] });
 }
+});
 
 module.exports.sendClockEmbed = sendClockEmbed;
 
