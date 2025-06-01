@@ -293,7 +293,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     if (!interaction.isChatInputCommand()) return;
     if (
-      !["wallet", "store", "iteminfo", "buy", "inventory"].includes(
+      !["wallet", "additem", "store", "iteminfo", "buy", "inventory"].includes(
         interaction.commandName,
       )
     )
