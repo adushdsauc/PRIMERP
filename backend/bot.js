@@ -418,7 +418,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
     return interaction.reply({ content: "❌ Admins only.", ephemeral: true });
   }
-});
 
   const sub = interaction.options.getSubcommand();
   const user = interaction.options.getUser("user");
@@ -469,6 +468,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
+});
 
 const ROLE_MAP = {
   "Standard Driver's License": process.env.ROLE_DRIVER,
