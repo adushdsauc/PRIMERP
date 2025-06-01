@@ -413,11 +413,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (role) embed.addFields({ name: "Role Requirement", value: `<@&${role.id}>` });
   
     return interaction.reply({ embeds: [embed], ephemeral: true });
-    
+
 
   if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
     return interaction.reply({ content: "❌ Admins only.", ephemeral: true });
   }
+});
 
   const sub = interaction.options.getSubcommand();
   const user = interaction.options.getUser("user");
@@ -702,7 +703,6 @@ async function sendClockEmbed({ officer, discordId, type, duration }) {
   if (user) await user.send({ embeds: [embed] }).catch(() => null);
   if (logChannel) await logChannel.send({ embeds: [embed] });
 }
-});
 
 module.exports.sendClockEmbed = sendClockEmbed;
 
