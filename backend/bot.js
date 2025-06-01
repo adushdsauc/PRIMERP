@@ -52,7 +52,7 @@ function formatStorePage(items, page = 0, pageSize = 5) {
   const embed = new EmbedBuilder()
     .setTitle("🛒 Store")
     .setDescription("Buy an item with `/buy`\nView details with `/iteminfo`")
-    .setColor("Blue")
+    .setColor("Black")
     .setTimestamp();
 
   pageItems.forEach((item) => {
@@ -68,19 +68,18 @@ function formatStorePage(items, page = 0, pageSize = 5) {
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId(`store_prev_${Math.max(page - 1, 0)}`)
-      .setLabel("⬅ Previous Page")
+      .setLabel("Previous Page")
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(page === 0),
     new ButtonBuilder()
       .setCustomId(`store_next_${page + 1}`)
-      .setLabel("Next Page ➡")
+      .setLabel("Next Page")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(page + 1 >= totalPages)
   );
 
   return { embed, row };
 }
-
 
 client.once(Events.ClientReady, () => {
   console.log(`✅ Bot logged in as ${client.user.tag}`);
