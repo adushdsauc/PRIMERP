@@ -84,148 +84,103 @@ client.once(Events.ClientReady, () => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  if (interaction.isButton()) {
-    const customId = interaction.customId;
+  try {
+    // BUTTON HANDLERS
+    if (interaction.isButton()) {
+      const customId = interaction.customId;
 
-    if (customId === "clock_in" || customId === "clock_out") {
-      const discordId = interaction.user.id;
-      const officer = await Officer.findOne({ discordId });
-      if (!officer) {
-        return interaction.reply({ content: "❌ Officer not registered.", ephemeral: true });
-      }
-    
-      const now = new Date();
-      const platform = officer.department.toLowerCase(); // xbox or playstation
-      const logChannelId = platform === "xbox" ? "1376268599924232202" : "1376268687656353914"; // use your platform-specific log channel IDs
-      const logChannel = await client.channels.fetch(logChannelId).catch(() => null);
-    
-      const dmEmbed = new EmbedBuilder()
-        .setColor(customId === "clock_in" ? "Green" : "Red")
-        .setTitle(customId === "clock_in" ? "🟢 You are now clocked in." : "🔴 You are now clocked out.")
-        .setDescription(`Officer **${officer.callsign}** has ${customId === "clock_in" ? "clocked in" : "clocked out"}.`)
-        .setFooter({ text: dayjs().format("MMMM D, YYYY • h:mm A") });
-    
-      const logEmbed = EmbedBuilder.from(dmEmbed)
-        .setTitle(`${customId === "clock_in" ? "🟢 Clock In Log" : "🔴 Clock Out Log"}`)
-        .addFields(
-          { name: "Name", value: officer.callsign, inline: true },
-          { name: "Badge #", value: String(officer.badgeNumber), inline: true },
-          { name: "Platform", value: officer.department, inline: true }
-        );
-    
-      if (customId === "clock_in") {
-        const active = await ClockSession.findOne({ discordId, clockOutTime: null });
-        if (active) return interaction.reply({ content: "❌ You are already clocked in.", ephemeral: true });
-    
-        await ClockSession.create({ discordId, clockInTime: now });
-    
-        await interaction.user.send({ embeds: [dmEmbed] }).catch(() => null);
-        if (logChannel) await logChannel.send({ embeds: [logEmbed] });
-    
-        return interaction.reply({ content: "✅ You are clocked in.", ephemeral: true });
-      }
-    
-      if (customId === "clock_out") {
+      if (customId === "clock_in" || customId === "clock_out") {
+        const discordId = interaction.user.id;
+        const officer = await Officer.findOne({ discordId });
+        if (!officer) return interaction.reply({ content: "❌ Officer not registered.", ephemeral: true });
+
+        const now = new Date();
+        const platform = officer.department.toLowerCase();
+        const logChannelId = platform === "xbox" ? "1376268599924232202" : "1376268687656353914";
+        const logChannel = await client.channels.fetch(logChannelId).catch(() => null);
+
+        const dmEmbed = new EmbedBuilder()
+          .setColor(customId === "clock_in" ? "Green" : "Red")
+          .setTitle(customId === "clock_in" ? "🟢 You are now clocked in." : "🔴 You are now clocked out.")
+          .setDescription(`Officer **${officer.callsign}** has ${customId === "clock_in" ? "clocked in" : "clocked out"}.`)
+          .setFooter({ text: dayjs().format("MMMM D, YYYY • h:mm A") });
+
+        const logEmbed = EmbedBuilder.from(dmEmbed)
+          .setTitle(customId === "clock_in" ? "🟢 Clock In Log" : "🔴 Clock Out Log")
+          .addFields(
+            { name: "Name", value: officer.callsign, inline: true },
+            { name: "Badge #", value: String(officer.badgeNumber), inline: true },
+            { name: "Platform", value: officer.department, inline: true }
+          );
+
+        if (customId === "clock_in") {
+          const active = await ClockSession.findOne({ discordId, clockOutTime: null });
+          if (active) return interaction.reply({ content: "❌ You are already clocked in.", ephemeral: true });
+          await ClockSession.create({ discordId, clockInTime: now });
+          await interaction.user.send({ embeds: [dmEmbed] }).catch(() => null);
+          if (logChannel) await logChannel.send({ embeds: [logEmbed] });
+          return interaction.reply({ content: "✅ You are clocked in.", ephemeral: true });
+        }
+
         const session = await ClockSession.findOne({ discordId, clockOutTime: null });
         if (!session) return interaction.reply({ content: "❌ You were not clocked in.", ephemeral: true });
-    
+
         session.clockOutTime = now;
         await session.save();
-    
+
         const durationMs = now - session.clockInTime;
         const hours = Math.floor(durationMs / (1000 * 60 * 60));
         const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
-    
+
         dmEmbed.setDescription(`Officer **${officer.callsign}** clocked out.\nTotal time: **${hours}h ${minutes}m**`);
         logEmbed.setDescription(`Officer **${officer.callsign}** clocked out.\nTotal time: **${hours}h ${minutes}m**`);
-    
+
         await interaction.user.send({ embeds: [dmEmbed] }).catch(() => null);
         if (logChannel) await logChannel.send({ embeds: [logEmbed] });
-    
         return interaction.reply({ content: "✅ You are clocked out.", ephemeral: true });
       }
-    }    
 
-    if (customId.startsWith("approve_bank_")) {
-      const accountId = customId.split("approve_bank_")[1];
-      const account = await BankAccount.findById(accountId);
-      if (!account) return interaction.reply({ content: "❌ Account not found.", ephemeral: true });
+      if (customId.startsWith("approve_bank_")) {
+        const accountId = customId.split("approve_bank_")[1];
+        const account = await BankAccount.findById(accountId);
+        if (!account) return interaction.reply({ content: "❌ Account not found.", ephemeral: true });
 
-      account.needsApproval = false;
-      account.status = "approved";
-      await account.save();
+        account.needsApproval = false;
+        account.status = "approved";
+        await account.save();
 
-      const civilian = await Civilian.findById(account.civilianId);
-      if (!civilian) return interaction.reply({ content: "❌ Civilian not found.", ephemeral: true });
+        const civilian = await Civilian.findById(account.civilianId);
+        if (!civilian) return interaction.reply({ content: "❌ Civilian not found.", ephemeral: true });
 
-      const user = await client.users.fetch(civilian.discordId);
-      const embed = new EmbedBuilder()
-        .setTitle("✅ Bank Account Approved")
-        .setDescription(`Your **${account.accountType}** account (#${account.accountNumber}) has been approved.`)
-        .setColor("Green")
-        .setTimestamp();
+        const user = await client.users.fetch(civilian.discordId);
+        const embed = new EmbedBuilder()
+          .setTitle("✅ Bank Account Approved")
+          .setDescription(`Your **${account.accountType}** account (#${account.accountNumber}) has been approved.`)
+          .setColor("Green")
+          .setTimestamp();
 
-      await user.send({ embeds: [embed] });
-      return interaction.reply({ content: "✅ Approved and user notified.", ephemeral: true });
-    }
-
-    if (customId.startsWith("pay_fine_")) {
-      const reportId = customId.split("pay_fine_")[1];
-      const discordId = interaction.user.id;
-  
-      const civilian = await Civilian.findOne({ discordId });
-      if (!civilian) return interaction.reply({ content: "❌ Civilian not found.", ephemeral: true });
-  
-      const report = civilian.reports.find(r => r.reportId?.toString() === reportId);
-      if (!report) return interaction.reply({ content: "❌ Report not found.", ephemeral: true });
-      if (report.paid) return interaction.reply({ content: "✅ Fine already paid.", ephemeral: true });
-  
-      const wallet = await Wallet.findOne({ discordId });
-      if (!wallet || wallet.balance < report.fine) {
-        return interaction.reply({ content: `❌ Not enough funds. You need $${report.fine}.`, ephemeral: true });
+        await user.send({ embeds: [embed] });
+        return interaction.reply({ content: "✅ Approved and user notified.", ephemeral: true });
       }
-  
-      wallet.balance -= report.fine;
-      report.paid = true;
-      await wallet.save();
-      await civilian.save();
-  
-      const updatedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
-        .setFooter({ text: `Status: PAID` })
-        .setColor("Green");
-  
-      await interaction.update({ embeds: [updatedEmbed], components: [] });
+
+      if (customId.startsWith("deny_bank_")) {
+        const accountId = customId.split("deny_bank_")[1];
+        const modal = new ModalBuilder()
+          .setCustomId(`deny_modal_${accountId}`)
+          .setTitle("Deny Bank Account")
+          .addComponents(
+            new ActionRowBuilder().addComponents(
+              new TextInputBuilder()
+                .setCustomId("deny_reason")
+                .setLabel("Reason for Denial")
+                .setStyle(TextInputStyle.Paragraph)
+                .setRequired(true)
+            )
+          );
+        return interaction.showModal(modal);
+      }
     }
-  
-
-    if (customId.startsWith("deny_bank_")) {
-      const accountId = customId.split("deny_bank_")[1];
-      const modal = new ModalBuilder()
-        .setCustomId(`deny_modal_${accountId}`)
-        .setTitle("Deny Bank Account")
-        .addComponents(
-          new ActionRowBuilder().addComponents(
-            new TextInputBuilder()
-              .setCustomId("deny_reason")
-              .setLabel("Reason for Denial")
-              .setStyle(TextInputStyle.Paragraph)
-              .setRequired(true)
-          )
-        );
-      return interaction.showModal(modal);
-    }
-  }
-  const customId = interaction.customId;
-
-  if (customId.startsWith("store_prev_") || customId.startsWith("store_next_")) {
-    const items = await StoreItem.find();
-    const [, , rawPage] = customId.split("_");
-    const page = parseInt(rawPage);
-
-    const { embed, row } = formatStorePage(items, page);
-    return interaction.update({ embeds: [embed], components: [row] });
-  }
-  
+    
   if (interaction.type === InteractionType.ModalSubmit && interaction.customId.startsWith("deny_modal_")) {
     const accountId = interaction.customId.split("deny_modal_")[1];
     const reason = interaction.fields.getTextInputValue("deny_reason");
@@ -467,7 +422,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
       .addFields({ name: "Balance", value: `$${amount.toFixed(2)}` });
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
-
+} catch (err) {
+  console.error("❌ Interaction handler error:", err);
+  if (interaction.replied || interaction.deferred) {
+    return interaction.followUp({ content: "❌ An error occurred while processing your interaction.", ephemeral: true });
+  }
+  return interaction.reply({ content: "❌ An error occurred while processing your interaction.", ephemeral: true });
+}
 });
 
 const ROLE_MAP = {
