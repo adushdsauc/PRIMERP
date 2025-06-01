@@ -52,7 +52,7 @@ function formatStorePage(items, page = 0, pageSize = 5) {
   const embed = new EmbedBuilder()
     .setTitle("🛒 Store")
     .setDescription("Buy an item with `/buy`\nView details with `/iteminfo`")
-    .setColor("Black")
+    .setColor("Blue")
     .setTimestamp();
 
   pageItems.forEach((item) => {
