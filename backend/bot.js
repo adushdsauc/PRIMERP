@@ -51,13 +51,14 @@ function formatStorePage(items, page = 0, pageSize = 5) {
 
   const embed = new EmbedBuilder()
     .setTitle("🛒 Store")
-    .setDescription("Buy an item with the `/buy`\ command.\nFor more information on an item use the`/iteminfo` command.")
+    .setDescription("Buy an item with `/buy` command.\nFor more information on an item use the `/iteminfo` command.")
     .setColor("Blue")
     .setTimestamp();
 
   pageItems.forEach((item) => {
     embed.addFields({
       name: `$${Number(item.price).toLocaleString()} – ${item.name}`,
+      value: item.description,
       inline: false
     });
   });
