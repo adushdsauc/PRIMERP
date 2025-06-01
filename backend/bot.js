@@ -43,6 +43,42 @@ const warrantChannels = {
   xbox: "1376269149785034842",
   playstation: "1376268932691787786",
 };
+function formatStorePage(items, page = 0, pageSize = 5) {
+  const start = page * pageSize;
+  const pageItems = items.slice(start, start + pageSize);
+
+  const embed = new EmbedBuilder()
+    .setTitle(`🛒 Store — Page ${page + 1}`)
+    .setColor("Blue")
+    .setTimestamp();
+
+  if (pageItems.length === 0) {
+    embed.setDescription("No items on this page.");
+  } else {
+    pageItems.forEach((item) => {
+      embed.addFields({
+        name: item.name,
+        value: `**Price:** $${item.price.toFixed(2)}\n${item.description}` +
+               (item.roleRequirement ? `\n**Role Required:** <@&${item.roleRequirement}>` : ""),
+      });
+    });
+  }
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`store_prev_${Math.max(page - 1, 0)}`)
+      .setLabel("⬅ Previous")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(page === 0),
+    new ButtonBuilder()
+      .setCustomId(`store_next_${page + 1}`)
+      .setLabel("Next ➡")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(start + pageSize >= items.length)
+  );
+
+  return { embed, row };
+}
 
 client.once(Events.ClientReady, () => {
   console.log(`✅ Bot logged in as ${client.user.tag}`);
@@ -110,7 +146,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
         return interaction.reply({ content: "✅ You are clocked out.", ephemeral: true });
       }
     }    
-
+    if (customId.startsWith("store_prev_") || customId.startsWith("store_next_")) {
+      const items = await StoreItem.find();
+      const [, , rawPage] = customId.split("_");
+      const page = parseInt(rawPage);
+    
+      const { embed, row } = formatStorePage(items, page);
+      return interaction.update({ embeds: [embed], components: [row] });
+    }
+    
     if (customId.startsWith("approve_bank_")) {
       const accountId = customId.split("approve_bank_")[1];
       const account = await BankAccount.findById(accountId);
@@ -228,6 +272,20 @@ client.on(Events.InteractionCreate, async (interaction) => {
   
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
+
+  if (interaction.commandName === "store") {
+    const items = await StoreItem.find();
+  
+    if (items.length === 0) {
+      return interaction.reply({
+        content: "🛒 The store is currently empty.",
+        ephemeral: true,
+      });
+    }
+  
+    const { embed, row } = formatStorePage(items, 0); // start on page 0
+    return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+  }
   
   if (interaction.commandName === "buy") {
     const name = interaction.options.getString("name");
@@ -295,35 +353,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
   
     return interaction.reply({ embeds: [embed], ephemeral: true });
-  }
-  
-  if (interaction.commandName === "store") {
-    const items = await StoreItem.find();
-  
-    if (items.length === 0) {
-      return interaction.reply({
-        content: "🛒 The store is currently empty.",
-        ephemeral: true,
-      });
-    }
-  
-    const embeds = items.map((item) => {
-      const embed = new EmbedBuilder()
-        .setTitle(item.name)
-        .setDescription(item.description)
-        .addFields({ name: "Price", value: `$${item.price}`, inline: true })
-        .setColor("Blue")
-        .setTimestamp();
-  
-      if (item.image) embed.setImage(item.image);
-      if (item.roleRequirement)
-        embed.addFields({ name: "Role Required", value: `<@&${item.roleRequirement}>` });
-  
-      return embed;
-    });
-  
-    // Send as multiple embeds (max 10 embeds per reply)
-    return interaction.reply({ embeds: embeds.slice(0, 10), ephemeral: true });
   }
   
   if (interaction.commandName === "additem") {
