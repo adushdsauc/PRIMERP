@@ -275,10 +275,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
 if (interaction.commandName === "inventory") {
-  const discordId = interaction.user.id.toString(); // ✅ Force string match
-  const inventory = await Inventory.findOne({ discordId });
+  const discordId = interaction.user.id;
+  const inventory = await Inventory.findOne({ discordId: discordId.toString() });
 
-  if (!inventory || inventory.items.length === 0) {
+  if (!inventory || !Array.isArray(inventory.items) || inventory.items.length === 0) {
     return interaction.reply({
       content: "🪹 Your inventory is empty.",
       ephemeral: true,
@@ -294,7 +294,7 @@ if (interaction.commandName === "inventory") {
   inventory.items.forEach((item, index) => {
     embed.addFields({
       name: `#${index + 1} — ${item.name}`,
-      value: `**Price:** $${item.price.toFixed(2)}\n**Purchased:** <t:${Math.floor(
+      value: `**Price:** $${item.price.toLocaleString()}\n**Purchased:** <t:${Math.floor(
         new Date(item.purchasedAt).getTime() / 1000
       )}:R>`,
     });
@@ -302,7 +302,6 @@ if (interaction.commandName === "inventory") {
 
   return interaction.reply({ embeds: [embed], ephemeral: true });
 }
-
 
   if (interaction.commandName === "store") {
     const items = await StoreItem.find();
