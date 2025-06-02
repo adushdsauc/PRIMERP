@@ -426,10 +426,6 @@ if (interaction.commandName === "buy") {
   
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
-  
-  if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-    return interaction.reply({ content: "❌ Admins only.", ephemeral: true });
-  }
 
   const sub = interaction.options.getSubcommand();
   const user = interaction.options.getUser("user");
@@ -458,28 +454,34 @@ if (interaction.commandName === "buy") {
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
+if (sub === "add" || sub === "set") {
+  if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+    return interaction.reply({ content: "❌ Admins only.", ephemeral: true });
+  }
+
+  const amount = interaction.options.getNumber("amount");
+
   if (sub === "add") {
-    const amount = interaction.options.getNumber("amount");
     wallet.balance += amount;
     await wallet.save();
     embed
       .setTitle("✅ Wallet Updated")
       .setDescription(`Added $${amount.toFixed(2)} to ${userMention(user.id)}'s wallet.`)
       .addFields({ name: "New Balance", value: `$${wallet.balance.toFixed(2)}` });
-    return interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
   if (sub === "set") {
-    const amount = interaction.options.getNumber("amount");
     wallet.balance = amount;
     await wallet.save();
     embed
       .setTitle("✏️ Wallet Set")
       .setDescription(`Wallet for ${userMention(user.id)} set to:`)
       .addFields({ name: "Balance", value: `$${amount.toFixed(2)}` });
-    return interaction.reply({ embeds: [embed], ephemeral: true });
   }
-});
+
+  return interaction.reply({ embeds: [embed], ephemeral: true });
+}
+
 
 const ROLE_MAP = {
   "Standard Driver's License": process.env.ROLE_DRIVER,
