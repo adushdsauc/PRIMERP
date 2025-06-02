@@ -276,7 +276,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 if (interaction.commandName === "inventory") {
   const discordId = interaction.user.id;
-  const Inventory = require("../models/Inventory");
 
   const inventory = await Inventory.findOne({ discordId });
 
