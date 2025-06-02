@@ -83,7 +83,7 @@ function formatStorePage(items, page = 0, pageSize = 5) {
 }
 
 client.once(Events.ClientReady, () => {
-  console.log(`✅ Bot logged in as ${client.user.tag}`);
+  console.log(`Bot logged in as ${client.user.tag}`);
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
