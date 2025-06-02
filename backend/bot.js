@@ -275,8 +275,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
 if (interaction.commandName === "inventory") {
-  const discordId = interaction.user.id;
-
+  const discordId = interaction.user.id.toString(); // ✅ Force string match
   const inventory = await Inventory.findOne({ discordId });
 
   if (!inventory || inventory.items.length === 0) {
@@ -296,13 +295,14 @@ if (interaction.commandName === "inventory") {
     embed.addFields({
       name: `#${index + 1} — ${item.name}`,
       value: `**Price:** $${item.price.toFixed(2)}\n**Purchased:** <t:${Math.floor(
-        item.purchasedAt.getTime() / 1000
+        new Date(item.purchasedAt).getTime() / 1000
       )}:R>`,
     });
   });
 
   return interaction.reply({ embeds: [embed], ephemeral: true });
 }
+
 
   if (interaction.commandName === "store") {
     const items = await StoreItem.find();
