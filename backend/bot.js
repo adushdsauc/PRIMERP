@@ -363,7 +363,6 @@ if (interaction.commandName === "buy") {
   await wallet.save();
 
   // Add item to inventory
-  const Inventory = require("../models/Inventory");
   await Inventory.findOneAndUpdate(
     { discordId },
     {
