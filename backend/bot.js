@@ -480,7 +480,7 @@ if (sub === "add" || sub === "set") {
   }
 
   return interaction.reply({ embeds: [embed], ephemeral: true });
-});
+}});
 
 
 const ROLE_MAP = {
