@@ -252,30 +252,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   if (!interaction.isChatInputCommand()) return;
   if (!["wallet", "additem", "store", "iteminfo", "buy", "inventory"].includes(interaction.commandName)) return;
-  if (interaction.commandName === "inventory") {
-    const items = await StoreItem.find({ buyers: interaction.user.id });
-  
-    if (items.length === 0) {
-      return interaction.reply({ content: "🪹 Your inventory is empty.", ephemeral: true });
-    }
-  
-    const embed = new EmbedBuilder()
-      .setTitle("📦 Your Inventory")
-      .setDescription("Here are the items you've purchased:")
-      .setColor("Blue")
-      .setTimestamp();
-  
-    items.forEach(item => {
-      embed.addFields({
-        name: item.name,
-        value: `**Price:** $${item.price.toFixed(2)}\n**Description:** ${item.description}`,
-      });
-    });
-  
-    return interaction.reply({ embeds: [embed], ephemeral: true });
-  }
+
 if (interaction.commandName === "inventory") {
   const discordId = interaction.user.id;
+  console.log("Searching for inventory with discordId:", discordId.toString());
   const inventory = await Inventory.findOne({ discordId: discordId.toString() });
 
   if (!inventory || !Array.isArray(inventory.items) || inventory.items.length === 0) {
