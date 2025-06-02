@@ -25,7 +25,7 @@ const StoreItem = require("./models/StoreItem"); // <-- Add this line
 const { v4: uuidv4 } = require("uuid"); // for generating unique report IDs if needed
 const ClockSession = require("./models/ClockSession");
 const Officer = require("./models/Officer");
-const Inventory = require("./backend/models/Inventory");
+const Inventory = require("./models/Inventory");
 
 const client = new Client({
   intents: [
