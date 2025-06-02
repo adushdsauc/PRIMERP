@@ -25,6 +25,7 @@ const StoreItem = require("./models/StoreItem"); // <-- Add this line
 const { v4: uuidv4 } = require("uuid"); // for generating unique report IDs if needed
 const ClockSession = require("./models/ClockSession");
 const Officer = require("./models/Officer");
+const Inventory = require("../models/Inventory"); // Add at the top if not already
 
 const client = new Client({
   intents: [
@@ -273,6 +274,36 @@ client.on(Events.InteractionCreate, async (interaction) => {
   
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
+if (interaction.commandName === "inventory") {
+  const discordId = interaction.user.id;
+  const Inventory = require("../models/Inventory");
+
+  const inventory = await Inventory.findOne({ discordId });
+
+  if (!inventory || inventory.items.length === 0) {
+    return interaction.reply({
+      content: "🪹 Your inventory is empty.",
+      ephemeral: true,
+    });
+  }
+
+  const embed = new EmbedBuilder()
+    .setTitle("📦 Your Inventory")
+    .setDescription("Here are the items you've purchased:")
+    .setColor("Blue")
+    .setTimestamp();
+
+  inventory.items.forEach((item, index) => {
+    embed.addFields({
+      name: `#${index + 1} — ${item.name}`,
+      value: `**Price:** $${item.price.toFixed(2)}\n**Purchased:** <t:${Math.floor(
+        item.purchasedAt.getTime() / 1000
+      )}:R>`,
+    });
+  });
+
+  return interaction.reply({ embeds: [embed], ephemeral: true });
+}
 
   if (interaction.commandName === "store") {
     const items = await StoreItem.find();
@@ -288,48 +319,76 @@ client.on(Events.InteractionCreate, async (interaction) => {
     return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
   }
   
-  if (interaction.commandName === "buy") {
-    const name = interaction.options.getString("name");
-    const item = await StoreItem.findOne({ name: new RegExp(`^${name}$`, "i") });
-  
-    if (!item) {
-      return interaction.reply({ content: `❌ No item named "${name}" found in the store.`, ephemeral: true });
-    }
-  
-    const user = interaction.user;
-    const discordId = user.id;
-  
-    const civilian = await Civilian.findOne({ discordId });
-    if (!civilian) {
-      return interaction.reply({ content: "❌ You don't have a registered civilian profile.", ephemeral: true });
-    }
-  
-    const wallet = await Wallet.findOne({ discordId });
-    if (!wallet || wallet.balance < item.price) {
-      return interaction.reply({ content: `❌ You don't have enough funds. You need $${item.price.toFixed(2)}.`, ephemeral: true });
-    }
-  
-    if (item.roleRequirement) {
-      const member = await interaction.guild.members.fetch(discordId);
-      if (!member.roles.cache.has(item.roleRequirement)) {
-        return interaction.reply({ content: `❌ You need the <@&${item.roleRequirement}> role to buy this item.`, ephemeral: true });
-      }
-    }
-  
-    wallet.balance -= item.price;
-    await wallet.save();
-  
-    // You can log this purchase somewhere or extend with an Inventory system later
-    const embed = new EmbedBuilder()
-      .setTitle("🛒 Purchase Successful")
-      .setDescription(`You bought **${item.name}** for **$${item.price.toFixed(2)}**.`)
-      .setColor("Green")
-      .setTimestamp();
-  
-    if (item.image) embed.setImage(item.image);
-  
-    return interaction.reply({ embeds: [embed], ephemeral: true });
+if (interaction.commandName === "buy") {
+  const name = interaction.options.getString("name");
+  const item = await StoreItem.findOne({ name: new RegExp(`^${name}$`, "i") });
+
+  if (!item) {
+    return interaction.reply({
+      content: `❌ No item named "${name}" found in the store.`,
+      ephemeral: true,
+    });
   }
+
+  const user = interaction.user;
+  const discordId = user.id;
+
+  const civilian = await Civilian.findOne({ discordId });
+  if (!civilian) {
+    return interaction.reply({
+      content: "❌ You don't have a registered civilian profile.",
+      ephemeral: true,
+    });
+  }
+
+  const wallet = await Wallet.findOne({ discordId });
+  if (!wallet || wallet.balance < item.price) {
+    return interaction.reply({
+      content: `❌ You don't have enough funds. You need $${item.price.toFixed(2)}.`,
+      ephemeral: true,
+    });
+  }
+
+  if (item.roleRequirement) {
+    const member = await interaction.guild.members.fetch(discordId);
+    if (!member.roles.cache.has(item.roleRequirement)) {
+      return interaction.reply({
+        content: `❌ You need the <@&${item.roleRequirement}> role to buy this item.`,
+        ephemeral: true,
+      });
+    }
+  }
+
+  // Deduct price
+  wallet.balance -= item.price;
+  await wallet.save();
+
+  // Add item to inventory
+  const Inventory = require("../models/Inventory");
+  await Inventory.findOneAndUpdate(
+    { discordId },
+    {
+      $push: {
+        items: {
+          name: item.name,
+          price: item.price,
+          purchasedAt: new Date(),
+        },
+      },
+    },
+    { upsert: true, new: true }
+  );
+
+  const embed = new EmbedBuilder()
+    .setTitle("🛒 Purchase Successful")
+    .setDescription(`You bought **${item.name}** for **$${item.price.toFixed(2)}**.`)
+    .setColor("Green")
+    .setTimestamp();
+
+  if (item.image) embed.setImage(item.image);
+
+  return interaction.reply({ embeds: [embed], ephemeral: true });
+}
   
   if (interaction.commandName === "iteminfo") {
     const name = interaction.options.getString("name");
