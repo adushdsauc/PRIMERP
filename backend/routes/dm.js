@@ -8,8 +8,10 @@ const bot = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.DirectMessages,
   ],
+  partials: ['CHANNEL'], // Required to receive DMs
 });
 
+// Login bot
 (async () => {
   try {
     await bot.login(process.env.DISCORD_BOT_TOKEN);
@@ -28,7 +30,9 @@ router.post("/send", async (req, res) => {
 
   try {
     const user = await bot.users.fetch(discordId);
-    if (!user) return res.status(404).json({ error: "User not found." });
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
 
     await user.send({
       embeds: [embed],
@@ -37,8 +41,13 @@ router.post("/send", async (req, res) => {
 
     return res.json({ success: true });
   } catch (err) {
+    if (err.code === 50007) {
+      console.warn(`❌ Cannot send DM to ${discordId} — likely has DMs off or blocked the bot.`);
+      return res.status(403).json({ error: "Cannot send DMs to this user. DMs may be disabled or the bot is blocked." });
+    }
+
     console.error("DM send error:", err);
-    return res.status(500).json({ error: "Failed to send DM." });
+    return res.status(500).json({ error: "Failed to send DM due to an unexpected error." });
   }
 });
 
