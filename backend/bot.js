@@ -17,6 +17,10 @@ const {
   PermissionsBitField,
   userMention
 } = require("discord.js");
+
+process.on("unhandledRejection", err => {
+  console.error("Unhandled promise rejection:", err);
+});
 const mongoose = require("mongoose");
 const BankAccount = require("./models/BankAccount");
 const Civilian = require("./models/Civilian");
@@ -177,6 +181,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
         .setTimestamp();
 
       await user.send({ embeds: [embed] });
+          await user.send({ embeds: [embed] });
+      await user.send({ embeds: [embed] }).catch(err => console.warn("Failed to DM user:", err));
       return interaction.reply({ content: "✅ Approved and user notified.", ephemeral: true });
     }
 
@@ -247,6 +253,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     await user.send({ embeds: [embed] });
     await BankAccount.findByIdAndDelete(accountId);
+      await user.send({ embeds: [embed] });
+    await user.send({ embeds: [embed] }).catch(err => console.warn("Failed to DM user:", err));
     return interaction.reply({ content: "✅ Account denied and user notified.", ephemeral: true });
   }
 
@@ -646,8 +654,9 @@ function jailUser(discordId, jailTime, platform) {
           .setTitle("🔓 Released from Jail")
           .setDescription(`You have completed your **${jailTime} minute** sentence.`)
           .setColor("Green");
+        
         return member.send({ embeds: [dmEmbed] });
-      }
+        return member.send({ embeds: [dmEmbed] }).catch(err => console.warn("Failed to DM member:", err));      }
     }, 10000);
 
     const dmEmbed = new EmbedBuilder()
@@ -656,8 +665,8 @@ function jailUser(discordId, jailTime, platform) {
       .setFooter({ text: "You will be released automatically." })
       .setColor("Orange");
 
-    await member.send({ embeds: [dmEmbed] });
-  });
+        return member.send({ embeds: [dmEmbed] });
+        return member.send({ embeds: [dmEmbed] }).catch(err => console.warn("Failed to DM member:", err));  });
 }
 function scheduleFineCheck(civilian, report, message, platform) {
   setTimeout(async () => {
