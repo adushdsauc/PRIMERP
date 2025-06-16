@@ -1,4 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
+const logError = require('./logError');
 
 const jailRoles = {
   xbox: '1376268599924232202',
@@ -6,7 +7,8 @@ const jailRoles = {
 };
 
 async function jailUser(client, discordId, jailTime, platform) {
-  client.guilds.fetch(process.env[platform.toUpperCase() + '_GUILD_ID']).then(async guild => {
+  try {
+    const guild = await client.guilds.fetch(process.env[platform.toUpperCase() + '_GUILD_ID']);
     const member = await guild.members.fetch(discordId);
     const jailRoleId = jailRoles[platform];
     await member.roles.add(jailRoleId);
@@ -16,12 +18,16 @@ async function jailUser(client, discordId, jailTime, platform) {
       const remaining = Math.max(0, releaseTime - Date.now());
       if (remaining <= 0) {
         clearInterval(interval);
-        await member.roles.remove(jailRoleId);
-        const dmEmbed = new EmbedBuilder()
-          .setTitle('🔓 Released from Jail')
-          .setDescription(`You have completed your **${jailTime} minute** sentence.`)
-          .setColor('Green');
-        return member.send({ embeds: [dmEmbed] });
+        try {
+          await member.roles.remove(jailRoleId);
+          const dmEmbed = new EmbedBuilder()
+            .setTitle('🔓 Released from Jail')
+            .setDescription(`You have completed your **${jailTime} minute** sentence.`)
+            .setColor('Green');
+          await member.send({ embeds: [dmEmbed] });
+        } catch (err) {
+          logError('Release jailed user', err);
+        }
       }
     }, 10000);
 
@@ -31,8 +37,12 @@ async function jailUser(client, discordId, jailTime, platform) {
       .setFooter({ text: 'You will be released automatically.' })
       .setColor('Orange');
 
-    return member.send({ embeds: [dmEmbed] });
-  });
+    await member.send({ embeds: [dmEmbed] });
+    return true;
+  } catch (err) {
+    logError('Jail user', err);
+    return false;
+  }
 }
 
 module.exports = jailUser;
