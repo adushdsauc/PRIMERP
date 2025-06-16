@@ -22,6 +22,7 @@ for (const file of fs.readdirSync(commandsPath).filter(f => f.endsWith('.js'))) 
 const eventsPath = path.join(__dirname, 'events');
 for (const file of fs.readdirSync(eventsPath).filter(f => f.endsWith('.js'))) {
   const event = require(path.join(eventsPath, file));
+  if (!event.name || !event.execute) continue;
   if (event.once) {
     client.once(event.name, (...args) => event.execute(...args));
   } else {
