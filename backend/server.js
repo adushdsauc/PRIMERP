@@ -7,7 +7,7 @@ const passport = require("passport");
 const DiscordStrategy = require("passport-discord").Strategy;
 const fetch = require("node-fetch");
 const MemoryStore = require("memorystore")(session);
-const { client } = require("./bot");
+const { client } = require("./bot/index.js");
 
 // Models and Routes
 const User = require("./models/User");
