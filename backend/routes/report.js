@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Civilian = mongoose.models.Civilian || require("../models/Civilian");
-const { jailUser, trackFine } = require("../bot");
+const { jailUser } = require("../utilities");
+const { trackFine, client } = require("../bot");
 const { Types } = require("mongoose");
 
 router.post("/create", async (req, res) => {
@@ -46,8 +47,8 @@ router.post("/create", async (req, res) => {
     await civilian.save();
 
     if (jailTime && jailTime > 0) {
-      jailUser(civilian.discordId, jailTime, platform.toLowerCase());
-    }   
+      jailUser(client, civilian.discordId, jailTime, platform.toLowerCase());
+    }
 
     return res.json({ recordId: reportId });
   } catch (err) {

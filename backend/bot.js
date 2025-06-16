@@ -616,79 +616,7 @@ new SlashCommandBuilder()
   }
 })();
 
-function scheduleFineCheck(civilian, report, message, platform) {
-  setTimeout(async () => {
-    if (report.paid) return;
-
-    const updatedEmbed = EmbedBuilder.from(message.embeds[0])
-      .setFooter({ text: `Status: UNPAID` })
-      .setColor("Red");
-
-    await message.edit({ embeds: [updatedEmbed], components: [] });
-
-    const warrantEmbed = new EmbedBuilder()
-      .setTitle("🚨 Warrant Issued")
-      .setDescription(`**${civilian.firstName} ${civilian.lastName}** failed to pay a fine of **$${report.fine}**.`)
-      .setColor("Red")
-      .setTimestamp();
-
-    const channelId = warrantChannels[platform];
-    const channel = await client.channels.fetch(channelId);
-    await channel.send({ embeds: [warrantEmbed] });
-  }, 1000 * 60 * 60 * 24); // 24 hours
-}
-
-function jailUser(discordId, jailTime, platform) {
-  client.guilds.fetch(process.env[platform.toUpperCase() + "_GUILD_ID"]).then(async guild => {
-    const member = await guild.members.fetch(discordId);
-    const jailRoleId = jailRoles[platform];
-    await member.roles.add(jailRoleId);
-
-    const releaseTime = Date.now() + jailTime * 60000;
-    const interval = setInterval(async () => {
-      const remaining = Math.max(0, releaseTime - Date.now());
-      if (remaining <= 0) {
-        clearInterval(interval);
-        await member.roles.remove(jailRoleId);
-        const dmEmbed = new EmbedBuilder()
-          .setTitle("🔓 Released from Jail")
-          .setDescription(`You have completed your **${jailTime} minute** sentence.`)
-          .setColor("Green");
-        
-        return member.send({ embeds: [dmEmbed] });
-        return member.send({ embeds: [dmEmbed] }).catch(err => console.warn("Failed to DM member:", err));      }
-    }, 10000);
-
-    const dmEmbed = new EmbedBuilder()
-      .setTitle("⛓️ You Have Been Jailed")
-      .setDescription(`You were jailed for **${jailTime} minutes**.`)
-      .setFooter({ text: "You will be released automatically." })
-      .setColor("Orange");
-
-        return member.send({ embeds: [dmEmbed] });
-        return member.send({ embeds: [dmEmbed] }).catch(err => console.warn("Failed to DM member:", err));  });
-}
-function scheduleFineCheck(civilian, report, message, platform) {
-  setTimeout(async () => {
-    if (report.paid) return;
-
-    const updatedEmbed = EmbedBuilder.from(message.embeds[0])
-      .setFooter({ text: `Status: UNPAID` })
-      .setColor("Red");
-
-    await message.edit({ embeds: [updatedEmbed], components: [] });
-
-    const warrantEmbed = new EmbedBuilder()
-      .setTitle("🚨 Warrant Issued")
-      .setDescription(`**${civilian.firstName} ${civilian.lastName}** failed to pay a fine of **$${report.fine}**.`)
-      .setColor("Red")
-      .setTimestamp();
-
-    const channelId = warrantChannels[platform];
-    const channel = await client.channels.fetch(channelId);
-    await channel.send({ embeds: [warrantEmbed] });
-  }, 1000 * 60 * 60 * 24); // 24 hours
-}
+const { scheduleFineCheck, jailUser, sendDM } = require('./utilities');
 
 async function trackFine({ civilianId, reportId, messageId, channelId, platform }) {
   const Civilian = require("./models/Civilian");
@@ -702,9 +630,8 @@ async function trackFine({ civilianId, reportId, messageId, channelId, platform 
   const message = await channel.messages.fetch(messageId).catch(() => null);
   if (!message) return;
 
-  scheduleFineCheck(civilian, report, message, platform);
+  scheduleFineCheck(client, warrantChannels, civilian, report, message, platform);
 }
-module.exports.trackFine = trackFine;
 
 async function sendClockEmbed({ officer, discordId, type, duration }) {
   const user = await client.users.fetch(discordId);
@@ -722,11 +649,10 @@ async function sendClockEmbed({ officer, discordId, type, duration }) {
     .setColor(type === "in" ? 0x00ff00 : 0xff0000)
     .setTimestamp();
 
-  if (user) await user.send({ embeds: [embed] }).catch(() => null);
+  if (user) await sendDM(user, embed);
   if (logChannel) await logChannel.send({ embeds: [embed] });
 }
 
-module.exports.sendClockEmbed = sendClockEmbed;
 
 mongoose.connect(process.env.MONGO_URI).then(() => {
   console.log("✅ MongoDB connected");
@@ -736,4 +662,4 @@ mongoose.connect(process.env.MONGO_URI).then(() => {
 
 client.login(process.env.DISCORD_BOT_TOKEN);
 
-module.exports = { client, assignLicenseRole, sendBankApprovalEmbed, trackFine, jailUser };
+module.exports = { client, assignLicenseRole, sendBankApprovalEmbed, trackFine, sendClockEmbed };
