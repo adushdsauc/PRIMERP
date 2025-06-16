@@ -1,8 +1,10 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const logError = require('./logError');
 
 async function sendBankApprovalEmbed(client, civilianName, discordId, accountType, reason, accountId, accountNumber) {
-  const channel = await client.channels.fetch('1373043842340622436');
-  const embed = new EmbedBuilder()
+  try {
+    const channel = await client.channels.fetch('1373043842340622436');
+    const embed = new EmbedBuilder()
     .setTitle('📝 New Bank Account Request')
     .addFields(
       { name: 'Civilian Name', value: civilianName },
@@ -14,7 +16,7 @@ async function sendBankApprovalEmbed(client, civilianName, discordId, accountTyp
     .setColor('Orange')
     .setTimestamp();
 
-  const row = new ActionRowBuilder().addComponents(
+    const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId(`approve_bank_${accountId}`)
       .setLabel('Approve')
@@ -25,7 +27,12 @@ async function sendBankApprovalEmbed(client, civilianName, discordId, accountTyp
       .setStyle(ButtonStyle.Danger)
   );
 
-  await channel.send({ embeds: [embed], components: [row] });
+    await channel.send({ embeds: [embed], components: [row] });
+    return true;
+  } catch (err) {
+    logError('Send bank approval embed', err);
+    return false;
+  }
 }
 
 module.exports = sendBankApprovalEmbed;
