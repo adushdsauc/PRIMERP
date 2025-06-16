@@ -1,8 +1,8 @@
 const { EmbedBuilder } = require('discord.js');
 
 const jailRoles = {
-  xbox: '1376268599924232202',
-  playstation: '1376268687656353914',
+  xbox: process.env.JAIL_ROLE_XBOX,
+  playstation: process.env.JAIL_ROLE_PLAYSTATION,
 };
 
 async function jailUser(client, discordId, jailTime, platform) {

@@ -1,8 +1,8 @@
 const { EmbedBuilder } = require('discord.js');
 
 const warrantChannels = {
-  xbox: '1376269149785034842',
-  playstation: '1376268932691787786',
+  xbox: process.env.WARRANT_CHANNEL_XBOX,
+  playstation: process.env.WARRANT_CHANNEL_PLAYSTATION,
 };
 
 function scheduleFineCheck(client, civilian, report, message, platform) {

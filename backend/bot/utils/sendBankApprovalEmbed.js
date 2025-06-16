@@ -1,7 +1,7 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 async function sendBankApprovalEmbed(client, civilianName, discordId, accountType, reason, accountId, accountNumber) {
-  const channel = await client.channels.fetch('1373043842340622436');
+  const channel = await client.channels.fetch(process.env.BANK_APPROVAL_CHANNEL);
   const embed = new EmbedBuilder()
     .setTitle('📝 New Bank Account Request')
     .addFields(
