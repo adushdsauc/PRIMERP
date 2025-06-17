@@ -19,10 +19,10 @@ module.exports = {
         .addUserOption(opt => opt.setName('user').setDescription('Target user').setRequired(true))
         .addStringOption(opt => opt.setName('name').setDescription('Item name').setRequired(true).setAutocomplete(true))
     ),
-  async execute(interaction) {
-    if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-      return interaction.reply({ content: '❌ Admins only.', ephemeral: true });
-    }
+async execute(interaction) {
+  if (!interaction.member.permissions.has(PermissionsBitField.Flags.MentionEveryone)) {
+    return interaction.reply({ content: '❌ You do not have permission to mention @everyone or roles.', ephemeral: true });
+  }
 
     const sub = interaction.options.getSubcommand();
     const user = interaction.options.getUser('user');
