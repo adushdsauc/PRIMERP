@@ -5,7 +5,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('iteminfo')
     .setDescription('Get detailed information about a store item')
-    .addStringOption(opt => opt.setName('name').setDescription('Name of the item').setRequired(true)),
+    .addStringOption(opt => opt.setName('name').setDescription('Name of the item').setRequired(true).setAutocomplete(true)),
   async execute(interaction) {
     const name = interaction.options.getString('name');
     const item = await StoreItem.findOne({ name: new RegExp(`^${name}$`, 'i') });
@@ -27,5 +27,10 @@ module.exports = {
     if (item.image) embed.setImage(item.image);
 
     return interaction.reply({ embeds: [embed], ephemeral: true });
+  },
+  async autocomplete(interaction) {
+    const focused = interaction.options.getFocused();
+    const items = await StoreItem.find({ name: { $regex: focused, $options: 'i' } }).limit(25);
+    await interaction.respond(items.map(i => ({ name: i.name, value: i.name })));
   }
 };

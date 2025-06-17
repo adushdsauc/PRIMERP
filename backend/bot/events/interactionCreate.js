@@ -13,6 +13,17 @@ module.exports = {
       return handleModalSubmissions(interaction);
     }
 
+    if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
+      const command = interaction.client.commands.get(interaction.commandName);
+      if (!command || !command.autocomplete) return;
+      try {
+        await command.autocomplete(interaction);
+      } catch (err) {
+        console.error('Autocomplete error:', err);
+      }
+      return;
+    }
+
     if (!interaction.isChatInputCommand()) return;
     const command = interaction.client.commands.get(interaction.commandName);
     if (!command) return;
