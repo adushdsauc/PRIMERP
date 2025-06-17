@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType } = require('discord.js');
 const Inventory = require('../../models/Inventory');
 const Auction = require('../../models/Auction');
 const closeAuction = require('../utils/closeAuction');
@@ -34,13 +34,6 @@ module.exports = {
       endDate: new Date(Date.now() + 1000 * 60 * 60 * 48)
     });
 
-    const threadChannelId = process.env.EBAY_THREAD_CHANNEL;
-    const channel = await interaction.client.channels.fetch(threadChannelId);
-    const thread = await channel.threads.create({
-      name: `${interaction.user.username} - ${itemName}`,
-      autoArchiveDuration: 1440
-    });
-
     const embed = new EmbedBuilder()
       .setTitle('🛎️ New Auction')
       .addFields(
@@ -58,7 +51,24 @@ module.exports = {
       new ButtonBuilder().setCustomId(`buyout_${auction._id}`).setLabel('Buyout').setStyle(ButtonStyle.Success)
     );
 
-    const message = await thread.send({ embeds: [embed], components: [row] });
+    const threadChannelId = process.env.EBAY_THREAD_CHANNEL;
+    const channel = await interaction.client.channels.fetch(threadChannelId);
+    const threadOptions = {
+      name: `${interaction.user.username} - ${itemName}`,
+      autoArchiveDuration: 1440
+    };
+
+    let thread;
+    let message;
+    if (channel.type === ChannelType.GuildForum) {
+      threadOptions.message = { embeds: [embed], components: [row] };
+      thread = await channel.threads.create(threadOptions);
+      message = await thread.fetchStarterMessage();
+    } else {
+      thread = await channel.threads.create(threadOptions);
+      message = await thread.send({ embeds: [embed], components: [row] });
+    }
+
     auction.channelId = thread.id;
     auction.messageId = message.id;
     await auction.save();
