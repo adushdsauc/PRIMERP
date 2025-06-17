@@ -115,10 +115,6 @@ const [withdrawError, setWithdrawError] = useState("");
       return;
     }
   
-    if (walletBalance > 50000) {
-      setDepositError("You are carrying too much cash. Please open a bank account.");
-      return;
-    }
   
     try {
       await api.post("/api/bank/deposit", {
