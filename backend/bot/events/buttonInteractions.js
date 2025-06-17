@@ -130,6 +130,46 @@ module.exports = async function handleButtonInteractions(interaction) {
     await interaction.update({ embeds: [updatedEmbed], components: [] });
   }
 
+  if (customId.startsWith('bid_')) {
+    const auctionId = customId.split('bid_')[1];
+    const modal = new ModalBuilder()
+      .setCustomId(`bid_modal_${auctionId}`)
+      .setTitle('Place Bid')
+      .addComponents(
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder()
+            .setCustomId('bid_amount')
+            .setLabel('Bid Amount')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+        )
+      );
+    return interaction.showModal(modal);
+  }
+
+  if (customId.startsWith('buyout_')) {
+    const auctionId = customId.split('buyout_')[1];
+    const Auction = require('../../models/Auction');
+    const Wallet = require('../../models/Wallet');
+    const closeAuction = require('../utils/closeAuction');
+
+    const auction = await Auction.findById(auctionId);
+    if (!auction || auction.status !== 'open') {
+      return interaction.reply({ content: '❌ Auction is closed.', ephemeral: true });
+    }
+
+    const wallet = await Wallet.findOne({ discordId: interaction.user.id }) || await Wallet.create({ discordId: interaction.user.id });
+    if (wallet.balance < auction.buyoutPrice) {
+      return interaction.reply({ content: '❌ Insufficient funds for buyout.', ephemeral: true });
+    }
+
+    auction.highestBid = { amount: auction.buyoutPrice, bidderId: interaction.user.id };
+    await auction.save();
+    await closeAuction(interaction.client, auction._id);
+
+    return interaction.reply({ content: '✅ Buyout successful.', ephemeral: true });
+  }
+
   if (customId.startsWith('deny_bank_')) {
     const accountId = customId.split('deny_bank_')[1];
     const modal = new ModalBuilder()
