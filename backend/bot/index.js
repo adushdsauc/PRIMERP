@@ -46,6 +46,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 client.login(process.env.DISCORD_BOT_TOKEN);
 
+const scheduleInvestmentUpdates = require("./utils/updateInvestments");
 // Utils
 const assignLicenseRoleUtil = require('./utils/assignLicenseRole');
 const sendBankApprovalEmbedUtil = require('./utils/sendBankApprovalEmbed');
@@ -53,7 +54,8 @@ const trackFineUtil = require('./utils/trackFine');
 const jailUserUtil = require('./utils/jailUser');
 const formatStorePage = require('./utils/formatStorePage');
 const scheduleFineCheckUtil = require('./utils/scheduleFineCheck');
-const sendClockEmbedUtil = require('./utils/sendClockEmbed');
+const sendClockEmbedUtil = require("./utils/sendClockEmbed");
+scheduleInvestmentUpdates();
 
 module.exports = {
   client,
