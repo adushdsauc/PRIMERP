@@ -9,7 +9,7 @@ module.exports = {
     .setName('buy')
     .setDescription('Purchase an item from the store')
     .addStringOption(opt =>
-      opt.setName('name').setDescription('Name of the item to purchase').setRequired(true)
+      opt.setName('name').setDescription('Name of the item to purchase').setRequired(true).setAutocomplete(true)
     ),
   async execute(interaction) {
     const name = interaction.options.getString('name');
@@ -57,5 +57,10 @@ module.exports = {
     if (item.image) embed.setImage(item.image);
 
     return interaction.reply({ embeds: [embed], ephemeral: true });
+  },
+  async autocomplete(interaction) {
+    const focused = interaction.options.getFocused();
+    const items = await StoreItem.find({ name: { $regex: focused, $options: 'i' } }).limit(25);
+    await interaction.respond(items.map(i => ({ name: i.name, value: i.name })));
   }
 };
