@@ -1,3 +1,5 @@
+// Map of license types to Discord role IDs. Environment variables
+// can override these defaults if provided.
 const ROLE_MAP = {
   "Standard Driver's License":
     process.env.ROLE_DRIVER || "1372243631766896680",
@@ -10,15 +12,20 @@ const logError = require('./logError');
 
 async function assignLicenseRole(client, discordId, licenseType) {
   try {
-    const guildId = process.env.DISCORD_GUILD_ID;
-    if (!guildId) throw new Error('DISCORD_GUILD_ID env var not set');
-
-    let guild = client.guilds.cache.get(guildId);
-    if (!guild) guild = await client.guilds.fetch(guildId);
+    let guildId = process.env.DISCORD_GUILD_ID;
+    let guild;
+    if (guildId) {
+      guild = client.guilds.cache.get(guildId);
+      if (!guild) guild = await client.guilds.fetch(guildId);
+    } else {
+      // Fallback to the first guild the bot is in if no env var provided
+      console.warn('⚠️ DISCORD_GUILD_ID env var not set, using first available guild');
+      guild = client.guilds.cache.first();
+      guildId = guild?.id;
+    }
     if (!guild) throw new Error('Guild not found');
 
 
-    if (!guild) throw new Error('Guild not found');
     const member = await guild.members.fetch(discordId);
     if (!member) throw new Error(`Member ${discordId} not found`);
 
