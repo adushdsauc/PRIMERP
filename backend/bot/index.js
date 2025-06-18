@@ -53,7 +53,7 @@ const trackFineUtil = require('./utils/trackFine');
 const jailUserUtil = require('./utils/jailUser');
 const formatStorePage = require('./utils/formatStorePage');
 const scheduleFineCheckUtil = require('./utils/scheduleFineCheck');
-const sendClockEmbedUtil = require('./utils/sendClockEmbed');
+const sendClockEmbedUtil = require("./utils/sendClockEmbed");
 
 module.exports = {
   client,
