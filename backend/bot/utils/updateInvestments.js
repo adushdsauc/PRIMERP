@@ -1,16 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const InvestmentAsset = require('../../models/InvestmentAsset');
-<<<<<<< i98tjn-codex/fix-wallet-prompt-and-add-ebay-auction-command
 const { EmbedBuilder } = require('discord.js');
 const logError = require('./logError');
 
 async function updatePrices(client) {
-=======
-const logError = require('./logError');
-
-async function updatePrices() {
->>>>>>> main
   try {
     let assets = await InvestmentAsset.find();
     if (assets.length === 0) {
@@ -38,7 +32,6 @@ async function updatePrices() {
       asset.price = newPrice;
       await asset.save();
     }
-<<<<<<< i98tjn-codex/fix-wallet-prompt-and-add-ebay-auction-command
 
     if (client) {
       const channelId = process.env.MARKET_CHANNEL_ID || '1372730256032665731';
@@ -53,24 +46,15 @@ async function updatePrices() {
         await channel.send({ embeds: [embed] });
       }
     }
-=======
->>>>>>> main
   } catch (err) {
     logError('Update investment prices', err);
   }
 }
 
-<<<<<<< i98tjn-codex/fix-wallet-prompt-and-add-ebay-auction-command
 function scheduleInvestmentUpdates(client) {
   // run immediately and then every 12 hours
   updatePrices(client);
   setInterval(() => updatePrices(client), 1000 * 60 * 60 * 12);
-=======
-function scheduleInvestmentUpdates() {
-  // run immediately and then every 12 hours
-  updatePrices();
-  setInterval(updatePrices, 1000 * 60 * 60 * 12);
->>>>>>> main
 }
 
 module.exports = scheduleInvestmentUpdates;
