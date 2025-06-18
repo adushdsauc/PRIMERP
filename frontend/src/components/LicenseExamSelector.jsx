@@ -6,7 +6,6 @@ const LicenseExamSelector = ({ onSelect }) => {
     "Motorcycle License",
     "CDL Class A",
     "CDL Class B",
-    "CDL Class C",
   ];
 
   return (
