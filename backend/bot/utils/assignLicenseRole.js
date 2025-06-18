@@ -25,6 +25,7 @@ async function assignLicenseRole(client, discordId, licenseType) {
     }
     if (!guild) throw new Error('Guild not found');
 
+
     const member = await guild.members.fetch(discordId);
     if (!member) throw new Error(`Member ${discordId} not found`);
 
