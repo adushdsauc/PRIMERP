@@ -1,5 +1,3 @@
-// Map of license types to Discord role IDs. Environment variables
-// can override these defaults if provided.
 const ROLE_MAP = {
   "Standard Driver's License":
     process.env.ROLE_DRIVER || "1372243631766896680",
@@ -19,6 +17,8 @@ async function assignLicenseRole(client, discordId, licenseType) {
     if (!guild) guild = await client.guilds.fetch(guildId);
     if (!guild) throw new Error('Guild not found');
 
+
+    if (!guild) throw new Error('Guild not found');
     const member = await guild.members.fetch(discordId);
     if (!member) throw new Error(`Member ${discordId} not found`);
 
