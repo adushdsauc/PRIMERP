@@ -40,11 +40,11 @@ router.post("/save-test", ensureAuth, async (req, res) => {
 
     // Attempt to assign license role if passed
     if (passed) {
-      try {
-        await assignLicenseRole(user.discordId, licenseType);
+      const success = await assignLicenseRole(user.discordId, licenseType);
+      if (success) {
         console.log(`✅ Assigned ${licenseType} role to ${user.username}`);
-      } catch (roleErr) {
-        console.error("❌ Failed to assign license role:", roleErr);
+      } else {
+        console.error(`❌ Failed to assign ${licenseType} role to ${user.username}`);
       }
     }
 

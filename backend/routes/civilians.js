@@ -128,11 +128,17 @@ router.post("/:id/add-license", ensureAuth, async (req, res) => {
     const licenseType = req.body.license;
     const discordId = req.user?.discordId;
 
+    // Map license names to Discord role IDs. Allow environment variables to
+    // override the defaults.
     const LICENSE_ROLE_MAP = {
-      "Class C - Standard Drivers License": process.env.ROLE_DRIVER,
-      "Class M - Motorcycle License": process.env.ROLE_MOTORCYCLE,
-      "Class A - CDL Class A License": process.env.ROLE_CDL_A,
-      "Class B - CDL Class B License": process.env.ROLE_CDL_B,
+      "Class C - Standard Drivers License":
+        process.env.ROLE_DRIVER || "1372243631766896680",
+      "Class M - Motorcycle License":
+        process.env.ROLE_MOTORCYCLE || "1372243630613598258",
+      "Class A - CDL Class A License":
+        process.env.ROLE_CDL_A || "1370192296162885672",
+      "Class B - CDL Class B License":
+        process.env.ROLE_CDL_B || "1370192299195236352",
     };
 
     const requiredRoleId = LICENSE_ROLE_MAP[licenseType];
