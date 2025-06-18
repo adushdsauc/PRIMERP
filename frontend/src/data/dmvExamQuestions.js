@@ -208,58 +208,6 @@ export const DMV_EXAMS = {
         options: ["Only on hills", "Whenever parked", "Never", "When stopped in traffic"],
         answer: "Whenever parked"
       }
-    ],
-    "CDL Class C": [
-      {
-        question: "Class C license is for:",
-        options: ["Vehicles transporting 16+ passengers or hazmat", "Motorcycles", "Emergency vehicles", "Trailers"],
-        answer: "Vehicles transporting 16+ passengers or hazmat"
-      },
-      {
-        question: "When should you check mirrors?",
-        options: ["Only when parked", "Every 5-8 seconds", "Only before lane changes", "Only when reversing"],
-        answer: "Every 5-8 seconds"
-      },
-      {
-        question: "What is a blind spot?",
-        options: ["Partially blocked mirror", "Area not visible in mirrors", "Driver's side", "Passenger area"],
-        answer: "Area not visible in mirrors"
-      },
-      {
-        question: "Who is responsible for cargo securement?",
-        options: ["Warehouse staff", "Loader", "Driver", "Manager"],
-        answer: "Driver"
-      },
-      {
-        question: "What are reflective triangles used for?",
-        options: ["Decoration", "Visibility during breakdown", "Police signals", "Accident scene"],
-        answer: "Visibility during breakdown"
-      },
-      {
-        question: "How should you signal lane changes?",
-        options: ["Flash lights", "Turn signal, check mirrors, blind spot", "Honk", "Brake lights"],
-        answer: "Turn signal, check mirrors, blind spot"
-      },
-      {
-        question: "What’s the best way to handle distractions?",
-        options: ["Multitask", "Minimize them before driving", "Handle while moving", "Ignore"],
-        answer: "Minimize them before driving"
-      },
-      {
-        question: "When should you use low beams?",
-        options: ["Always", "In fog or snow", "Never", "Only at night"],
-        answer: "In fog or snow"
-      },
-      {
-        question: "Which vehicles require Class C CDL?",
-        options: ["All passenger cars", "Vehicles under 10,000 lbs", "Passenger vans with 16+ or hazmat", "Buses only"],
-        answer: "Passenger vans with 16+ or hazmat"
-      },
-      {
-        question: "What to do during a tire blowout?",
-        options: ["Brake hard", "Accelerate", "Grip wheel and steer straight", "Swerve left"],
-        answer: "Grip wheel and steer straight"
-      }
     ]
   };
   
