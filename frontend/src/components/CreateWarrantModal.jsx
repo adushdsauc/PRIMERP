@@ -26,9 +26,9 @@ export default function CreateWarrantModal({ onClose, onSuccess }) {
         const session = await api.get("/api/auth/me");
         const officerRes = await api.get(`/api/officers/${session.data.discordId}`);
         const civRes = await api.get("/api/civilians/all");
-  
+
         setOfficer(officerRes.data);
-        setCivilians(civRes.data);
+        setCivilians(civRes.data.civilians);
       } catch (err) {
         console.error("❌ Init error:", err);
         console.trace();
@@ -43,14 +43,20 @@ export default function CreateWarrantModal({ onClose, onSuccess }) {
   }, []);  
 
   useEffect(() => {
+    const q = query.toLowerCase();
     setFilteredCivilians(
-      query === ""
+      q === ""
         ? civilians
-        : civilians.filter((civ) =>
-            `${civ.firstName} ${civ.lastName}`
-              .toLowerCase()
-              .includes(query.toLowerCase())
-          )
+        : civilians.filter((civ) => {
+            const first = civ.firstName?.toLowerCase() || "";
+            const last = civ.lastName?.toLowerCase() || "";
+            const full = `${first} ${last}`;
+            return (
+              first.includes(q) ||
+              last.includes(q) ||
+              full.includes(q)
+            );
+          })
     );
   }, [query, civilians]);
 
