@@ -1,6 +1,7 @@
 // Search Database UI (finalized layout with full civilian info toggle and full detail sections)
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect, Fragment } from "react";
+import api from "../../utils/axios";
+import { Combobox, Transition } from "@headlessui/react";
 import CreateReportModal from "../../components/CreateReportModal";
 
 export default function SearchDatabase() {
@@ -13,6 +14,65 @@ export default function SearchDatabase() {
   const [searchType, setSearchType] = useState(null);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showFullCivilian, setShowFullCivilian] = useState(false);
+  const [civilians, setCivilians] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [weapons, setWeapons] = useState([]);
+  const [filteredCivilians, setFilteredCivilians] = useState([]);
+  const [filteredVehicles, setFilteredVehicles] = useState([]);
+  const [filteredWeapons, setFilteredWeapons] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const civRes = await api.get("/api/civilians/all");
+        const vehRes = await api.get("/api/vehicles/all");
+        const weapRes = await api.get("/api/weapons/all");
+        setCivilians(civRes.data.civilians || []);
+        setVehicles(vehRes.data.vehicles || []);
+        setWeapons(weapRes.data.weapons || []);
+      } catch (err) {
+        console.error("Failed to load dropdown data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const q = nameQuery.toLowerCase();
+    setFilteredCivilians(
+      q === ""
+        ? civilians
+        : civilians.filter((c) => {
+            const first = c.firstName?.toLowerCase() || "";
+            const last = c.lastName?.toLowerCase() || "";
+            const full = `${first} ${last}`;
+            return first.includes(q) || last.includes(q) || full.includes(q);
+          })
+    );
+  }, [nameQuery, civilians]);
+
+  useEffect(() => {
+    const q = plateQuery.toLowerCase();
+    setFilteredVehicles(
+      q === ""
+        ? vehicles
+        : vehicles.filter((v) => v.plate.toLowerCase().includes(q))
+    );
+  }, [plateQuery, vehicles]);
+
+  useEffect(() => {
+    const q = weaponQuery.toLowerCase();
+    setFilteredWeapons(
+      q === ""
+        ? weapons
+        : weapons.filter(
+            (w) =>
+              w.serialNumber.toLowerCase().includes(q) ||
+              w.weaponType.toLowerCase().includes(q)
+          )
+    );
+  }, [weaponQuery, weapons]);
 
   const handleSearch = async () => {
     try {
@@ -22,7 +82,7 @@ export default function SearchDatabase() {
       setSearchType(null);
       setShowFullCivilian(false);
 
-      const res = await axios.get("/api/search", {
+      const res = await api.get("/api/search", {
         params: { name: nameQuery, plate: plateQuery, weapon: weaponQuery },
       });
 
@@ -52,33 +112,102 @@ export default function SearchDatabase() {
       <div className="flex justify-center space-x-4 mb-6">
         <div className="flex flex-col">
           <label className="text-purple-400 font-semibold mb-1">Name Search</label>
-          <input
-            type="text"
-            placeholder="Search Name or SSN"
-            value={nameQuery}
-            onChange={(e) => setNameQuery(e.target.value)}
-            className="bg-gray-800 text-white px-4 py-2 rounded-md"
-          />
+          <Combobox value={nameQuery} onChange={setNameQuery}>
+            <div className="relative">
+              <Combobox.Input
+                className="bg-gray-800 text-white px-4 py-2 rounded-md w-56"
+                displayValue={(val) => val}
+                onChange={(e) => setNameQuery(e.target.value)}
+                placeholder="Search Name"
+              />
+              <Transition
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Combobox.Options className="absolute z-10 mt-1 bg-gray-800 border border-gray-700 rounded w-full max-h-60 overflow-auto">
+                  {filteredCivilians.map((civ) => (
+                    <Combobox.Option
+                      key={civ._id}
+                      value={`${civ.firstName} ${civ.lastName}`}
+                      className={({ active }) =>
+                        `cursor-pointer p-2 text-sm ${active ? "bg-gray-700" : ""}`
+                      }
+                    >
+                      {civ.firstName} {civ.lastName}
+                    </Combobox.Option>
+                  ))}
+                </Combobox.Options>
+              </Transition>
+            </div>
+          </Combobox>
         </div>
         <div className="flex flex-col">
           <label className="text-green-400 font-semibold mb-1">Plate Search</label>
-          <input
-            type="text"
-            placeholder="Search Plate or VIN"
-            value={plateQuery}
-            onChange={(e) => setPlateQuery(e.target.value)}
-            className="bg-gray-800 text-white px-4 py-2 rounded-md"
-          />
+          <Combobox value={plateQuery} onChange={setPlateQuery}>
+            <div className="relative">
+              <Combobox.Input
+                className="bg-gray-800 text-white px-4 py-2 rounded-md w-56"
+                displayValue={(val) => val}
+                onChange={(e) => setPlateQuery(e.target.value)}
+                placeholder="Search Plate"
+              />
+              <Transition
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Combobox.Options className="absolute z-10 mt-1 bg-gray-800 border border-gray-700 rounded w-full max-h-60 overflow-auto">
+                  {filteredVehicles.map((v) => (
+                    <Combobox.Option
+                      key={v._id}
+                      value={v.plate}
+                      className={({ active }) =>
+                        `cursor-pointer p-2 text-sm ${active ? "bg-gray-700" : ""}`
+                      }
+                    >
+                      {v.plate.toUpperCase()} - {v.make} {v.model}
+                    </Combobox.Option>
+                  ))}
+                </Combobox.Options>
+              </Transition>
+            </div>
+          </Combobox>
         </div>
         <div className="flex flex-col">
           <label className="text-yellow-400 font-semibold mb-1">Weapon Search</label>
-          <input
-            type="text"
-            placeholder="Search Name or Serial"
-            value={weaponQuery}
-            onChange={(e) => setWeaponQuery(e.target.value)}
-            className="bg-gray-800 text-white px-4 py-2 rounded-md"
-          />
+          <Combobox value={weaponQuery} onChange={setWeaponQuery}>
+            <div className="relative">
+              <Combobox.Input
+                className="bg-gray-800 text-white px-4 py-2 rounded-md w-56"
+                displayValue={(val) => val}
+                onChange={(e) => setWeaponQuery(e.target.value)}
+                placeholder="Search Weapon"
+              />
+              <Transition
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Combobox.Options className="absolute z-10 mt-1 bg-gray-800 border border-gray-700 rounded w-full max-h-60 overflow-auto">
+                  {filteredWeapons.map((w) => (
+                    <Combobox.Option
+                      key={w._id}
+                      value={w.serialNumber}
+                      className={({ active }) =>
+                        `cursor-pointer p-2 text-sm ${active ? "bg-gray-700" : ""}`
+                      }
+                    >
+                      {w.serialNumber} - {w.weaponType}
+                    </Combobox.Option>
+                  ))}
+                </Combobox.Options>
+              </Transition>
+            </div>
+          </Combobox>
         </div>
         <button
           onClick={handleSearch}
