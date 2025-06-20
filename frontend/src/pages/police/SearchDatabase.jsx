@@ -1,6 +1,7 @@
 // Search Database UI (finalized layout with full civilian info toggle and full detail sections)
 import React, { useState, useEffect, Fragment } from "react";
-import axios from "axios";
+import api from "../../utils/axios";
+
 import { Combobox, Transition } from "@headlessui/react";
 import CreateReportModal from "../../components/CreateReportModal";
 
@@ -24,9 +25,10 @@ export default function SearchDatabase() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const civRes = await axios.get("/api/civilians/all");
-        const vehRes = await axios.get("/api/vehicles/all");
-        const weapRes = await axios.get("/api/weapons/all");
+        const civRes = await api.get("/api/civilians/all");
+        const vehRes = await api.get("/api/vehicles/all");
+        const weapRes = await api.get("/api/weapons/all");
+
         setCivilians(civRes.data.civilians || []);
         setVehicles(vehRes.data.vehicles || []);
         setWeapons(weapRes.data.weapons || []);
@@ -82,7 +84,7 @@ export default function SearchDatabase() {
       setSearchType(null);
       setShowFullCivilian(false);
 
-      const res = await axios.get("/api/search", {
+      const res = await api.get("/api/search", {
         params: { name: nameQuery, plate: plateQuery, weapon: weaponQuery },
       });
 
