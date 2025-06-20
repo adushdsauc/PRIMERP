@@ -12,14 +12,27 @@ router.get("/", async (req, res) => {
 
     // 🔍 Name-based search
     if (name) {
-      const regex = new RegExp(name, "i");
-      civilian = await Civilian.findOne({
-        $or: [
-          { firstName: regex },
-          { lastName: regex },
-          { knownAliases: regex },
-        ],
-      }).lean();
+      const trimmed = name.trim();
+      if (trimmed.includes(" ")) {
+        const parts = trimmed.split(/\s+/);
+        const first = parts.shift();
+        const last = parts.join(" ");
+        civilian = await Civilian.findOne({
+          firstName: new RegExp(first, "i"),
+          lastName: new RegExp(last, "i"),
+        }).lean();
+      }
+
+      if (!civilian) {
+        const regex = new RegExp(trimmed, "i");
+        civilian = await Civilian.findOne({
+          $or: [
+            { firstName: regex },
+            { lastName: regex },
+            { knownAliases: regex },
+          ],
+        }).lean();
+      }
 
       if (!civilian) return res.status(404).json({ error: "Civilian not found." });
     }
