@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Weapon = require("../models/Weapon");
+const { ensureAuth } = require("../middleware/auth");
 
 // POST /api/weapons/register
 router.post("/register", async (req, res) => {
@@ -36,6 +37,29 @@ router.get("/by-civilian/:id", async (req, res) => {
   } catch (err) {
     console.error("Error fetching weapons by civilian ID:", err);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// GET /api/weapons/all - for search dropdowns
+router.get("/all", ensureAuth, async (req, res) => {
+  try {
+    const weapons = await Weapon.find({}).populate(
+      "civilianId",
+      "firstName lastName"
+    );
+    const formatted = weapons.map((w) => ({
+      _id: w._id,
+      weaponType: w.weaponType,
+      serialNumber: w.serialNumber,
+      registeredName: w.registeredName,
+      civilianName: w.civilianId
+        ? `${w.civilianId.firstName} ${w.civilianId.lastName}`
+        : "Unknown",
+    }));
+    res.json({ success: true, weapons: formatted });
+  } catch (err) {
+    console.error("❌ Fetch all weapons error:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch weapons" });
   }
 });
 
