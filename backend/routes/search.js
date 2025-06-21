@@ -8,24 +8,24 @@ router.get("/", async (req, res) => {
   const { name, plate, weapon } = req.query;
 
   try {
-    let civilian = null;
-
     // 🔍 Name-based search
     if (name) {
       const trimmed = name.trim();
+      let civilians = [];
+
       if (trimmed.includes(" ")) {
         const parts = trimmed.split(/\s+/);
         const first = parts.shift();
         const last = parts.join(" ");
-        civilian = await Civilian.findOne({
+        civilians = await Civilian.find({
           firstName: new RegExp(first, "i"),
           lastName: new RegExp(last, "i"),
         }).lean();
       }
 
-      if (!civilian) {
+      if (civilians.length === 0) {
         const regex = new RegExp(trimmed, "i");
-        civilian = await Civilian.findOne({
+        civilians = await Civilian.find({
           $or: [
             { firstName: regex },
             { lastName: regex },
@@ -34,49 +34,62 @@ router.get("/", async (req, res) => {
         }).lean();
       }
 
-      if (!civilian) return res.status(404).json({ error: "Civilian not found." });
+      if (civilians.length === 0) {
+        return res.status(404).json({ error: "Civilian not found." });
+      }
+
+      const results = await Promise.all(
+        civilians.map(async (civ) => {
+          const vehicles = await Vehicle.find({ civilianId: civ._id }).lean();
+          const weapons = await Weapon.find({ civilianId: civ._id }).lean();
+          return { ...civ, vehicles, weapons };
+        })
+      );
+
+      return res.json({ civilians: results });
     }
 
     // 🚗 Plate-based search
     if (plate) {
-      const vehicle = await Vehicle.findOne({ plate: new RegExp(`^${plate}$`, "i") }).lean();
-      if (!vehicle) return res.status(404).json({ error: "Vehicle not found." });
+      const vehicles = await Vehicle.find({
+        plate: new RegExp(`^${plate}$`, "i"),
+      }).lean();
 
-      civilian = await Civilian.findById(vehicle.civilianId).lean();
-      if (!civilian) return res.status(404).json({ error: "Owner not found." });
+      if (vehicles.length === 0) {
+        return res.status(404).json({ error: "Vehicle not found." });
+      }
 
-      const vehicles = await Vehicle.find({ civilianId: civilian._id }).lean();
-      const weapons = await Weapon.find({ civilianId: civilian._id }).lean();
+      const results = await Promise.all(
+        vehicles.map(async (vehicle) => {
+          const civilian = await Civilian.findById(vehicle.civilianId).lean();
+          return { vehicle, civilian };
+        })
+      );
 
-      return res.json({ vehicle, civilian: { ...civilian, vehicles, weapons } });
+      return res.json({ vehicles: results });
     }
 
     // 🔫 Weapon-based search
     if (weapon) {
-      const foundWeapon = await Weapon.findOne({
+      const weapons = await Weapon.find({
         $or: [
           { serialNumber: new RegExp(weapon, "i") },
           { weaponType: new RegExp(weapon, "i") },
         ],
       }).lean();
 
-      if (!foundWeapon) return res.status(404).json({ error: "Weapon not found." });
+      if (weapons.length === 0) {
+        return res.status(404).json({ error: "Weapon not found." });
+      }
 
-      civilian = await Civilian.findById(foundWeapon.civilianId).lean();
-      if (!civilian) return res.status(404).json({ error: "Owner not found." });
+      const results = await Promise.all(
+        weapons.map(async (weaponDoc) => {
+          const civilian = await Civilian.findById(weaponDoc.civilianId).lean();
+          return { weapon: weaponDoc, civilian };
+        })
+      );
 
-      const vehicles = await Vehicle.find({ civilianId: civilian._id }).lean();
-      const weapons = await Weapon.find({ civilianId: civilian._id }).lean();
-
-      return res.json({ weapon: foundWeapon, civilian: { ...civilian, vehicles, weapons } });
-    }
-
-    // Only do this if name-based search succeeded
-    if (civilian) {
-      const vehicles = await Vehicle.find({ civilianId: civilian._id }).lean();
-      const weapons = await Weapon.find({ civilianId: civilian._id }).lean();
-
-      return res.json({ ...civilian, vehicles, weapons });
+      return res.json({ weapons: results });
     }
 
     return res.status(400).json({ error: "No valid search query." });
