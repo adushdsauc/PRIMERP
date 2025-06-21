@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CreateReportModal from "../../components/CreateReportModal";
 
+
 export default function SearchDatabase() {
   const [nameQuery, setNameQuery] = useState("");
   const [plateQuery, setPlateQuery] = useState("");
@@ -19,6 +20,7 @@ export default function SearchDatabase() {
       setCivilian(null);
       setVehicleResult(null);
       setWeaponResult(null);
+
       setSearchType(null);
       setShowFullCivilian(false);
 
@@ -42,12 +44,33 @@ export default function SearchDatabase() {
       
     } catch (err) {
       console.error("Search failed:", err);
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        setSearchError("You do not have permission to access the requested resource.");
+      } else {
+        setSearchError(err.response?.data?.message || "Search failed. Please try again later.");
+      }
+
     }
   };
 
   return (
     <div className="p-6">
       <h2 className="text-3xl font-bold text-white mb-6 text-center">Search Database</h2>
+      {dropdownError && (
+        <div className="text-center mb-4">
+          <p className="text-red-500">{dropdownError}</p>
+          <button
+            onClick={fetchDropdownData}
+            className="text-indigo-400 underline mt-2"
+          >
+            Retry
+          </button>
+        </div>
+
+      )}
+      {searchError && (
+        <p className="text-red-500 text-center mb-4">{searchError}</p>
+      )}
 
       <div className="flex justify-center space-x-4 mb-6">
         <div className="flex flex-col">
