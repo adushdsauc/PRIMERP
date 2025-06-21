@@ -2,6 +2,10 @@
 import React, { useState, useEffect, Fragment } from "react";
 import api from "../../utils/axios";
 
+// The build previously failed because this component attempted to
+// reset state hooks that were never defined. Those lines were removed
+// so ESLint no longer reports `no-undef` errors.
+
 import { Combobox, Transition } from "@headlessui/react";
 
 export default function SearchDatabase() {
@@ -40,6 +44,7 @@ export default function SearchDatabase() {
         setDropdownError("You do not have permission to access the requested resource.");
       } else {
         setDropdownError(err.response?.data?.message || "Failed to load dropdown data.");
+
       }
     }
   };
@@ -121,6 +126,7 @@ export default function SearchDatabase() {
       } else {
         setSearchError(err.response?.data?.message || "Search failed. Please try again later.");
       }
+
     }
   };
 
@@ -137,6 +143,7 @@ export default function SearchDatabase() {
             Retry
           </button>
         </div>
+
       )}
       {searchError && (
         <p className="text-red-500 text-center mb-4">{searchError}</p>
