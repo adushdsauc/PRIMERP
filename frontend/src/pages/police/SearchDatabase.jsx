@@ -1,6 +1,7 @@
 // Search Database UI (finalized layout with full civilian info toggle and full detail sections)
 import React, { useState, useEffect, Fragment } from "react";
 import api from "../../utils/axios";
+
 import { Combobox, Transition } from "@headlessui/react";
 import CreateReportModal from "../../components/CreateReportModal";
 
@@ -32,6 +33,7 @@ export default function SearchDatabase() {
         const civRes = await api.get("/api/civilians/all");
         const vehRes = await api.get("/api/vehicles/all");
         const weapRes = await api.get("/api/weapons/all");
+
         setCivilians(civRes.data.civilians || []);
         setVehicles(vehRes.data.vehicles || []);
         setWeapons(weapRes.data.weapons || []);
@@ -45,6 +47,7 @@ export default function SearchDatabase() {
 
   useEffect(() => {
     const q = nameInput.toLowerCase();
+
     setFilteredCivilians(
       q === ""
         ? civilians
@@ -59,6 +62,7 @@ export default function SearchDatabase() {
 
   useEffect(() => {
     const q = plateInput.toLowerCase();
+
     setFilteredVehicles(
       q === ""
         ? vehicles
@@ -68,6 +72,7 @@ export default function SearchDatabase() {
 
   useEffect(() => {
     const q = weaponInput.toLowerCase();
+
     setFilteredWeapons(
       q === ""
         ? weapons
@@ -78,6 +83,7 @@ export default function SearchDatabase() {
           )
     );
   }, [weaponInput, weapons]);
+
 
   const handleSearch = async () => {
     try {
@@ -93,6 +99,7 @@ export default function SearchDatabase() {
           plate: plateQuery || plateInput,
           weapon: weaponQuery || weaponInput,
         },
+
       });
 
       if (plateQuery) {
@@ -131,6 +138,7 @@ export default function SearchDatabase() {
               <Combobox.Input
                 className="bg-gray-800 text-white px-4 py-2 rounded-md w-56"
                 onChange={(e) => setNameInput(e.target.value)}
+
                 placeholder="Search Name"
               />
               <Transition
@@ -139,6 +147,7 @@ export default function SearchDatabase() {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
                 afterLeave={() => setNameInput("")}
+
               >
                 <Combobox.Options className="absolute z-10 mt-1 bg-gray-800 border border-gray-700 rounded w-full max-h-60 overflow-auto">
                   {filteredCivilians.map((civ) => (
@@ -169,6 +178,7 @@ export default function SearchDatabase() {
               <Combobox.Input
                 className="bg-gray-800 text-white px-4 py-2 rounded-md w-56"
                 onChange={(e) => setPlateInput(e.target.value)}
+
                 placeholder="Search Plate"
               />
               <Transition
@@ -177,6 +187,7 @@ export default function SearchDatabase() {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
                 afterLeave={() => setPlateInput("")}
+
               >
                 <Combobox.Options className="absolute z-10 mt-1 bg-gray-800 border border-gray-700 rounded w-full max-h-60 overflow-auto">
                   {filteredVehicles.map((v) => (
@@ -207,6 +218,7 @@ export default function SearchDatabase() {
               <Combobox.Input
                 className="bg-gray-800 text-white px-4 py-2 rounded-md w-56"
                 onChange={(e) => setWeaponInput(e.target.value)}
+
                 placeholder="Search Weapon"
               />
               <Transition
@@ -215,6 +227,7 @@ export default function SearchDatabase() {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
                 afterLeave={() => setWeaponInput("")}
+
               >
                 <Combobox.Options className="absolute z-10 mt-1 bg-gray-800 border border-gray-700 rounded w-full max-h-60 overflow-auto">
                   {filteredWeapons.map((w) => (
