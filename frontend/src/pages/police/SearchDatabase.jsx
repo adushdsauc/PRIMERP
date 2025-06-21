@@ -4,8 +4,8 @@ import api from "../../utils/axios";
 import { Combobox, Transition } from "@headlessui/react";
 import CreateReportModal from "../../components/CreateReportModal";
 
+
 export default function SearchDatabase() {
-  // Selected search values
   const [nameQuery, setNameQuery] = useState("");
   const [plateQuery, setPlateQuery] = useState("");
   const [weaponQuery, setWeaponQuery] = useState("");
@@ -13,6 +13,7 @@ export default function SearchDatabase() {
   const [nameInput, setNameInput] = useState("");
   const [plateInput, setPlateInput] = useState("");
   const [weaponInput, setWeaponInput] = useState("");
+
   const [civilian, setCivilian] = useState(null);
   const [vehicleResult, setVehicleResult] = useState(null);
   const [weaponResult, setWeaponResult] = useState(null);
@@ -79,6 +80,7 @@ export default function SearchDatabase() {
     );
   }, [weaponInput, weapons]);
 
+
   const handleSearch = async () => {
     try {
       setCivilian(null);
@@ -93,9 +95,10 @@ export default function SearchDatabase() {
           plate: plateQuery || plateInput,
           weapon: weaponQuery || weaponInput,
         },
+
       });
 
-      if (plateQuery || plateInput) {
+      if (plateQuery) {
         setSearchType("plate");
         setVehicleResult(res.data.vehicle);
         setCivilian(res.data.civilian || null);
@@ -104,6 +107,7 @@ export default function SearchDatabase() {
         setWeaponResult(res.data.weapon);
         setCivilian(res.data.civilian || null);
       } else if (nameQuery || nameInput) {
+
         setSearchType("name");
         setCivilian(res.data);
         setShowFullCivilian(true);
@@ -111,17 +115,40 @@ export default function SearchDatabase() {
       
     } catch (err) {
       console.error("Search failed:", err);
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        setSearchError("You do not have permission to access the requested resource.");
+      } else {
+        setSearchError(err.response?.data?.message || "Search failed. Please try again later.");
+      }
+
     }
   };
 
   return (
     <div className="p-6">
       <h2 className="text-3xl font-bold text-white mb-6 text-center">Search Database</h2>
+      {dropdownError && (
+        <div className="text-center mb-4">
+          <p className="text-red-500">{dropdownError}</p>
+          <button
+            onClick={fetchDropdownData}
+            className="text-indigo-400 underline mt-2"
+          >
+            Retry
+          </button>
+        </div>
+
+      )}
+      {searchError && (
+        <p className="text-red-500 text-center mb-4">{searchError}</p>
+      )}
 
       <div className="flex justify-center space-x-4 mb-6">
         <div className="flex flex-col">
           <label className="text-purple-400 font-semibold mb-1">Name Search</label>
-          <Combobox
+          <input
+            type="text"
+            placeholder="Search Name or SSN"
             value={nameQuery}
             onChange={(val) => {
               setNameQuery(val);
@@ -156,10 +183,13 @@ export default function SearchDatabase() {
               </Transition>
             </div>
           </Combobox>
+
         </div>
         <div className="flex flex-col">
           <label className="text-green-400 font-semibold mb-1">Plate Search</label>
-          <Combobox
+          <input
+            type="text"
+            placeholder="Search Plate or VIN"
             value={plateQuery}
             onChange={(val) => {
               setPlateQuery(val);
@@ -194,10 +224,13 @@ export default function SearchDatabase() {
               </Transition>
             </div>
           </Combobox>
+
         </div>
         <div className="flex flex-col">
           <label className="text-yellow-400 font-semibold mb-1">Weapon Search</label>
-          <Combobox
+          <input
+            type="text"
+            placeholder="Search Name or Serial"
             value={weaponQuery}
             onChange={(val) => {
               setWeaponQuery(val);
@@ -232,6 +265,7 @@ export default function SearchDatabase() {
               </Transition>
             </div>
           </Combobox>
+
         </div>
         <button
           onClick={handleSearch}
@@ -288,6 +322,7 @@ export default function SearchDatabase() {
               <p className="text-white">Occupation: {civilian.occupation}</p>
             </div>
 
+
             <div className="flex flex-col gap-6">
               <div className="bg-gray-900 p-4 rounded-md h-full">
                 <h4 className="text-white font-semibold mb-2">Medical Information</h4>
@@ -311,6 +346,7 @@ export default function SearchDatabase() {
                 </ul>
               ) : <p className="text-white">No licenses found.</p>}
             </div>
+
 
             <div className="bg-gray-900 p-4 rounded-md">
               <h4 className="text-white font-semibold mb-2">Public Safety Tools</h4>
