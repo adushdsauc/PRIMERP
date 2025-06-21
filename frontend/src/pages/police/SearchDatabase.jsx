@@ -102,15 +102,15 @@ export default function SearchDatabase() {
 
       });
 
-      if (plateQuery) {
+      if (plateQuery || plateInput) {
         setSearchType("plate");
         setVehicleResult(res.data.vehicle);
         setCivilian(res.data.civilian || null);
-      } else if (weaponQuery) {
+      } else if (weaponQuery || weaponInput) {
         setSearchType("weapon");
         setWeaponResult(res.data.weapon);
         setCivilian(res.data.civilian || null);
-      } else if (nameQuery) {
+      } else if (nameQuery || nameInput) {
         setSearchType("name");
         setCivilian(res.data);
         setShowFullCivilian(true);

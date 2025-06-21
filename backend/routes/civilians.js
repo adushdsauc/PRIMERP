@@ -5,7 +5,7 @@ const Civilian = mongoose.models.Civilian || require("../models/Civilian");
 const { ensureAuth } = require("../middleware/auth");
 
 // GET all civilians (admin/staff access)
-router.get("/all", ensureAuth, async (req, res) => {
+router.get("/all", async (req, res) => {
   try {
     const civilians = await Civilian.find({});
     res.json({ success: true, civilians });

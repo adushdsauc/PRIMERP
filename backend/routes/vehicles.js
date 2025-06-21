@@ -67,7 +67,9 @@ router.get("/by-civilian/:id", async (req, res) => {
 });
 
 // GET /api/vehicles/all - for search dropdowns
-router.get("/all", ensureAuth, async (req, res) => {
+router.get("/all", async (req, res) => {
+
+
   try {
     const vehicles = await Vehicle.find({}).populate(
       "civilianId",
