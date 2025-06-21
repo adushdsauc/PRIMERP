@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
+import { defaultBaseURL } from "../utils/axios";
 
 const LoginGate = () => {
   const { discordId, loading } = useUser();
@@ -13,8 +14,7 @@ const LoginGate = () => {
   }, [discordId, loading, navigate]);
 
   const handleLogin = () => {
-    const baseUrl =
-      process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
+    const baseUrl = process.env.REACT_APP_API_BASE_URL || defaultBaseURL;
     try {
       window.location.href = `${baseUrl}/auth/discord`;
     } catch (err) {
