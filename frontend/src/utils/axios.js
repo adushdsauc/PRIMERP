@@ -10,6 +10,7 @@ export const defaultBaseURL = /^localhost$|^127\./.test(window.location.hostname
   ? "http://localhost:8080"
   : "https://api.primerpcad.com";
 
+
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL || defaultBaseURL,
   withCredentials: true,
