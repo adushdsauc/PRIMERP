@@ -41,7 +41,12 @@ export default function SearchDatabase() {
         setWeapons(weapRes.data.weapons || []);
       } catch (err) {
         console.error("Failed to load dropdown data:", err);
-        setDropdownError("Failed to load dropdown data.");
+        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+          setDropdownError("You do not have permission to access the requested resource.");
+        } else {
+          setDropdownError("Failed to load dropdown data.");
+        }
+
       }
     };
 
@@ -116,7 +121,12 @@ export default function SearchDatabase() {
       
     } catch (err) {
       console.error("Search failed:", err);
-      setSearchError("Search failed. Please try again later.");
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        setSearchError("You do not have permission to access the requested resource.");
+      } else {
+        setSearchError("Search failed. Please try again later.");
+      }
+
     }
   };
 
