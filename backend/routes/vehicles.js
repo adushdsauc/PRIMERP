@@ -3,6 +3,7 @@ const router = express.Router();
 const Vehicle = require("../models/Vehicle");
 const mongoose = require("mongoose");
 const Civilian = mongoose.models.Civilian || require("../models/Civilian");
+const { ensureAuth } = require("../middleware/auth");
 
 // POST /api/vehicles/register
 router.post("/register", async (req, res) => {
@@ -62,6 +63,31 @@ router.get("/by-civilian/:id", async (req, res) => {
   } catch (err) {
     console.error("Vehicle fetch error:", err);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// GET /api/vehicles/all - for search dropdowns
+router.get("/all", async (req, res) => {
+  try {
+    const vehicles = await Vehicle.find({}).populate(
+      "civilianId",
+      "firstName lastName"
+    );
+    const formatted = vehicles.map((v) => ({
+      _id: v._id,
+      plate: v.plate,
+      make: v.make,
+      model: v.model,
+      color: v.color,
+      year: v.year,
+      civilianName: v.civilianId
+        ? `${v.civilianId.firstName} ${v.civilianId.lastName}`
+        : "Unknown",
+    }));
+    res.json({ success: true, vehicles: formatted });
+  } catch (err) {
+    console.error("❌ Fetch all vehicles error:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch vehicles" });
   }
 });
 
