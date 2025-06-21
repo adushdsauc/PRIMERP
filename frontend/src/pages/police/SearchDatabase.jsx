@@ -25,10 +25,13 @@ export default function SearchDatabase() {
   const [filteredCivilians, setFilteredCivilians] = useState([]);
   const [filteredVehicles, setFilteredVehicles] = useState([]);
   const [filteredWeapons, setFilteredWeapons] = useState([]);
+  const [dropdownError, setDropdownError] = useState(null);
+  const [searchError, setSearchError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setDropdownError(null);
         const civRes = await api.get("/api/civilians/all");
         const vehRes = await api.get("/api/vehicles/all");
         const weapRes = await api.get("/api/weapons/all");
@@ -38,6 +41,7 @@ export default function SearchDatabase() {
         setWeapons(weapRes.data.weapons || []);
       } catch (err) {
         console.error("Failed to load dropdown data:", err);
+        setDropdownError("Failed to load dropdown data.");
       }
     };
 
@@ -86,6 +90,7 @@ export default function SearchDatabase() {
 
   const handleSearch = async () => {
     try {
+      setSearchError(null);
       setSearchType(null);
       setResults([]);
 
@@ -111,12 +116,19 @@ export default function SearchDatabase() {
       
     } catch (err) {
       console.error("Search failed:", err);
+      setSearchError("Search failed. Please try again later.");
     }
   };
 
   return (
     <div className="p-6">
       <h2 className="text-3xl font-bold text-white mb-6 text-center">Search Database</h2>
+      {dropdownError && (
+        <p className="text-red-500 text-center mb-4">{dropdownError}</p>
+      )}
+      {searchError && (
+        <p className="text-red-500 text-center mb-4">{searchError}</p>
+      )}
 
       <div className="flex justify-center space-x-4 mb-6">
         <div className="flex flex-col">
