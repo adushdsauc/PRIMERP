@@ -6,9 +6,14 @@ import { Combobox, Transition } from "@headlessui/react";
 import CreateReportModal from "../../components/CreateReportModal";
 
 export default function SearchDatabase() {
+  // Selected search values
   const [nameQuery, setNameQuery] = useState("");
   const [plateQuery, setPlateQuery] = useState("");
   const [weaponQuery, setWeaponQuery] = useState("");
+  // Text the user is typing into each combobox
+  const [nameInput, setNameInput] = useState("");
+  const [plateInput, setPlateInput] = useState("");
+  const [weaponInput, setWeaponInput] = useState("");
   const [civilian, setCivilian] = useState(null);
   const [vehicleResult, setVehicleResult] = useState(null);
   const [weaponResult, setWeaponResult] = useState(null);
@@ -41,7 +46,8 @@ export default function SearchDatabase() {
   }, []);
 
   useEffect(() => {
-    const q = nameQuery.toLowerCase();
+    const q = nameInput.toLowerCase();
+
     setFilteredCivilians(
       q === ""
         ? civilians
@@ -52,19 +58,21 @@ export default function SearchDatabase() {
             return first.includes(q) || last.includes(q) || full.includes(q);
           })
     );
-  }, [nameQuery, civilians]);
+  }, [nameInput, civilians]);
 
   useEffect(() => {
-    const q = plateQuery.toLowerCase();
+    const q = plateInput.toLowerCase();
+
     setFilteredVehicles(
       q === ""
         ? vehicles
         : vehicles.filter((v) => v.plate.toLowerCase().includes(q))
     );
-  }, [plateQuery, vehicles]);
+  }, [plateInput, vehicles]);
 
   useEffect(() => {
-    const q = weaponQuery.toLowerCase();
+    const q = weaponInput.toLowerCase();
+
     setFilteredWeapons(
       q === ""
         ? weapons
@@ -74,7 +82,8 @@ export default function SearchDatabase() {
               w.weaponType.toLowerCase().includes(q)
           )
     );
-  }, [weaponQuery, weapons]);
+  }, [weaponInput, weapons]);
+
 
   const handleSearch = async () => {
     try {
@@ -85,7 +94,12 @@ export default function SearchDatabase() {
       setShowFullCivilian(false);
 
       const res = await api.get("/api/search", {
-        params: { name: nameQuery, plate: plateQuery, weapon: weaponQuery },
+        params: {
+          name: nameQuery || nameInput,
+          plate: plateQuery || plateInput,
+          weapon: weaponQuery || weaponInput,
+        },
+
       });
 
       if (plateQuery) {
@@ -114,12 +128,17 @@ export default function SearchDatabase() {
       <div className="flex justify-center space-x-4 mb-6">
         <div className="flex flex-col">
           <label className="text-purple-400 font-semibold mb-1">Name Search</label>
-          <Combobox value={nameQuery} onChange={setNameQuery}>
+          <Combobox
+            value={nameQuery}
+            onChange={(val) => {
+              setNameQuery(val);
+            }}
+          >
             <div className="relative">
               <Combobox.Input
                 className="bg-gray-800 text-white px-4 py-2 rounded-md w-56"
-                displayValue={(val) => val}
-                onChange={(e) => setNameQuery(e.target.value)}
+                onChange={(e) => setNameInput(e.target.value)}
+
                 placeholder="Search Name"
               />
               <Transition
@@ -127,6 +146,8 @@ export default function SearchDatabase() {
                 leave="transition ease-in duration-100"
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
+                afterLeave={() => setNameInput("")}
+
               >
                 <Combobox.Options className="absolute z-10 mt-1 bg-gray-800 border border-gray-700 rounded w-full max-h-60 overflow-auto">
                   {filteredCivilians.map((civ) => (
@@ -147,12 +168,17 @@ export default function SearchDatabase() {
         </div>
         <div className="flex flex-col">
           <label className="text-green-400 font-semibold mb-1">Plate Search</label>
-          <Combobox value={plateQuery} onChange={setPlateQuery}>
+          <Combobox
+            value={plateQuery}
+            onChange={(val) => {
+              setPlateQuery(val);
+            }}
+          >
             <div className="relative">
               <Combobox.Input
                 className="bg-gray-800 text-white px-4 py-2 rounded-md w-56"
-                displayValue={(val) => val}
-                onChange={(e) => setPlateQuery(e.target.value)}
+                onChange={(e) => setPlateInput(e.target.value)}
+
                 placeholder="Search Plate"
               />
               <Transition
@@ -160,6 +186,8 @@ export default function SearchDatabase() {
                 leave="transition ease-in duration-100"
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
+                afterLeave={() => setPlateInput("")}
+
               >
                 <Combobox.Options className="absolute z-10 mt-1 bg-gray-800 border border-gray-700 rounded w-full max-h-60 overflow-auto">
                   {filteredVehicles.map((v) => (
@@ -180,12 +208,17 @@ export default function SearchDatabase() {
         </div>
         <div className="flex flex-col">
           <label className="text-yellow-400 font-semibold mb-1">Weapon Search</label>
-          <Combobox value={weaponQuery} onChange={setWeaponQuery}>
+          <Combobox
+            value={weaponQuery}
+            onChange={(val) => {
+              setWeaponQuery(val);
+            }}
+          >
             <div className="relative">
               <Combobox.Input
                 className="bg-gray-800 text-white px-4 py-2 rounded-md w-56"
-                displayValue={(val) => val}
-                onChange={(e) => setWeaponQuery(e.target.value)}
+                onChange={(e) => setWeaponInput(e.target.value)}
+
                 placeholder="Search Weapon"
               />
               <Transition
@@ -193,6 +226,8 @@ export default function SearchDatabase() {
                 leave="transition ease-in duration-100"
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
+                afterLeave={() => setWeaponInput("")}
+
               >
                 <Combobox.Options className="absolute z-10 mt-1 bg-gray-800 border border-gray-700 rounded w-full max-h-60 overflow-auto">
                   {filteredWeapons.map((w) => (
