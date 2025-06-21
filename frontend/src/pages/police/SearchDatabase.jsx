@@ -82,12 +82,8 @@ export default function SearchDatabase() {
 
   const handleSearch = async () => {
     try {
-      setCivilian(null);
-      setVehicleResult(null);
-      setWeaponResult(null);
       setSearchType(null);
       setResults([]);
-      setShowFullCivilian(false);
 
       const res = await api.get("/api/search", {
         params: {
