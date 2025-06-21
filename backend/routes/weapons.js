@@ -18,28 +18,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
-  try {
-    const weapon = await Weapon.findById(req.params.id);
-    if (!weapon) return res.status(404).json({ success: false, message: "Weapon not found" });
-
-    res.json({ success: true, weapon });
-  } catch (err) {
-    console.error("Fetch weapon error:", err);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-});
-// GET /api/weapons/by-civilian/:id
-router.get("/by-civilian/:id", async (req, res) => {
-  try {
-    const weapons = await Weapon.find({ civilianId: req.params.id });
-    res.json({ success: true, weapons });
-  } catch (err) {
-    console.error("Error fetching weapons by civilian ID:", err);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-});
-
 // GET /api/weapons/all - for search dropdowns
 router.get("/all", async (req, res) => {
 
@@ -61,6 +39,29 @@ router.get("/all", async (req, res) => {
   } catch (err) {
     console.error("❌ Fetch all weapons error:", err);
     res.status(500).json({ success: false, message: "Failed to fetch weapons" });
+  }
+});
+
+// GET /api/weapons/by-civilian/:id
+router.get("/by-civilian/:id", async (req, res) => {
+  try {
+    const weapons = await Weapon.find({ civilianId: req.params.id });
+    res.json({ success: true, weapons });
+  } catch (err) {
+    console.error("Error fetching weapons by civilian ID:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const weapon = await Weapon.findById(req.params.id);
+    if (!weapon) return res.status(404).json({ success: false, message: "Weapon not found" });
+
+    res.json({ success: true, weapon });
+  } catch (err) {
+    console.error("Fetch weapon error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
