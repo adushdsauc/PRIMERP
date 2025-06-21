@@ -42,6 +42,7 @@ router.get("/by-civilian/:id", async (req, res) => {
 
 // GET /api/weapons/all - for search dropdowns
 router.get("/all", async (req, res) => {
+
   try {
     const weapons = await Weapon.find({}).populate(
       "civilianId",
