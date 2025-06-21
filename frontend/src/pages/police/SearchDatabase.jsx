@@ -2,6 +2,10 @@
 import React, { useState, useEffect, Fragment } from "react";
 import api from "../../utils/axios";
 
+// The build previously failed because this component attempted to
+// reset state hooks that were never defined. Those lines were removed
+// so ESLint no longer reports `no-undef` errors.
+
 import { Combobox, Transition } from "@headlessui/react";
 
 export default function SearchDatabase() {
