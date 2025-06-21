@@ -122,7 +122,7 @@ export default function SearchDatabase() {
   };
 
   return (
-    <div className="p-6">
+<main className="flex-1 bg-gray-950 p-6 overflow-visible">
       <h2 className="text-3xl font-bold text-white mb-6 text-center">Search Database</h2>
 
       <div className="flex justify-center space-x-4 mb-6">
