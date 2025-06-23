@@ -10,10 +10,10 @@ module.exports = {
     .addNumberOption(opt => opt.setName('price').setDescription('Item price').setRequired(true))
     .addStringOption(opt => opt.setName('image').setDescription('Image URL (optional)').setRequired(false))
     .addRoleOption(opt => opt.setName('role').setDescription('Role requirement (optional)').setRequired(false)),
-  async execute(interaction) {
-    if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-      return interaction.reply({ content: '❌ Admins only.', ephemeral: true });
-    }
+async execute(interaction) {
+  if (!interaction.member.permissions.has(PermissionsBitField.Flags.MentionEveryone)) {
+    return interaction.reply({ content: '❌ You do not have permission to mention @everyone or roles.', ephemeral: true });
+  }
 
     const name = interaction.options.getString('name');
     const description = interaction.options.getString('description');
