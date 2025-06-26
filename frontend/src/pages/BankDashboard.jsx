@@ -609,7 +609,7 @@ className="bg-[#e30908] hover:bg-red-600 px-4 py-2 rounded shadow text-sm"
 
               <div className="bg-zinc-900 p-6 rounded-lg shadow-lg border border-zinc-700 overflow-x-auto">
                 <div className="flex items-center text-gray-300 text-base font-medium border-b border-neutral-700 pb-2 mb-4">
-                  <span className="mr-2">🧾</span>
+<History className="w-5 h-5 mr-2 text-muted-foreground" />
                   Recent Transactions
                 </div>
 
