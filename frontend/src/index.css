@@ -9,7 +9,7 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #0f172a; /* dark mode to match Tailwind gray-900 */
+  background-color: #101214;
   color: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',

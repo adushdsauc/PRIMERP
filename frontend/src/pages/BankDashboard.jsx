@@ -313,7 +313,7 @@ const [withdrawError, setWithdrawError] = useState("");
         </button>
         <button
           onClick={handleDeposit}
-          className="px-4 py-2 rounded bg-green-700 hover:bg-green-600"
+          className="px-4 py-2 rounded bg-[#22c55e] hover:bg-green-600 shadow"
         >
           Deposit
         </button>
@@ -343,7 +343,7 @@ const [withdrawError, setWithdrawError] = useState("");
         </button>
         <button
           onClick={handleWithdraw}
-          className="px-4 py-2 rounded bg-yellow-600 hover:bg-yellow-500"
+          className="px-4 py-2 rounded bg-amber-600 hover:bg-amber-500 shadow"
         >
           Withdraw
         </button>
@@ -352,68 +352,68 @@ const [withdrawError, setWithdrawError] = useState("");
   </div>
 )}
       {/* Header */}
-      <header className="flex items-center justify-between bg-zinc-900 border-b border-red-900 px-6 py-3">
+      <header className="flex items-center justify-between bg-zinc-900 border-b border-[#e30908] px-6 py-4 shadow">
         <div className="flex items-center gap-4">
-          <img src="/Mazebank.png" alt="Maze Bank" className="h-8" />
-          <div className="flex items-center gap-1 text-red-600 font-semibold">
+          <img src="/Mazebank.png" alt="Maze Bank" className="h-9" />
+          <div className="flex items-center gap-1 text-[#e30908] font-semibold">
             <Wallet className="w-5 h-5" />
-            <span>My Accounts</span>
+            <span className="text-lg">My Accounts</span>
           </div>
         </div>
         <div className="flex items-center gap-6">
           <div className="text-right">
             <div className="text-xs text-gray-400">Welcome</div>
-            <div className="font-bold">{civilian?.firstName} {civilian?.lastName}</div>
+            <div className="font-bold text-sm">{civilian?.firstName} {civilian?.lastName}</div>
           </div>
           <div className="text-right">
             <div className="text-xs text-gray-400">Wallet Balance</div>
-            <div className="font-bold">${walletBalance?.toFixed(2)}</div>
+            <div className="font-bold text-sm">${walletBalance?.toFixed(2)}</div>
           </div>
-          <button onClick={() => navigate('/civilian')} className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm">Exit</button>
+          <button onClick={() => navigate('/civilian')} className="bg-[#e30908] hover:bg-red-600 px-4 py-2 rounded shadow text-sm">Exit</button>
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        <aside className="w-72 bg-zinc-950 p-6 overflow-y-auto border-r border-red-900 space-y-6">
+      <div className="flex flex-1 overflow-hidden flex-col md:flex-row">
+        <aside className="w-full md:w-72 bg-zinc-950 p-6 overflow-y-auto border-b md:border-b-0 md:border-r border-[#e30908] space-y-6 rounded-b-lg md:rounded-none shadow-inner">
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-red-500">Personal Accounts</h3>
-              <button onClick={() => { setNewAccountType(null); setShowAccountModal(true); }} className="bg-red-600 hover:bg-red-700 text-sm px-2 py-1 rounded">Open</button>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-semibold text-[#e30908]">Personal Accounts</h3>
+              <button onClick={() => { setNewAccountType(null); setShowAccountModal(true); }} className="bg-[#e30908] hover:bg-red-600 text-sm px-3 py-1 rounded shadow">Open</button>
             </div>
-            <nav className="space-y-1">
+            <nav className="space-y-2">
               {personalAccounts.map((acc) => (
-                <button key={acc._id} onClick={() => setSelectedAccount(acc)} className={`w-full text-left p-2 rounded ${selectedAccount?._id === acc._id ? 'bg-red-700 text-white' : 'hover:bg-red-900 text-gray-300'}`}>
-                  <div className="font-medium">{acc.accountType}</div>
+                <button key={acc._id} onClick={() => setSelectedAccount(acc)} className={`w-full text-left p-3 rounded-lg border border-zinc-700/50 bg-zinc-900 shadow-sm ${selectedAccount?._id === acc._id ? 'border-[#e30908] bg-zinc-800' : 'hover:border-[#e30908]'}`}>
+                  <div className="font-semibold">{acc.accountType}</div>
                   <div className="text-xs text-gray-400">#{acc.accountNumber}</div>
-                  <div className="text-sm font-semibold">${acc.balance.toFixed(2)}</div>
+                  <div className="text-sm font-bold text-right">${acc.balance.toFixed(2)}</div>
                 </button>
               ))}
             </nav>
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-red-500">Business Accounts</h3>
-              <button onClick={() => { setNewAccountType(null); setShowAccountModal(true); }} className="bg-red-600 hover:bg-red-700 text-sm px-2 py-1 rounded">Open</button>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-semibold text-[#e30908]">Business Accounts</h3>
+              <button onClick={() => { setNewAccountType(null); setShowAccountModal(true); }} className="bg-[#e30908] hover:bg-red-600 text-sm px-3 py-1 rounded shadow">Open</button>
             </div>
-            <nav className="space-y-1">
+            <nav className="space-y-2">
               {businessAccounts.map((acc) => (
-                <button key={acc._id} onClick={() => setSelectedAccount(acc)} className={`w-full text-left p-2 rounded ${selectedAccount?._id === acc._id ? 'bg-red-700 text-white' : 'hover:bg-red-900 text-gray-300'}`}>
-                  <div className="font-medium">{acc.accountType.replace('Business ', '')}</div>
+                <button key={acc._id} onClick={() => setSelectedAccount(acc)} className={`w-full text-left p-3 rounded-lg border border-zinc-700/50 bg-zinc-900 shadow-sm ${selectedAccount?._id === acc._id ? 'border-[#e30908] bg-zinc-800' : 'hover:border-[#e30908]'}`}>
+                  <div className="font-semibold">{acc.accountType.replace('Business ', '')}</div>
                   <div className="text-xs text-gray-400">#{acc.accountNumber}</div>
-                  <div className="text-sm font-semibold">${acc.balance.toFixed(2)}</div>
+                  <div className="text-sm font-bold text-right">${acc.balance.toFixed(2)}</div>
                 </button>
               ))}
             </nav>
           </div>
         </aside>
 
-        <main className="flex-1 p-8 overflow-y-auto">
+        <main className="flex-1 p-8 overflow-y-auto space-y-6">
           {selectedAccount && (
             <>
-              <h1 className="text-2xl font-bold mb-1">{selectedAccount.accountType}</h1>
-              <p className="text-3xl font-bold text-green-400 mb-6">${selectedAccount.balance.toFixed(2)}</p>
-              <div className="bg-zinc-900 border border-red-800 rounded-lg p-4 mb-6">
+              <h1 className="text-3xl font-bold mb-1">{selectedAccount.accountType}</h1>
+              <p className="text-4xl font-extrabold text-[#22c55e] mb-6">${selectedAccount.balance.toFixed(2)}</p>
+              <div className="bg-zinc-900 border border-[#e30908] rounded-lg p-6 shadow">
                 <div className="grid grid-cols-2 gap-y-2 text-sm">
                   <div className="text-gray-400">Account Type:</div>
                   <div>{selectedAccount.accountType}</div>
@@ -423,23 +423,23 @@ const [withdrawError, setWithdrawError] = useState("");
                   <div>${selectedAccount.balance.toFixed(2)}</div>
                 </div>
               </div>
-              <div className="flex gap-2 mb-6">
-                <button onClick={() => setShowDepositModal(true)} className="bg-green-700 hover:bg-green-600 px-4 py-2 rounded">Deposit Cash</button>
-                <button onClick={() => setShowWithdrawModal(true)} className="bg-yellow-600 hover:bg-yellow-500 px-4 py-2 rounded">Withdraw Cash</button>
-                <button onClick={() => { setFromAccount(selectedAccount); setActiveTab('transfers'); }} className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Transfer Funds</button>
+              <div className="flex flex-wrap gap-2 mb-6">
+                <button onClick={() => setShowDepositModal(true)} className="bg-[#22c55e] hover:bg-green-600 px-4 py-2 rounded shadow">Deposit Cash</button>
+                <button onClick={() => setShowWithdrawModal(true)} className="bg-amber-600 hover:bg-amber-500 px-4 py-2 rounded shadow">Withdraw Cash</button>
+                <button onClick={() => { setFromAccount(selectedAccount); setActiveTab('transfers'); }} className="bg-[#e30908] hover:bg-red-600 px-4 py-2 rounded shadow">Transfer Funds</button>
               </div>
-              <h2 className="font-semibold mb-2">Recent Transactions</h2>
-              <div className="bg-zinc-900 p-4 rounded-lg shadow-lg overflow-x-auto mb-8">
+              <h2 className="font-semibold mb-2 text-lg">Recent Transactions</h2>
+              <div className="bg-zinc-900 p-6 rounded-lg shadow-lg border border-zinc-700 overflow-x-auto">
                 {transactions.filter((tx) => tx.accountId === selectedAccount._id).slice(0, 10).length === 0 ? (
                   <p className="text-gray-400 italic">No transactions found.</p>
                 ) : (
                   <table className="w-full text-sm text-left">
                     <thead>
                       <tr className="border-b border-gray-700">
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Amount</th>
-                        <th>Description</th>
+                        <th className="px-4 py-2">Date</th>
+                        <th className="px-4 py-2">Type</th>
+                        <th className="px-4 py-2">Amount</th>
+                        <th className="px-4 py-2">Description</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -448,12 +448,12 @@ const [withdrawError, setWithdrawError] = useState("");
                         .slice(0, 10)
                         .map((tx) => (
                           <tr key={tx._id} className="border-b border-gray-800">
-                            <td>{new Date(tx.createdAt).toLocaleDateString()}</td>
-                            <td>{tx.type}</td>
-                            <td className={tx.amount < 0 ? 'text-red-400' : 'text-green-400'}>
+                            <td className="px-4 py-2">{new Date(tx.createdAt).toLocaleDateString()}</td>
+                            <td className="px-4 py-2">{tx.type}</td>
+                            <td className={`px-4 py-2 ${tx.amount < 0 ? 'text-[#ef4444]' : 'text-[#22c55e]'}`}> 
                               {tx.amount < 0 ? '-' : '+'}${Math.abs(tx.amount).toFixed(2)}
                             </td>
-                            <td>{tx.description || '—'}</td>
+                            <td className="px-4 py-2">{tx.description || '—'}</td>
                           </tr>
                         ))}
                     </tbody>
@@ -489,7 +489,7 @@ const [withdrawError, setWithdrawError] = useState("");
               <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full px-4 py-2 mb-4 bg-black border border-gray-700 rounded" />
               <label className="block mb-2">Description</label>
               <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full px-4 py-2 mb-4 bg-black border border-gray-700 rounded" />
-              <button onClick={handleTransfer} className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded">Send Transfer</button>
+              <button onClick={handleTransfer} className="w-full bg-[#e30908] hover:bg-red-600 text-white py-2 rounded shadow">Send Transfer</button>
             </div>
           )}
         </main>
