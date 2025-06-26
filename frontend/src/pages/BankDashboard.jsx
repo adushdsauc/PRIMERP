@@ -14,7 +14,8 @@ import {
   ArrowLeftRight,
   Pencil,
   Zap,
-  Info
+  Info,
+  History
 } from "lucide-react";
 
 export default function BankDashboard() {
@@ -167,6 +168,7 @@ const [withdrawError, setWithdrawError] = useState("");
       setWalletBalance(
         updatedWallet.data.wallet?.balance ?? updatedWallet.data.balance ?? 0
       );
+
       window.location.reload();
       setTimeout(() => setShowToast(false), 4000);
       setTransactionAmount("");
@@ -193,6 +195,7 @@ const [withdrawError, setWithdrawError] = useState("");
       setWalletBalance(
         updatedWallet.data.wallet?.balance ?? updatedWallet.data.balance ?? 0
       );
+
       window.location.reload();
       setTimeout(() => setShowToast(false), 4000);
       setTransactionAmount("");
@@ -606,9 +609,10 @@ const [withdrawError, setWithdrawError] = useState("");
 
               <div className="bg-zinc-900 p-6 rounded-lg shadow-lg border border-zinc-700 overflow-x-auto">
                 <div className="flex items-center text-gray-300 text-base font-medium border-b border-neutral-700 pb-2 mb-4">
-                  <span className="mr-2">🧾</span>
+<History className="w-5 h-5 mr-2 text-muted-foreground" />
                   Recent Transactions
                 </div>
+
                 {transactions.filter((tx) => tx.accountId === selectedAccount._id).slice(0, 10).length === 0 ? (
                   <p className="text-gray-400 italic">No transactions found.</p>
                 ) : (
