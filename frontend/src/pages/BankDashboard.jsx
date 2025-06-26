@@ -494,5 +494,7 @@ const [withdrawError, setWithdrawError] = useState("");
           )}
         </main>
       </div>
+      </div>
+
   );
 }
