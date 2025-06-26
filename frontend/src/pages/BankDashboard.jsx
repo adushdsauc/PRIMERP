@@ -494,7 +494,7 @@ const [withdrawError, setWithdrawError] = useState("");
                     onClick={() => { setFromAccount(selectedAccount); setActiveTab('transfers'); }}
                     className="flex items-center justify-center gap-2 bg-[#e30908] hover:bg-red-600 px-4 py-2 rounded shadow"
                   >
-                    <ArrowsLeftRight className="w-4 h-4" /> Transfer
+                    <ArrowLeftRight className="w-4 h-4" /> Transfer
                   </button>
                   <button
                     className="flex items-center justify-center gap-2 border border-green-600 text-green-500 hover:bg-green-600 hover:text-white px-4 py-2 rounded shadow"
