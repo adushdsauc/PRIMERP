@@ -463,26 +463,26 @@ const [withdrawError, setWithdrawError] = useState("");
               </h3>
               <button
                 onClick={() => { setNewAccountType(null); setShowAccountModal(true); }}
-                className="w-full mt-2 md:mt-0 md:w-auto px-3 py-2 border-2 border-dashed border-zinc-600 text-xs rounded hover:border-[#e30908]"
+                className="w-full mt-2 md:mt-0 md:w-auto rounded-lg border border-neutral-700 bg-neutral-800 text-white py-2 text-sm font-medium hover:bg-neutral-700 transition"
               >
                 Open New Account
               </button>
             </div>
-            <nav className="space-y-2">
-              {personalAccounts.map((acc) => (
-                <button
-                  key={acc._id}
-                  onClick={() => setSelectedAccount(acc)}
-                  className={`w-full text-left p-3 rounded-lg border bg-zinc-900 shadow-sm flex flex-col gap-1 ${selectedAccount?._id === acc._id ? 'border-[#e30908] bg-zinc-800' : 'border-zinc-700/50 hover:border-[#e30908]'}`}
-                >
-                  <div className="font-semibold flex justify-between">
-                    <span>{acc.accountType}</span>
-                    <span className="text-sm font-bold">${acc.balance.toFixed(2)}</span>
-                  </div>
-                  <div className="text-xs text-gray-400">#{acc.accountNumber}</div>
-                </button>
-              ))}
-            </nav>
+              <nav className="space-y-2">
+                {personalAccounts.map((acc) => (
+                  <button
+                    key={acc._id}
+                    onClick={() => setSelectedAccount(acc)}
+                    className={`w-full text-left rounded-md bg-neutral-800 py-3 px-4 mb-2 hover:bg-neutral-700 transition cursor-pointer flex flex-col border ${selectedAccount?._id === acc._id ? 'border-[#e30908]' : 'border-neutral-700'}`}
+                  >
+                    <div className="flex justify-between font-semibold text-white">
+                      <span>{acc.accountType}</span>
+                      <span>${acc.balance.toFixed(2)}</span>
+                    </div>
+                    <div className="text-sm text-neutral-400">#{acc.accountNumber}</div>
+                  </button>
+                ))}
+              </nav>
           </div>
 
           <div>
@@ -492,26 +492,26 @@ const [withdrawError, setWithdrawError] = useState("");
               </h3>
               <button
                 onClick={() => { setNewAccountType(null); setShowAccountModal(true); }}
-                className="w-full mt-2 md:mt-0 md:w-auto px-3 py-2 border-2 border-dashed border-zinc-600 text-xs rounded hover:border-[#e30908]"
+                className="w-full mt-2 md:mt-0 md:w-auto rounded-lg border border-neutral-700 bg-neutral-800 text-white py-2 text-sm font-medium hover:bg-neutral-700 transition"
               >
                 Open New Account
               </button>
             </div>
-            <nav className="space-y-2">
-              {businessAccounts.map((acc) => (
-                <button
-                  key={acc._id}
-                  onClick={() => setSelectedAccount(acc)}
-                  className={`w-full text-left p-3 rounded-lg border bg-zinc-900 shadow-sm flex flex-col gap-1 ${selectedAccount?._id === acc._id ? 'border-[#e30908] bg-zinc-800' : 'border-zinc-700/50 hover:border-[#e30908]'}`}
-                >
-                  <div className="font-semibold flex justify-between">
-                    <span>{acc.accountType.replace('Business ', '')}</span>
-                    <span className="text-sm font-bold">${acc.balance.toFixed(2)}</span>
-                  </div>
-                  <div className="text-xs text-gray-400">#{acc.accountNumber}</div>
-                </button>
-              ))}
-            </nav>
+              <nav className="space-y-2">
+                {businessAccounts.map((acc) => (
+                  <button
+                    key={acc._id}
+                    onClick={() => setSelectedAccount(acc)}
+                    className={`w-full text-left rounded-md bg-neutral-800 py-3 px-4 mb-2 hover:bg-neutral-700 transition cursor-pointer flex flex-col border ${selectedAccount?._id === acc._id ? 'border-[#e30908]' : 'border-neutral-700'}`}
+                  >
+                    <div className="flex justify-between font-semibold text-white">
+                      <span>{acc.accountType.replace('Business ', '')}</span>
+                      <span>${acc.balance.toFixed(2)}</span>
+                    </div>
+                    <div className="text-sm text-neutral-400">#{acc.accountNumber}</div>
+                  </button>
+                ))}
+              </nav>
           </div>
 
           <div className="mt-6 p-3 bg-zinc-900 rounded-lg border border-zinc-700 flex items-center justify-between">
@@ -525,10 +525,8 @@ const [withdrawError, setWithdrawError] = useState("");
         <main className="flex-1 p-8 overflow-y-auto space-y-6">
           {selectedAccount && (
             <>
-              <h1 className="text-3xl font-bold mb-1">{selectedAccount.accountType}</h1>
-              <p className="text-4xl font-extrabold text-[#22c55e] mb-6">${selectedAccount.balance.toFixed(2)}</p>
-              <div className="flex flex-col lg:flex-row gap-6 mb-6">
-                <div className="flex-1">
+              <div className="flex flex-col md:flex-row gap-4 mb-6">
+                <div className="w-full md:w-1/2">
                   <div className="bg-[#111] rounded-lg border border-neutral-800 p-4 shadow-sm mb-4">
                     <div className="text-gray-300 text-base font-medium border-b border-neutral-700 pb-2 mb-4 flex items-center">
                       <i className="fa fa-info-circle mr-2 text-sm" />
@@ -554,7 +552,7 @@ const [withdrawError, setWithdrawError] = useState("");
                     </div>
                   </div>
                 </div>
-                <div className="w-full lg:w-56">
+                <div className="w-full md:w-1/2">
                   <div className="bg-[#111] rounded-lg border border-neutral-800 p-4 shadow-sm">
                     <div className="flex items-center text-gray-300 text-base font-medium border-b border-neutral-700 pb-2 mb-4">
                       <Zap className="w-4 h-4 mr-2" />
