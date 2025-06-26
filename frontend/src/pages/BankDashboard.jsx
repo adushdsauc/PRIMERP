@@ -11,7 +11,7 @@ import {
   ArrowUpCircle,
   ArrowDown,
   ArrowUp,
-  ArrowsLeftRight,
+  ArrowLeftRight,
   Pencil,
   Zap
 } from "lucide-react";
@@ -579,7 +579,7 @@ const [withdrawError, setWithdrawError] = useState("");
                         onClick={handleTransfer}
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md flex items-center justify-center"
                       >
-                        <ArrowsLeftRight className="w-5 h-5 mr-2" />
+                        <ArrowLeftRight className="w-5 h-5 mr-2" />
                         Transfer Funds
                       </button>
                       <button
