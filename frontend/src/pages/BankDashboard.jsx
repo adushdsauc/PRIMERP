@@ -5,13 +5,15 @@ import api from "../utils/axios";
 import { Listbox } from "@headlessui/react";
 import {
   Wallet,
-  Banknote,
   Building2,
   DollarSign,
   ArrowDownCircle,
   ArrowUpCircle,
-  ArrowLeftRight,
-  Pencil
+  ArrowDown,
+  ArrowUp,
+  ArrowsLeftRight,
+  Pencil,
+  Zap
 } from "lucide-react";
 
 export default function BankDashboard() {
@@ -38,11 +40,14 @@ export default function BankDashboard() {
 
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [showRenameModal, setShowRenameModal] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [transactionAmount, setTransactionAmount] = useState("");
   const [walletBalance, setWalletBalance] = useState(null);
   const [depositError, setDepositError] = useState("");
 const [withdrawError, setWithdrawError] = useState("");
+  const [newAccountName, setNewAccountName] = useState("");
 
   const personalAccounts = accounts.filter(
     (acc) => !acc.accountType.startsWith("Business")
@@ -131,7 +136,12 @@ const [withdrawError, setWithdrawError] = useState("");
     }
   };
 
-  const handleDeposit = async () => {
+  const handleDeposit = () => setShowDepositModal(true);
+  const handleWithdraw = () => setShowWithdrawModal(true);
+  const handleTransfer = () => setShowTransferModal(true);
+  const handleRename = () => setShowRenameModal(true);
+
+  const submitDeposit = async () => {
     const name = civilian?.firstName || "Unknown";
   
     if (walletBalance !== null && parseFloat(transactionAmount) > walletBalance) {
@@ -160,7 +170,7 @@ const [withdrawError, setWithdrawError] = useState("");
     }
   };  
 
-  const handleWithdraw = async () => {
+  const submitWithdraw = async () => {
     const name = civilian?.firstName || "Unknown";
   
     try {
@@ -183,7 +193,7 @@ const [withdrawError, setWithdrawError] = useState("");
     }
   };  
 
-  const handleTransfer = async () => {
+  const submitTransfer = async () => {
     setError("");
     setSuccess("");
   
@@ -321,7 +331,7 @@ const [withdrawError, setWithdrawError] = useState("");
           Cancel
         </button>
         <button
-          onClick={handleDeposit}
+          onClick={submitDeposit}
           className="px-4 py-2 rounded bg-[#22c55e] hover:bg-green-600 shadow"
         >
           Deposit
@@ -351,11 +361,64 @@ const [withdrawError, setWithdrawError] = useState("");
           Cancel
         </button>
         <button
-          onClick={handleWithdraw}
+          onClick={submitWithdraw}
           className="px-4 py-2 rounded bg-amber-600 hover:bg-amber-500 shadow"
         >
           Withdraw
         </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{showTransferModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-zinc-900 p-6 rounded shadow-lg w-full max-w-md">
+      <h2 className="text-xl mb-4">Transfer Funds</h2>
+      {error && <p className="text-red-500 mb-2 text-sm">{error}</p>}
+      <label className="block mb-2 text-sm">From Account</label>
+      <Listbox value={fromAccount} onChange={setFromAccount}>
+        <div className="relative mb-4">
+          <Listbox.Button className="w-full bg-black border border-gray-700 text-white rounded px-4 py-2 text-left">
+            {fromAccount ? `${fromAccount.accountType} ••••${fromAccount.accountNumber.slice(-4)}` : "-- Select --"}
+          </Listbox.Button>
+          <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto bg-zinc-900 rounded shadow-lg border border-zinc-700 z-10">
+            {accounts.map((acc) => (
+              <Listbox.Option key={acc._id} value={acc} className={({ active }) => `cursor-pointer select-none px-4 py-2 ${active ? 'bg-red-700 text-white' : 'text-white'}`}>
+                {acc.accountType} ••••{acc.accountNumber.slice(-4)} (${acc.balance.toFixed(2)})
+              </Listbox.Option>
+            ))}
+          </Listbox.Options>
+        </div>
+      </Listbox>
+      <label className="block mb-2 text-sm">To Account Number</label>
+      <input type="text" value={toAccount} onChange={(e) => setToAccount(e.target.value)} className="w-full px-4 py-2 mb-4 bg-black border border-gray-700 rounded" />
+      <label className="block mb-2 text-sm">Amount</label>
+      <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full px-4 py-2 mb-4 bg-black border border-gray-700 rounded" />
+      <label className="block mb-2 text-sm">Description</label>
+      <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full px-4 py-2 mb-4 bg-black border border-gray-700 rounded" />
+      <div className="flex justify-end gap-2">
+        <button onClick={() => setShowTransferModal(false)} className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600">Cancel</button>
+        <button onClick={submitTransfer} className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white shadow">Transfer</button>
+      </div>
+    </div>
+  </div>
+)}
+
+{showRenameModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-zinc-900 p-6 rounded shadow-lg w-full max-w-sm">
+      <h2 className="text-xl mb-4">Rename Account</h2>
+      <input
+        type="text"
+        value={newAccountName}
+        onChange={(e) => setNewAccountName(e.target.value)}
+        placeholder="New Account Name"
+        className="w-full mb-4 px-4 py-2 bg-black border border-gray-700 rounded text-white"
+      />
+      <div className="flex justify-end gap-2">
+        <button onClick={() => setShowRenameModal(false)} className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600">Cancel</button>
+        <button onClick={() => setShowRenameModal(false)} className="px-4 py-2 rounded bg-green-600 hover:bg-green-500 text-white">Rename</button>
       </div>
     </div>
   </div>
@@ -465,42 +528,69 @@ const [withdrawError, setWithdrawError] = useState("");
               <h1 className="text-3xl font-bold mb-1">{selectedAccount.accountType}</h1>
               <p className="text-4xl font-extrabold text-[#22c55e] mb-6">${selectedAccount.balance.toFixed(2)}</p>
               <div className="flex flex-col lg:flex-row gap-6 mb-6">
-                <div className="flex-1 bg-zinc-900 border border-[#e30908] rounded-lg p-6 shadow">
-                  <div className="grid grid-cols-2 gap-y-2 text-sm">
-                    <div className="text-gray-400">Account Name:</div>
-                    <div>{selectedAccount.accountType}</div>
-                    <div className="text-gray-400">Account Type:</div>
-                    <div>{selectedAccount.accountType}</div>
-                    <div className="text-gray-400">Account Number:</div>
-                    <div>{selectedAccount.accountNumber}</div>
-                    <div className="text-gray-400">Available Balance:</div>
-                    <div>${selectedAccount.balance.toFixed(2)}</div>
+                <div className="flex-1">
+                  <div className="bg-[#111] rounded-lg border border-neutral-800 p-4 shadow-sm mb-4">
+                    <div className="text-gray-300 text-base font-medium border-b border-neutral-700 pb-2 mb-4 flex items-center">
+                      <i className="fa fa-info-circle mr-2 text-sm" />
+                      Account Information
+                    </div>
+                    <div className="space-y-3 text-white">
+                      <div>
+                        <div className="text-sm text-gray-400">Account Name</div>
+                        <div className="text-lg font-bold">{selectedAccount?.name || selectedAccount?.accountType}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">Account Type</div>
+                        <div className="text-lg font-bold">{selectedAccount?.type || selectedAccount?.accountType}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">Account Number</div>
+                        <div className="text-lg font-bold">{selectedAccount?.number || selectedAccount?.accountNumber}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">Available Balance</div>
+                        <div className="text-lg font-bold text-green-400">${selectedAccount?.balance?.toLocaleString()}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="w-full lg:w-56 flex flex-col gap-2">
-                  <button
-                    onClick={() => setShowDepositModal(true)}
-                    className="flex items-center justify-center gap-2 bg-[#22c55e] hover:bg-green-600 px-4 py-2 rounded shadow"
-                  >
-                    <ArrowDownCircle className="w-4 h-4" /> Deposit
-                  </button>
-                  <button
-                    onClick={() => setShowWithdrawModal(true)}
-                    className="flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 py-2 rounded shadow"
-                  >
-                    <ArrowUpCircle className="w-4 h-4" /> Withdraw
-                  </button>
-                  <button
-                    onClick={() => { setFromAccount(selectedAccount); setActiveTab('transfers'); }}
-                    className="flex items-center justify-center gap-2 bg-[#e30908] hover:bg-red-600 px-4 py-2 rounded shadow"
-                  >
-                    <ArrowLeftRight className="w-4 h-4" /> Transfer
-                  </button>
-                  <button
-                    className="flex items-center justify-center gap-2 border border-green-600 text-green-500 hover:bg-green-600 hover:text-white px-4 py-2 rounded shadow"
-                  >
-                    <Pencil className="w-4 h-4" /> Rename
-                  </button>
+                <div className="w-full lg:w-56">
+                  <div className="bg-[#111] rounded-lg border border-neutral-800 p-4 shadow-sm">
+                    <div className="flex items-center text-gray-300 text-base font-medium border-b border-neutral-700 pb-2 mb-4">
+                      <Zap className="w-4 h-4 mr-2" />
+                      Quick Actions
+                    </div>
+                    <div className="space-y-3">
+                      <button
+                        onClick={handleDeposit}
+                        className="w-full bg-green-500 hover:bg-green-600 text-black font-medium py-2 rounded-md flex items-center justify-center"
+                      >
+                        <ArrowDown className="w-5 h-5 mr-2" />
+                        Deposit Cash
+                      </button>
+                      <button
+                        onClick={handleWithdraw}
+                        className="w-full bg-amber-400 hover:bg-amber-500 text-black font-medium py-2 rounded-md flex items-center justify-center"
+                      >
+                        <ArrowUp className="w-5 h-5 mr-2" />
+                        Withdraw Cash
+                      </button>
+                      <button
+                        onClick={handleTransfer}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md flex items-center justify-center"
+                      >
+                        <ArrowsLeftRight className="w-5 h-5 mr-2" />
+                        Transfer Funds
+                      </button>
+                      <button
+                        onClick={handleRename}
+                        className="w-full border border-green-500 hover:bg-green-900 text-green-400 font-medium py-2 rounded-md flex items-center justify-center mt-2"
+                      >
+                        <Pencil className="w-5 h-5 mr-2" />
+                        Rename Account
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -562,7 +652,7 @@ const [withdrawError, setWithdrawError] = useState("");
               <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full px-4 py-2 mb-4 bg-black border border-gray-700 rounded" />
               <label className="block mb-2">Description</label>
               <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full px-4 py-2 mb-4 bg-black border border-gray-700 rounded" />
-              <button onClick={handleTransfer} className="w-full bg-[#e30908] hover:bg-red-600 text-white py-2 rounded shadow">Send Transfer</button>
+              <button onClick={submitTransfer} className="w-full bg-[#e30908] hover:bg-red-600 text-white py-2 rounded shadow">Send Transfer</button>
             </div>
           )}
         </main>
