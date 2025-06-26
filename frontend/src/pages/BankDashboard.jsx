@@ -13,7 +13,8 @@ import {
   ArrowUp,
   ArrowLeftRight,
   Pencil,
-  Zap
+  Zap,
+  Info
 } from "lucide-react";
 
 export default function BankDashboard() {
@@ -160,8 +161,9 @@ const [withdrawError, setWithdrawError] = useState("");
       setShowDepositModal(false);
       setSuccess(`Deposit of $${transactionAmount} submitted.`);
       setShowToast(true);
-      const updatedWallet = await api.get(`/api/wallet/${civilianId}`);
-      setWalletBalance(updatedWallet.data.balance);
+      const updatedWallet = await api.get(`/api/wallet/${civilian.discordId}`);
+      setWalletBalance(updatedWallet.data.wallet?.balance || updatedWallet.data.balance);
+      window.location.reload();
       setTimeout(() => setShowToast(false), 4000);
       setTransactionAmount("");
       setDepositError("");
@@ -183,8 +185,9 @@ const [withdrawError, setWithdrawError] = useState("");
       setShowWithdrawModal(false);
       setSuccess(`Withdrawal of $${transactionAmount} submitted.`);
       setShowToast(true);
-      const updatedWallet = await api.get(`/api/wallet/${civilianId}`);
-      setWalletBalance(updatedWallet.data.balance);
+      const updatedWallet = await api.get(`/api/wallet/${civilian.discordId}`);
+      setWalletBalance(updatedWallet.data.wallet?.balance || updatedWallet.data.balance);
+      window.location.reload();
       setTimeout(() => setShowToast(false), 4000);
       setTransactionAmount("");
       setWithdrawError("");
@@ -230,6 +233,7 @@ const [withdrawError, setWithdrawError] = useState("");
       setToAccount("");
       setAmount("");
       setDescription("");
+      window.location.reload();
     } catch (err) {
       setError(err.response?.data?.error || "Transfer failed.");
     }
@@ -528,8 +532,9 @@ const [withdrawError, setWithdrawError] = useState("");
               <div className="flex flex-col md:flex-row gap-4 mb-6 items-stretch">
                 <div className="w-full md:w-1/2 flex-1">
                   <div className="bg-[#111] rounded-lg border border-neutral-800 p-4 shadow-sm mb-4 md:mb-0 h-full flex flex-col">
-                    <div className="text-gray-300 text-base font-medium border-b border-neutral-700 pb-2 mb-4">
-                      🧾 Account Information
+                    <div className="flex items-center text-gray-300 text-base font-medium border-b border-neutral-700 pb-2 mb-4">
+                      <Info className="w-4 h-4 mr-2" />
+                      Account Information
                     </div>
                     <div className="space-y-3 text-white">
                       <div>
@@ -593,8 +598,8 @@ const [withdrawError, setWithdrawError] = useState("");
                 </div>
               </div>
 
-              <h2 className="font-semibold mb-2 text-lg">Recent Transactions</h2>
               <div className="bg-zinc-900 p-6 rounded-lg shadow-lg border border-zinc-700 overflow-x-auto">
+                <h2 className="font-semibold mb-4 text-lg">Recent Transactions</h2>
                 {transactions.filter((tx) => tx.accountId === selectedAccount._id).slice(0, 10).length === 0 ? (
                   <p className="text-gray-400 italic">No transactions found.</p>
                 ) : (
@@ -602,28 +607,19 @@ const [withdrawError, setWithdrawError] = useState("");
                     {transactions
                       .filter((tx) => tx.accountId === selectedAccount._id)
                       .slice(0, 10)
-                      .map((tx) => {
-                        const emoji = tx.type.toLowerCase().includes('deposit')
-                          ? '🟩'
-                          : tx.amount < 0
-                          ? '🟥'
-                          : '🔄';
-                        return (
-                          <li
-                            key={tx._id}
-                            className="bg-neutral-800 rounded-md p-3 mb-2 flex justify-between items-start text-sm"
-                          >
-                            <div>
-                              <p className="font-semibold flex items-center gap-1">
-                                {emoji} {tx.type}
-                              </p>
-                              <p className="text-neutral-400">{tx.description || '—'}</p>
-                              <p className="text-neutral-600 text-xs">{new Date(tx.createdAt).toLocaleString()}</p>
-                            </div>
-                            <p className={`${tx.amount < 0 ? 'text-red-500' : 'text-green-500'} font-bold`}>{tx.amount < 0 ? '-' : '+'}${Math.abs(tx.amount).toFixed(2)}</p>
-                          </li>
-                        );
-                      })}
+                      .map((tx) => (
+                        <li
+                          key={tx._id}
+                          className="bg-neutral-800 rounded-md p-3 mb-2 flex justify-between items-start text-sm"
+                        >
+                          <div>
+                            <p className="font-semibold">{tx.type}</p>
+                            <p className="text-neutral-400">{tx.description || '—'}</p>
+                            <p className="text-neutral-600 text-xs">{new Date(tx.createdAt).toLocaleString()}</p>
+                          </div>
+                          <p className={`${tx.amount < 0 ? 'text-red-500' : 'text-green-500'} font-bold`}>{tx.amount < 0 ? '-' : '+'}${Math.abs(tx.amount).toFixed(2)}</p>
+                        </li>
+                      ))}
                   </ul>
                 )}
               </div>
