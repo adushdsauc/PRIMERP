@@ -3,7 +3,16 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import api from "../utils/axios";
 import { Listbox } from "@headlessui/react";
-import { Wallet } from "lucide-react";
+import {
+  Wallet,
+  Banknote,
+  Building2,
+  DollarSign,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  ArrowsLeftRight,
+  Pencil
+} from "lucide-react";
 
 export default function BankDashboard() {
   const [params] = useSearchParams();
@@ -352,59 +361,101 @@ const [withdrawError, setWithdrawError] = useState("");
   </div>
 )}
       {/* Header */}
-      <header className="flex items-center justify-between bg-zinc-900 border-b border-[#e30908] px-6 py-4 shadow">
+      <header className="flex items-center justify-between bg-zinc-900 border-b border-[#e30908] px-6 py-3 shadow">
         <div className="flex items-center gap-4">
           <img src="/Mazebank.png" alt="Maze Bank" className="h-9" />
-          <div className="flex items-center gap-1 text-[#e30908] font-semibold">
+          <div className="border-l border-zinc-700 h-8 mx-4" />
+          <div className="flex items-center gap-2 text-[#e30908] font-semibold">
             <Wallet className="w-5 h-5" />
             <span className="text-lg">My Accounts</span>
           </div>
         </div>
         <div className="flex items-center gap-6">
-          <div className="text-right">
+          <div className="text-right leading-none">
             <div className="text-xs text-gray-400">Welcome</div>
             <div className="font-bold text-sm">{civilian?.firstName} {civilian?.lastName}</div>
           </div>
-          <div className="text-right">
-            <div className="text-xs text-gray-400">Wallet Balance</div>
-            <div className="font-bold text-sm">${walletBalance?.toFixed(2)}</div>
+          <div className="flex items-center gap-1 text-right leading-none">
+            <DollarSign className="w-4 h-4 text-gray-400" />
+            <div>
+              <div className="text-xs text-gray-400">Wallet Balance</div>
+              <div className="font-bold text-sm">${walletBalance?.toFixed(2)}</div>
+            </div>
           </div>
-          <button onClick={() => navigate('/civilian')} className="bg-[#e30908] hover:bg-red-600 px-4 py-2 rounded shadow text-sm">Exit</button>
+          <button
+            onClick={() => navigate('/civilian')}
+            className="bg-[#e30908] hover:bg-red-600 px-4 py-2 rounded shadow text-sm"
+          >
+            Exit
+          </button>
         </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden flex-col md:flex-row">
-        <aside className="w-full md:w-72 bg-zinc-950 p-6 overflow-y-auto border-b md:border-b-0 md:border-r border-[#e30908] space-y-6 rounded-b-lg md:rounded-none shadow-inner">
+        <aside className="w-full md:w-72 bg-zinc-950 p-6 overflow-y-auto border-b md:border-b-0 md:border-r border-[#e30908] space-y-6 rounded-b-lg md:rounded-none shadow-inner flex flex-col">
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-base font-semibold text-[#e30908]">Personal Accounts</h3>
-              <button onClick={() => { setNewAccountType(null); setShowAccountModal(true); }} className="bg-[#e30908] hover:bg-red-600 text-sm px-3 py-1 rounded shadow">Open</button>
+              <h3 className="flex items-center gap-1 text-base font-semibold text-[#e30908]">
+                <Wallet className="w-4 h-4" /> Personal Accounts
+              </h3>
+              <button
+                onClick={() => { setNewAccountType(null); setShowAccountModal(true); }}
+                className="w-full mt-2 md:mt-0 md:w-auto px-3 py-2 border-2 border-dashed border-zinc-600 text-xs rounded hover:border-[#e30908]"
+              >
+                Open New Account
+              </button>
             </div>
             <nav className="space-y-2">
               {personalAccounts.map((acc) => (
-                <button key={acc._id} onClick={() => setSelectedAccount(acc)} className={`w-full text-left p-3 rounded-lg border border-zinc-700/50 bg-zinc-900 shadow-sm ${selectedAccount?._id === acc._id ? 'border-[#e30908] bg-zinc-800' : 'hover:border-[#e30908]'}`}>
-                  <div className="font-semibold">{acc.accountType}</div>
+                <button
+                  key={acc._id}
+                  onClick={() => setSelectedAccount(acc)}
+                  className={`w-full text-left p-3 rounded-lg border bg-zinc-900 shadow-sm flex flex-col gap-1 ${selectedAccount?._id === acc._id ? 'border-[#e30908] bg-zinc-800' : 'border-zinc-700/50 hover:border-[#e30908]'}`}
+                >
+                  <div className="font-semibold flex justify-between">
+                    <span>{acc.accountType}</span>
+                    <span className="text-sm font-bold">${acc.balance.toFixed(2)}</span>
+                  </div>
                   <div className="text-xs text-gray-400">#{acc.accountNumber}</div>
-                  <div className="text-sm font-bold text-right">${acc.balance.toFixed(2)}</div>
                 </button>
               ))}
             </nav>
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-base font-semibold text-[#e30908]">Business Accounts</h3>
-              <button onClick={() => { setNewAccountType(null); setShowAccountModal(true); }} className="bg-[#e30908] hover:bg-red-600 text-sm px-3 py-1 rounded shadow">Open</button>
+            <div className="flex items-center justify-between mb-3 mt-6">
+              <h3 className="flex items-center gap-1 text-base font-semibold text-[#e30908]">
+                <Building2 className="w-4 h-4" /> Business Accounts
+              </h3>
+              <button
+                onClick={() => { setNewAccountType(null); setShowAccountModal(true); }}
+                className="w-full mt-2 md:mt-0 md:w-auto px-3 py-2 border-2 border-dashed border-zinc-600 text-xs rounded hover:border-[#e30908]"
+              >
+                Open New Account
+              </button>
             </div>
             <nav className="space-y-2">
               {businessAccounts.map((acc) => (
-                <button key={acc._id} onClick={() => setSelectedAccount(acc)} className={`w-full text-left p-3 rounded-lg border border-zinc-700/50 bg-zinc-900 shadow-sm ${selectedAccount?._id === acc._id ? 'border-[#e30908] bg-zinc-800' : 'hover:border-[#e30908]'}`}>
-                  <div className="font-semibold">{acc.accountType.replace('Business ', '')}</div>
+                <button
+                  key={acc._id}
+                  onClick={() => setSelectedAccount(acc)}
+                  className={`w-full text-left p-3 rounded-lg border bg-zinc-900 shadow-sm flex flex-col gap-1 ${selectedAccount?._id === acc._id ? 'border-[#e30908] bg-zinc-800' : 'border-zinc-700/50 hover:border-[#e30908]'}`}
+                >
+                  <div className="font-semibold flex justify-between">
+                    <span>{acc.accountType.replace('Business ', '')}</span>
+                    <span className="text-sm font-bold">${acc.balance.toFixed(2)}</span>
+                  </div>
                   <div className="text-xs text-gray-400">#{acc.accountNumber}</div>
-                  <div className="text-sm font-bold text-right">${acc.balance.toFixed(2)}</div>
                 </button>
               ))}
             </nav>
+          </div>
+
+          <div className="mt-6 p-3 bg-zinc-900 rounded-lg border border-zinc-700 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm">
+              <Wallet className="w-4 h-4" /> Cash Balance
+            </div>
+            <div className="font-bold">${walletBalance?.toFixed(2)}</div>
           </div>
         </aside>
 
@@ -413,51 +464,73 @@ const [withdrawError, setWithdrawError] = useState("");
             <>
               <h1 className="text-3xl font-bold mb-1">{selectedAccount.accountType}</h1>
               <p className="text-4xl font-extrabold text-[#22c55e] mb-6">${selectedAccount.balance.toFixed(2)}</p>
-              <div className="bg-zinc-900 border border-[#e30908] rounded-lg p-6 shadow">
-                <div className="grid grid-cols-2 gap-y-2 text-sm">
-                  <div className="text-gray-400">Account Type:</div>
-                  <div>{selectedAccount.accountType}</div>
-                  <div className="text-gray-400">Account Number:</div>
-                  <div>{selectedAccount.accountNumber}</div>
-                  <div className="text-gray-400">Available Balance:</div>
-                  <div>${selectedAccount.balance.toFixed(2)}</div>
+              <div className="flex flex-col lg:flex-row gap-6 mb-6">
+                <div className="flex-1 bg-zinc-900 border border-[#e30908] rounded-lg p-6 shadow">
+                  <div className="grid grid-cols-2 gap-y-2 text-sm">
+                    <div className="text-gray-400">Account Name:</div>
+                    <div>{selectedAccount.accountType}</div>
+                    <div className="text-gray-400">Account Type:</div>
+                    <div>{selectedAccount.accountType}</div>
+                    <div className="text-gray-400">Account Number:</div>
+                    <div>{selectedAccount.accountNumber}</div>
+                    <div className="text-gray-400">Available Balance:</div>
+                    <div>${selectedAccount.balance.toFixed(2)}</div>
+                  </div>
+                </div>
+                <div className="w-full lg:w-56 flex flex-col gap-2">
+                  <button
+                    onClick={() => setShowDepositModal(true)}
+                    className="flex items-center justify-center gap-2 bg-[#22c55e] hover:bg-green-600 px-4 py-2 rounded shadow"
+                  >
+                    <ArrowDownCircle className="w-4 h-4" /> Deposit
+                  </button>
+                  <button
+                    onClick={() => setShowWithdrawModal(true)}
+                    className="flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 py-2 rounded shadow"
+                  >
+                    <ArrowUpCircle className="w-4 h-4" /> Withdraw
+                  </button>
+                  <button
+                    onClick={() => { setFromAccount(selectedAccount); setActiveTab('transfers'); }}
+                    className="flex items-center justify-center gap-2 bg-[#e30908] hover:bg-red-600 px-4 py-2 rounded shadow"
+                  >
+                    <ArrowsLeftRight className="w-4 h-4" /> Transfer
+                  </button>
+                  <button
+                    className="flex items-center justify-center gap-2 border border-green-600 text-green-500 hover:bg-green-600 hover:text-white px-4 py-2 rounded shadow"
+                  >
+                    <Pencil className="w-4 h-4" /> Rename
+                  </button>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2 mb-6">
-                <button onClick={() => setShowDepositModal(true)} className="bg-[#22c55e] hover:bg-green-600 px-4 py-2 rounded shadow">Deposit Cash</button>
-                <button onClick={() => setShowWithdrawModal(true)} className="bg-amber-600 hover:bg-amber-500 px-4 py-2 rounded shadow">Withdraw Cash</button>
-                <button onClick={() => { setFromAccount(selectedAccount); setActiveTab('transfers'); }} className="bg-[#e30908] hover:bg-red-600 px-4 py-2 rounded shadow">Transfer Funds</button>
-              </div>
-              <h2 className="font-semibold mb-2 text-lg">Recent Transactions</h2>
+
+              <h2 className="font-semibold mb-2 text-lg">Recent Transactions ({transactions.filter((tx) => tx.accountId === selectedAccount._id).length} Total)</h2>
               <div className="bg-zinc-900 p-6 rounded-lg shadow-lg border border-zinc-700 overflow-x-auto">
                 {transactions.filter((tx) => tx.accountId === selectedAccount._id).slice(0, 10).length === 0 ? (
                   <p className="text-gray-400 italic">No transactions found.</p>
                 ) : (
-                  <table className="w-full text-sm text-left">
-                    <thead>
-                      <tr className="border-b border-gray-700">
-                        <th className="px-4 py-2">Date</th>
-                        <th className="px-4 py-2">Type</th>
-                        <th className="px-4 py-2">Amount</th>
-                        <th className="px-4 py-2">Description</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {transactions
-                        .filter((tx) => tx.accountId === selectedAccount._id)
-                        .slice(0, 10)
-                        .map((tx) => (
-                          <tr key={tx._id} className="border-b border-gray-800">
-                            <td className="px-4 py-2">{new Date(tx.createdAt).toLocaleDateString()}</td>
-                            <td className="px-4 py-2">{tx.type}</td>
-                            <td className={`px-4 py-2 ${tx.amount < 0 ? 'text-[#ef4444]' : 'text-[#22c55e]'}`}> 
-                              {tx.amount < 0 ? '-' : '+'}${Math.abs(tx.amount).toFixed(2)}
-                            </td>
-                            <td className="px-4 py-2">{tx.description || '—'}</td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
+                  <ul className="space-y-3">
+                    {transactions
+                      .filter((tx) => tx.accountId === selectedAccount._id)
+                      .slice(0, 10)
+                      .map((tx) => (
+                        <li key={tx._id} className="flex items-center justify-between bg-zinc-800 rounded-md px-4 py-3 shadow">
+                          <div className="flex items-center gap-3">
+                            {tx.amount < 0 ? (
+                              <ArrowUpCircle className="w-5 h-5 text-red-500" />
+                            ) : (
+                              <ArrowDownCircle className="w-5 h-5 text-green-500" />
+                            )}
+                            <div>
+                              <div className="font-semibold">{tx.type}</div>
+                              <div className="text-xs text-gray-400">{tx.description || '—'}</div>
+                              <div className="text-xs text-gray-500">{new Date(tx.createdAt).toLocaleString()}</div>
+                            </div>
+                          </div>
+                          <div className={`font-bold ${tx.amount < 0 ? 'text-red-500' : 'text-green-500'}`}>{tx.amount < 0 ? '-' : '+'}${Math.abs(tx.amount).toFixed(2)}</div>
+                        </li>
+                      ))}
+                  </ul>
                 )}
               </div>
             </>
