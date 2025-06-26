@@ -457,61 +457,69 @@ const [withdrawError, setWithdrawError] = useState("");
       <div className="flex flex-1 overflow-hidden flex-col md:flex-row">
         <aside className="w-full md:w-72 bg-zinc-950 p-6 overflow-y-auto border-b md:border-b-0 md:border-r border-[#e30908] space-y-6 rounded-b-lg md:rounded-none shadow-inner flex flex-col">
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="flex items-center gap-1 text-base font-semibold text-[#e30908]">
-                <Wallet className="w-4 h-4" /> Personal Accounts
-              </h3>
-              <button
-                onClick={() => { setNewAccountType(null); setShowAccountModal(true); }}
-                className="w-full mt-2 md:mt-0 md:w-auto rounded-lg border border-neutral-700 bg-neutral-800 text-white py-2 text-sm font-medium hover:bg-neutral-700 transition"
-              >
-                Open New Account
-              </button>
-            </div>
-              <nav className="space-y-2">
-                {personalAccounts.map((acc) => (
-                  <button
-                    key={acc._id}
-                    onClick={() => setSelectedAccount(acc)}
-                    className={`w-full text-left rounded-md bg-neutral-800 py-3 px-4 mb-2 hover:bg-neutral-700 transition cursor-pointer flex flex-col border ${selectedAccount?._id === acc._id ? 'border-[#e30908]' : 'border-neutral-700'}`}
-                  >
-                    <div className="flex justify-between font-semibold text-white">
-                      <span>{acc.accountType}</span>
-                      <span>${acc.balance.toFixed(2)}</span>
-                    </div>
-                    <div className="text-sm text-neutral-400">#{acc.accountNumber}</div>
-                  </button>
-                ))}
-              </nav>
+            <h3 className="flex items-center gap-1 uppercase text-xs text-neutral-400 tracking-wide font-semibold mb-2">
+              <Wallet className="w-3 h-3" /> Personal Accounts
+            </h3>
+            <nav>
+              {personalAccounts.map((acc) => (
+                <button
+                  key={acc._id}
+                  onClick={() => setSelectedAccount(acc)}
+                  className={`w-full text-left rounded-md bg-neutral-800 px-4 py-3 mb-3 hover:bg-neutral-700 transition border ${selectedAccount?._id === acc._id ? 'border-[#e30908]' : 'border-neutral-700'}`}
+                >
+                  <p className="text-xs text-neutral-400">Account Name:</p>
+                  <p className="text-white font-semibold">{acc.accountType}</p>
+
+                  <p className="text-xs text-neutral-400 mt-2">Account Number:</p>
+                  <p className="text-white font-medium">{acc.accountNumber}</p>
+
+                  <p className="text-xs text-neutral-400 mt-2">Account Balance:</p>
+                  <p className="text-emerald-400 font-bold">${acc.balance.toFixed(2)}</p>
+                </button>
+              ))}
+            </nav>
+            <button
+              onClick={() => {
+                setNewAccountType(null);
+                setShowAccountModal(true);
+              }}
+              className="w-full bg-neutral-700 text-white rounded-md py-1.5 text-sm hover:bg-neutral-600 transition mt-2"
+            >
+              Open New Account
+            </button>
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-3 mt-6">
-              <h3 className="flex items-center gap-1 text-base font-semibold text-[#e30908]">
-                <Building2 className="w-4 h-4" /> Business Accounts
-              </h3>
-              <button
-                onClick={() => { setNewAccountType(null); setShowAccountModal(true); }}
-                className="w-full mt-2 md:mt-0 md:w-auto rounded-lg border border-neutral-700 bg-neutral-800 text-white py-2 text-sm font-medium hover:bg-neutral-700 transition"
-              >
-                Open New Account
-              </button>
-            </div>
-              <nav className="space-y-2">
-                {businessAccounts.map((acc) => (
-                  <button
-                    key={acc._id}
-                    onClick={() => setSelectedAccount(acc)}
-                    className={`w-full text-left rounded-md bg-neutral-800 py-3 px-4 mb-2 hover:bg-neutral-700 transition cursor-pointer flex flex-col border ${selectedAccount?._id === acc._id ? 'border-[#e30908]' : 'border-neutral-700'}`}
-                  >
-                    <div className="flex justify-between font-semibold text-white">
-                      <span>{acc.accountType.replace('Business ', '')}</span>
-                      <span>${acc.balance.toFixed(2)}</span>
-                    </div>
-                    <div className="text-sm text-neutral-400">#{acc.accountNumber}</div>
-                  </button>
-                ))}
-              </nav>
+            <h3 className="flex items-center gap-1 uppercase text-xs text-neutral-400 tracking-wide font-semibold mb-2 mt-6">
+              <Building2 className="w-3 h-3" /> Business Accounts
+            </h3>
+            <nav>
+              {businessAccounts.map((acc) => (
+                <button
+                  key={acc._id}
+                  onClick={() => setSelectedAccount(acc)}
+                  className={`w-full text-left rounded-md bg-neutral-800 px-4 py-3 mb-3 hover:bg-neutral-700 transition border ${selectedAccount?._id === acc._id ? 'border-[#e30908]' : 'border-neutral-700'}`}
+                >
+                  <p className="text-xs text-neutral-400">Account Name:</p>
+                  <p className="text-white font-semibold">{acc.accountType.replace('Business ', '')}</p>
+
+                  <p className="text-xs text-neutral-400 mt-2">Account Number:</p>
+                  <p className="text-white font-medium">{acc.accountNumber}</p>
+
+                  <p className="text-xs text-neutral-400 mt-2">Account Balance:</p>
+                  <p className="text-emerald-400 font-bold">${acc.balance.toFixed(2)}</p>
+                </button>
+              ))}
+            </nav>
+            <button
+              onClick={() => {
+                setNewAccountType(null);
+                setShowAccountModal(true);
+              }}
+              className="w-full bg-neutral-700 text-white rounded-md py-1.5 text-sm hover:bg-neutral-600 transition mt-2"
+            >
+              Open New Account
+            </button>
           </div>
 
           <div className="mt-6 p-3 bg-zinc-900 rounded-lg border border-zinc-700 flex items-center justify-between">
