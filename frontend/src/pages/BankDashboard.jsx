@@ -45,7 +45,7 @@ export default function BankDashboard() {
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [transactionAmount, setTransactionAmount] = useState("");
-  const [walletBalance, setWalletBalance] = useState(null);
+  const [walletBalance, setWalletBalance] = useState(0);
   const [depositError, setDepositError] = useState("");
 const [withdrawError, setWithdrawError] = useState("");
   const [newAccountName, setNewAccountName] = useState("");
@@ -83,7 +83,9 @@ const [withdrawError, setWithdrawError] = useState("");
   
         const discordId = civRes.data.civilian.discordId;
         const walletRes = await api.get(`/api/wallet/${discordId}`);
-        setWalletBalance(walletRes.data.wallet?.balance || walletRes.data.balance);
+        setWalletBalance(
+          walletRes.data.wallet?.balance ?? walletRes.data.balance ?? 0
+        );
   
         setError(""); // clear error
         console.log("✅ All data loaded successfully");
@@ -162,7 +164,9 @@ const [withdrawError, setWithdrawError] = useState("");
       setSuccess(`Deposit of $${transactionAmount} submitted.`);
       setShowToast(true);
       const updatedWallet = await api.get(`/api/wallet/${civilian.discordId}`);
-      setWalletBalance(updatedWallet.data.wallet?.balance || updatedWallet.data.balance);
+      setWalletBalance(
+        updatedWallet.data.wallet?.balance ?? updatedWallet.data.balance ?? 0
+      );
       window.location.reload();
       setTimeout(() => setShowToast(false), 4000);
       setTransactionAmount("");
@@ -186,7 +190,9 @@ const [withdrawError, setWithdrawError] = useState("");
       setSuccess(`Withdrawal of $${transactionAmount} submitted.`);
       setShowToast(true);
       const updatedWallet = await api.get(`/api/wallet/${civilian.discordId}`);
-      setWalletBalance(updatedWallet.data.wallet?.balance || updatedWallet.data.balance);
+      setWalletBalance(
+        updatedWallet.data.wallet?.balance ?? updatedWallet.data.balance ?? 0
+      );
       window.location.reload();
       setTimeout(() => setShowToast(false), 4000);
       setTransactionAmount("");
@@ -432,7 +438,7 @@ const [withdrawError, setWithdrawError] = useState("");
         <div className="flex items-center gap-4">
           <img src="/Mazebank.png" alt="Maze Bank" className="h-9" />
           <div className="border-l border-zinc-700 h-8 mx-4" />
-          <div className="flex items-center gap-2 text-[#e30908] font-semibold">
+          <div className="flex items-center gap-2 text-white font-semibold">
             <Wallet className="w-5 h-5" />
             <span className="text-lg">My Accounts</span>
           </div>
@@ -599,7 +605,10 @@ const [withdrawError, setWithdrawError] = useState("");
               </div>
 
               <div className="bg-zinc-900 p-6 rounded-lg shadow-lg border border-zinc-700 overflow-x-auto">
-                <h2 className="font-semibold mb-4 text-lg">Recent Transactions</h2>
+                <div className="flex items-center text-gray-300 text-base font-medium border-b border-neutral-700 pb-2 mb-4">
+                  <span className="mr-2">🧾</span>
+                  Recent Transactions
+                </div>
                 {transactions.filter((tx) => tx.accountId === selectedAccount._id).slice(0, 10).length === 0 ? (
                   <p className="text-gray-400 italic">No transactions found.</p>
                 ) : (
