@@ -167,6 +167,7 @@ const [withdrawError, setWithdrawError] = useState("");
       setWalletBalance(
         updatedWallet.data.wallet?.balance ?? updatedWallet.data.balance ?? 0
       );
+
       window.location.reload();
       setTimeout(() => setShowToast(false), 4000);
       setTransactionAmount("");
@@ -193,6 +194,7 @@ const [withdrawError, setWithdrawError] = useState("");
       setWalletBalance(
         updatedWallet.data.wallet?.balance ?? updatedWallet.data.balance ?? 0
       );
+
       window.location.reload();
       setTimeout(() => setShowToast(false), 4000);
       setTransactionAmount("");
@@ -609,6 +611,7 @@ const [withdrawError, setWithdrawError] = useState("");
                   <span className="mr-2">🧾</span>
                   Recent Transactions
                 </div>
+
                 {transactions.filter((tx) => tx.accountId === selectedAccount._id).slice(0, 10).length === 0 ? (
                   <p className="text-gray-400 italic">No transactions found.</p>
                 ) : (
