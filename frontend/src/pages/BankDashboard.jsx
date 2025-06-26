@@ -465,15 +465,12 @@ const [withdrawError, setWithdrawError] = useState("");
                 <button
                   key={acc._id}
                   onClick={() => setSelectedAccount(acc)}
-                  className={`w-full text-left rounded-md bg-neutral-800 px-4 py-3 mb-3 hover:bg-neutral-700 transition border ${selectedAccount?._id === acc._id ? 'border-[#e30908]' : 'border-neutral-700'}`}
+                  className={`w-full text-left rounded-md bg-neutral-800 px-4 py-2 mb-2 hover:bg-neutral-700 transition border text-sm ${selectedAccount?._id === acc._id ? 'border-red-500' : 'border-neutral-700'}`}
                 >
-                  <p className="text-xs text-neutral-400">Account Name:</p>
-                  <p className="text-white font-semibold">{acc.accountType}</p>
-
-                  <p className="text-xs text-neutral-400 mt-2">Account Number:</p>
-                  <p className="text-white font-medium">{acc.accountNumber}</p>
-
-                  <p className="text-xs text-neutral-400 mt-2">Account Balance:</p>
+                  <p className="font-semibold text-white">
+                    {acc.accountType}
+                  </p>
+                  <p className="text-neutral-400 text-xs">{acc.accountNumber}</p>
                   <p className="text-emerald-400 font-bold">${acc.balance.toFixed(2)}</p>
                 </button>
               ))}
@@ -483,7 +480,7 @@ const [withdrawError, setWithdrawError] = useState("");
                 setNewAccountType(null);
                 setShowAccountModal(true);
               }}
-              className="w-full bg-neutral-700 text-white rounded-md py-1.5 text-sm hover:bg-neutral-600 transition mt-2"
+              className="w-full bg-neutral-700 hover:bg-neutral-600 text-white rounded-md py-1.5 mt-2"
             >
               Open New Account
             </button>
@@ -498,15 +495,10 @@ const [withdrawError, setWithdrawError] = useState("");
                 <button
                   key={acc._id}
                   onClick={() => setSelectedAccount(acc)}
-                  className={`w-full text-left rounded-md bg-neutral-800 px-4 py-3 mb-3 hover:bg-neutral-700 transition border ${selectedAccount?._id === acc._id ? 'border-[#e30908]' : 'border-neutral-700'}`}
+                  className={`w-full text-left rounded-md bg-neutral-800 px-4 py-2 mb-2 hover:bg-neutral-700 transition border text-sm ${selectedAccount?._id === acc._id ? 'border-red-500' : 'border-neutral-700'}`}
                 >
-                  <p className="text-xs text-neutral-400">Account Name:</p>
-                  <p className="text-white font-semibold">{acc.accountType.replace('Business ', '')}</p>
-
-                  <p className="text-xs text-neutral-400 mt-2">Account Number:</p>
-                  <p className="text-white font-medium">{acc.accountNumber}</p>
-
-                  <p className="text-xs text-neutral-400 mt-2">Account Balance:</p>
+                  <p className="font-semibold text-white">{acc.accountType.replace('Business ', '')}</p>
+                  <p className="text-neutral-400 text-xs">{acc.accountNumber}</p>
                   <p className="text-emerald-400 font-bold">${acc.balance.toFixed(2)}</p>
                 </button>
               ))}
@@ -516,7 +508,7 @@ const [withdrawError, setWithdrawError] = useState("");
                 setNewAccountType(null);
                 setShowAccountModal(true);
               }}
-              className="w-full bg-neutral-700 text-white rounded-md py-1.5 text-sm hover:bg-neutral-600 transition mt-2"
+              className="w-full bg-neutral-700 hover:bg-neutral-600 text-white rounded-md py-1.5 mt-2"
             >
               Open New Account
             </button>
@@ -533,22 +525,23 @@ const [withdrawError, setWithdrawError] = useState("");
         <main className="flex-1 p-8 overflow-y-auto space-y-6">
           {selectedAccount && (
             <>
-              <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <div className="w-full md:w-1/2">
-                  <div className="bg-[#111] rounded-lg border border-neutral-800 p-4 shadow-sm mb-4">
-                    <div className="text-gray-300 text-base font-medium border-b border-neutral-700 pb-2 mb-4 flex items-center">
-                      <i className="fa fa-info-circle mr-2 text-sm" />
-                      Account Information
+              <div className="flex flex-col md:flex-row gap-4 mb-6 items-stretch">
+                <div className="w-full md:w-1/2 flex-1">
+                  <div className="bg-[#111] rounded-lg border border-neutral-800 p-4 shadow-sm mb-4 md:mb-0 h-full flex flex-col">
+                    <div className="text-gray-300 text-base font-medium border-b border-neutral-700 pb-2 mb-4">
+                      🧾 Account Information
                     </div>
                     <div className="space-y-3 text-white">
                       <div>
                         <div className="text-sm text-gray-400">Account Name</div>
                         <div className="text-lg font-bold">{selectedAccount?.name || selectedAccount?.accountType}</div>
                       </div>
-                      <div>
-                        <div className="text-sm text-gray-400">Account Type</div>
-                        <div className="text-lg font-bold">{selectedAccount?.type || selectedAccount?.accountType}</div>
-                      </div>
+                      {(selectedAccount?.name || selectedAccount?.accountType) !== (selectedAccount?.type || selectedAccount?.accountType) && (
+                        <div>
+                          <div className="text-sm text-gray-400">Account Type</div>
+                          <div className="text-lg font-bold">{selectedAccount?.type || selectedAccount?.accountType}</div>
+                        </div>
+                      )}
                       <div>
                         <div className="text-sm text-gray-400">Account Number</div>
                         <div className="text-lg font-bold">{selectedAccount?.number || selectedAccount?.accountNumber}</div>
@@ -560,8 +553,8 @@ const [withdrawError, setWithdrawError] = useState("");
                     </div>
                   </div>
                 </div>
-                <div className="w-full md:w-1/2">
-                  <div className="bg-[#111] rounded-lg border border-neutral-800 p-4 shadow-sm">
+                <div className="w-full md:w-1/2 flex-1">
+                  <div className="bg-[#111] rounded-lg border border-neutral-800 p-4 shadow-sm flex flex-col">
                     <div className="flex items-center text-gray-300 text-base font-medium border-b border-neutral-700 pb-2 mb-4">
                       <Zap className="w-4 h-4 mr-2" />
                       Quick Actions
@@ -600,32 +593,37 @@ const [withdrawError, setWithdrawError] = useState("");
                 </div>
               </div>
 
-              <h2 className="font-semibold mb-2 text-lg">Recent Transactions ({transactions.filter((tx) => tx.accountId === selectedAccount._id).length} Total)</h2>
+              <h2 className="font-semibold mb-2 text-lg">Recent Transactions</h2>
               <div className="bg-zinc-900 p-6 rounded-lg shadow-lg border border-zinc-700 overflow-x-auto">
                 {transactions.filter((tx) => tx.accountId === selectedAccount._id).slice(0, 10).length === 0 ? (
                   <p className="text-gray-400 italic">No transactions found.</p>
                 ) : (
-                  <ul className="space-y-3">
+                  <ul className="space-y-1">
                     {transactions
                       .filter((tx) => tx.accountId === selectedAccount._id)
                       .slice(0, 10)
-                      .map((tx) => (
-                        <li key={tx._id} className="flex items-center justify-between bg-zinc-800 rounded-md px-4 py-3 shadow">
-                          <div className="flex items-center gap-3">
-                            {tx.amount < 0 ? (
-                              <ArrowUpCircle className="w-5 h-5 text-red-500" />
-                            ) : (
-                              <ArrowDownCircle className="w-5 h-5 text-green-500" />
-                            )}
+                      .map((tx) => {
+                        const emoji = tx.type.toLowerCase().includes('deposit')
+                          ? '🟩'
+                          : tx.amount < 0
+                          ? '🟥'
+                          : '🔄';
+                        return (
+                          <li
+                            key={tx._id}
+                            className="bg-neutral-800 rounded-md p-3 mb-2 flex justify-between items-start text-sm"
+                          >
                             <div>
-                              <div className="font-semibold">{tx.type}</div>
-                              <div className="text-xs text-gray-400">{tx.description || '—'}</div>
-                              <div className="text-xs text-gray-500">{new Date(tx.createdAt).toLocaleString()}</div>
+                              <p className="font-semibold flex items-center gap-1">
+                                {emoji} {tx.type}
+                              </p>
+                              <p className="text-neutral-400">{tx.description || '—'}</p>
+                              <p className="text-neutral-600 text-xs">{new Date(tx.createdAt).toLocaleString()}</p>
                             </div>
-                          </div>
-                          <div className={`font-bold ${tx.amount < 0 ? 'text-red-500' : 'text-green-500'}`}>{tx.amount < 0 ? '-' : '+'}${Math.abs(tx.amount).toFixed(2)}</div>
-                        </li>
-                      ))}
+                            <p className={`${tx.amount < 0 ? 'text-red-500' : 'text-green-500'} font-bold`}>{tx.amount < 0 ? '-' : '+'}${Math.abs(tx.amount).toFixed(2)}</p>
+                          </li>
+                        );
+                      })}
                   </ul>
                 )}
               </div>
