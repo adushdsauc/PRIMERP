@@ -10,7 +10,7 @@ import {
   DollarSign,
   ArrowDownCircle,
   ArrowUpCircle,
-  ArrowsLeftRight,
+  ArrowLeftRight,
   Pencil
 } from "lucide-react";
 
