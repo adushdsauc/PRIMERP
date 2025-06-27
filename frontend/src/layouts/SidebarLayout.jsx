@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
 import {
-  Home, User, Shield, Ambulance, Banknote, LineChart, Menu
-} from "lucide-react";
+  Home, User, Shield, Ambulance, Banknote, Menu
+} from "lucide-react"; // 👈 Removed LineChart
 
 const PSO_ROLE_IDS = ["1372312806220890247", "1370878407856099408"];
 const SAFR_ROLE_IDS = ["1372312806220890246", "1370878410364162058"];
@@ -67,7 +67,6 @@ const SidebarLayout = ({ children, roles }) => {
           <Link to="/bank" className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium ${isActive("/bank") ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700"}`}>
             <Banknote className="w-4 h-4" /> Maze Bank
           </Link>
-          <Link to="/dashboard/stocks" className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium ${isActive("/dashboard/stocks") ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700"}`}><LineChart className="w-4 h-4" /> Stock Market</Link>
         </nav>
       </div>
     </aside>
