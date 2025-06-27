@@ -1,4 +1,4 @@
-// src/pages/Civilian.jsx (styled like PD dashboard)
+// src/pages/Civilian.jsx
 import React, { useState, useEffect } from "react";
 import api from "../utils/axios";
 import { useUser } from "../hooks/useUser";
@@ -39,8 +39,10 @@ export default function CivilianPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white p-6">
-      <h1 className="text-3xl font-bold mb-4">Civilian Dashboard</h1>
+    <div className="min-h-screen bg-zinc-950 text-white p-4 sm:p-6">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center sm:text-left">
+        Civilian Dashboard
+      </h1>
 
       {viewMode === "detail" && selectedCivilian ? (
         <CivilianDetailView
@@ -66,22 +68,24 @@ export default function CivilianPage() {
         />
       ) : (
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold">Your Civilians</h2>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
+            <h2 className="text-xl sm:text-2xl font-semibold text-center sm:text-left">
+              Your Civilians
+            </h2>
             <button
               onClick={() => setShowCreate(true)}
-              className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-white"
+              className="w-full sm:w-auto bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-white"
             >
               + Add Civilian
             </button>
           </div>
 
           {loading ? (
-            <p>Loading...</p>
+            <p className="text-center text-gray-400">Loading...</p>
           ) : civilians.length === 0 ? (
-            <p className="text-gray-400">No civilians found.</p>
+            <p className="text-center text-gray-400">No civilians found.</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {civilians.map((civ) => (
                 <div
                   key={civ._id}
@@ -91,9 +95,15 @@ export default function CivilianPage() {
                     setViewMode("detail");
                   }}
                 >
-                  <h3 className="text-xl font-bold">{civ.firstName} {civ.lastName}</h3>
-                  <p className="text-sm text-gray-400">DOB: {civ.dateOfBirth || "N/A"}</p>
-                  <p className="text-sm text-gray-400">Occupation: {civ.occupation || "Unemployed"}</p>
+                  <h3 className="text-lg sm:text-xl font-bold">
+                    {civ.firstName} {civ.lastName}
+                  </h3>
+                  <p className="text-sm text-gray-400">
+                    DOB: {civ.dateOfBirth || "N/A"}
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Occupation: {civ.occupation || "Unemployed"}
+                  </p>
                 </div>
               ))}
             </div>
