@@ -143,6 +143,13 @@ app.get("/auth/logout", (req, res) => {
   });
 });
 
+app.get("/auth/resync", (req, res) => {
+  req.logout((err) => {
+    if (err) return res.status(500).send("Logout failed.");
+    res.redirect("/auth/discord");
+  });
+});
+
 app.get("/auth/failure", (req, res) => res.send("❌ Discord login failed"));
 
 app.get("/api/auth/me", (req, res) => {
