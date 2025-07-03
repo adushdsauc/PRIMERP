@@ -14,6 +14,12 @@ const SidebarLayout = ({ children, roles }) => {
   const [showSAFR, setShowSAFR] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const handleResync = () => {
+    const baseUrl =
+      process.env.REACT_APP_API_BASE_URL || "https://api.primerpcad.com";
+    window.location.href = `${baseUrl}/auth/resync`;
+  };
+
   const isActive = (path) => location.pathname === path;
   const isPSO = roles.some((id) => PSO_ROLE_IDS.includes(id));
   const isSAFR = roles.some((id) => SAFR_ROLE_IDS.includes(id));
@@ -67,6 +73,12 @@ const SidebarLayout = ({ children, roles }) => {
           <Link to="/bank" className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium ${isActive("/bank") ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700"}`}>
             <Banknote className="w-4 h-4" /> Maze Bank
           </Link>
+          <button
+            onClick={handleResync}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700"
+          >
+            Resync
+          </button>
         </nav>
       </div>
     </aside>
