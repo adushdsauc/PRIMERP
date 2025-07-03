@@ -8,7 +8,6 @@ const Civilian = mongoose.models.Civilian || require("../models/Civilian");
 const Wallet = require("../models/Wallet");
 const { sendBankApprovalEmbed } = require("../bot");
 
-const MAX_WALLET_BALANCE = 50000;
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 router.get("/accounts/:civilianId", async (req, res) => {
@@ -99,7 +98,6 @@ router.post("/withdraw", async (req, res) => {
     let wallet = await Wallet.findOne({ discordId: civilian.discordId });
     if (!wallet) wallet = await Wallet.create({ discordId: civilian.discordId });
 
-    if (wallet.balance + amount > MAX_WALLET_BALANCE) return res.status(400).json({ error: `Wallet limit exceeded. Max is $${MAX_WALLET_BALANCE}` });
 
     account.balance -= amount;
     wallet.balance += amount;
