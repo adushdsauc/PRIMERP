@@ -6,7 +6,8 @@ const InvestmentAssetSchema = new mongoose.Schema({
   category: { type: String, required: true },
   risk: { type: Number, required: true },
   price: { type: Number, default: 100 },
-  eventModifier: { type: Number, default: 0 }
+  eventModifier: { type: Number, default: 0 },
+  netDemand: { type: Number, default: 0 } // tracks net buys minus sells since last update
 }, { timestamps: true });
 
 module.exports = mongoose.model('InvestmentAsset', InvestmentAssetSchema);

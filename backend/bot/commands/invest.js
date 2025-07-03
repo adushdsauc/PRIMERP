@@ -52,6 +52,8 @@ module.exports = {
         holding.avgPrice = totalCost / holding.quantity;
         await holding.save();
       }
+      asset.netDemand += quantity;
+      await asset.save();
       await wallet.save();
       return interaction.reply({ content: `✅ Bought ${quantity} ${identifier} for $${cost}.`, ephemeral: true });
     } else {
@@ -67,6 +69,8 @@ module.exports = {
       const revenue = asset.price * quantity;
       holding.quantity -= quantity;
       wallet.balance += revenue;
+      asset.netDemand -= quantity;
+      await asset.save();
       await wallet.save();
       if (holding.quantity <= 0) {
         await InvestmentHolding.deleteOne({ _id: holding._id });

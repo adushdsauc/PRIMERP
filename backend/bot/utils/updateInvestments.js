@@ -27,6 +27,11 @@ async function updatePrices(client) {
         changePercent += asset.eventModifier * asset.risk * 2;
         asset.eventModifier = 0;
       }
+      // apply demand modifier from user trading
+      if (asset.netDemand) {
+        changePercent += asset.netDemand * asset.risk * 0.05;
+        asset.netDemand = 0;
+      }
 
       const newPrice = Math.max(1, Math.round(asset.price * (1 + changePercent / 100)));
       asset.price = newPrice;
