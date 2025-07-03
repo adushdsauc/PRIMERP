@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
 import {
-  Home, User, Shield, Ambulance, Banknote, Menu
+  Home, User, Shield, Ambulance, Banknote, Menu, RefreshCcw
 } from "lucide-react"; // 👈 Removed LineChart
 
 const PSO_ROLE_IDS = ["1372312806220890247", "1370878407856099408"];
@@ -68,19 +68,22 @@ const SidebarLayout = ({ children, roles }) => {
         </div>
       )}
 
-      <div className="mt-4 border-t border-gray-600 pt-4">
-        <nav className="flex flex-col space-y-2">
-          <Link to="/bank" className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium ${isActive("/bank") ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700"}`}>
-            <Banknote className="w-4 h-4" /> Maze Bank
-          </Link>
-          <button
-            onClick={handleResync}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700"
-          >
-            Resync
-          </button>
-        </nav>
-      </div>
+<div className="mt-4 border-t border-gray-600 pt-4">
+  <nav className="flex flex-col space-y-2">
+    <Link to="/bank" className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium ${isActive("/bank") ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700"}`}>
+      <Banknote className="w-4 h-4" /> Maze Bank
+    </Link>
+  </nav>
+</div>
+
+<div className="absolute bottom-5 left-4 right-4">
+  <button
+    onClick={handleResync}
+    className="flex items-center w-full gap-2 px-3 py-1.5 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700"
+  >
+    <RefreshCcw className="w-4 h-4" /> Resync
+  </button>
+</div>
     </aside>
   );
 
