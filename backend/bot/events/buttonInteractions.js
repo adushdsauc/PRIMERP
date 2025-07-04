@@ -251,6 +251,7 @@ module.exports = async function handleButtonInteractions(interaction) {
 
   if (customId.startsWith('loan_sign_')) {
     const [, , amt, term, rate] = customId.split('_');
+
     const { createLoan } = require('../services/loanService');
     const amount = parseFloat(amt);
     const termWeeks = parseInt(term);
