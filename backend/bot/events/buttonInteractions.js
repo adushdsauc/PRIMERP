@@ -211,4 +211,62 @@ module.exports = async function handleButtonInteractions(interaction) {
       );
     return interaction.showModal(modal);
   }
+
+  if (customId === 'loan_apply') {
+    const modal = new ModalBuilder()
+      .setCustomId('loan_application')
+      .setTitle('Loan Application')
+      .addComponents(
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder()
+            .setCustomId('loan_amount')
+            .setLabel('Loan Amount')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+        ),
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder()
+            .setCustomId('loan_term')
+            .setLabel('Loan Term (Weeks)')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+        ),
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder()
+            .setCustomId('loan_purpose')
+            .setLabel('Purpose of Loan')
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(true)
+        ),
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder()
+            .setCustomId('loan_terms')
+            .setLabel('Agree to Terms? (Yes/No)')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+        )
+      );
+    return interaction.showModal(modal);
+  }
+
+  if (customId.startsWith('loan_sign_')) {
+    const [, , amt, term, rate] = customId.split('_');
+    const { createLoan } = require('../services/loanService');
+    const amount = parseFloat(amt);
+    const termWeeks = parseInt(term);
+    const interest = parseFloat(rate);
+    await createLoan(interaction.client, interaction.user.id, amount, termWeeks, interest);
+    await interaction.update({ content: '✅ Loan signed and stored.', embeds: [], components: [] });
+  }
+
+  if (customId === 'loan_decline') {
+    return interaction.update({ content: '❌ Loan declined.', embeds: [], components: [] });
+  }
+
+  if (customId.startsWith('loan_pay_')) {
+    const loanId = customId.split('loan_pay_')[1];
+    const { payLoan } = require('../services/loanService');
+    await payLoan(interaction.client, loanId);
+    await interaction.update({ content: '✅ Payment received.', embeds: [], components: [] });
+  }
 };

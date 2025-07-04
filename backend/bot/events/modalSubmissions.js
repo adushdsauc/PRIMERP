@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const BankAccount = require('../../models/BankAccount');
 const Civilian = require('../../models/Civilian');
 
@@ -66,5 +66,70 @@ module.exports = async function handleModalSubmissions(interaction) {
     }
 
     return interaction.reply({ content: '✅ Bid placed.', ephemeral: true });
+  }
+
+  if (interaction.customId === 'loan_application') {
+    const amount = parseFloat(interaction.fields.getTextInputValue('loan_amount'));
+    const termWeeks = parseInt(interaction.fields.getTextInputValue('loan_term'));
+    const agree = interaction.fields.getTextInputValue('loan_terms').toLowerCase();
+    const purpose = interaction.fields.getTextInputValue('loan_purpose');
+
+    if (agree !== 'yes') {
+      return interaction.reply({ content: '❌ You must agree to the terms.', ephemeral: true });
+    }
+
+    const { getCredit } = require('../services/loanService');
+    const profile = await getCredit(interaction.user.id);
+
+    const getRate = score => {
+      if (score <= 579) return 25;
+      if (score <= 669) return 18;
+      if (score <= 739) return 12;
+      if (score <= 799) return 6;
+      return 3;
+    };
+
+    if (profile.score < 580) {
+      const warn = new EmbedBuilder()
+        .setTitle('Collateral Required')
+        .setDescription('Your credit score is below 580. Collateral will be required.')
+        .setColor('Orange');
+      await interaction.reply({ embeds: [warn], ephemeral: true });
+      const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
+      const log = EmbedBuilder.from(warn)
+        .setTitle('⚠️ Loan Collateral Needed')
+        .addFields({ name: 'User', value: `<@${interaction.user.id}>` }, { name: 'Purpose', value: purpose });
+      await sendFinancialLogEmbed(interaction.client, log);
+      return;
+    }
+
+    const rate = getRate(profile.score);
+    const total = amount * (1 + rate / 100);
+    const weeklyPayment = Number((total / termWeeks).toFixed(2));
+
+    const contract = new EmbedBuilder()
+      .setTitle('📜 Loan Contract')
+      .setColor('Blue')
+      .addFields(
+        { name: 'Loan Type', value: 'Personal', inline: true },
+        { name: 'Loan Amount', value: `$${amount}`, inline: true },
+        { name: 'Term Length', value: `${termWeeks} weeks`, inline: true },
+        { name: 'Interest %', value: `${rate}%`, inline: true },
+        { name: 'Total Repayment', value: `$${total.toFixed(2)}`, inline: true },
+        { name: 'Weekly Payment', value: `$${weeklyPayment}`, inline: true }
+      );
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`loan_sign_${amount}_${termWeeks}_${rate}`)
+        .setLabel('Sign Loan')
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId('loan_decline')
+        .setLabel('Decline')
+        .setStyle(ButtonStyle.Danger)
+    );
+
+    await interaction.reply({ content: '📑 Contract sent to your DMs.', ephemeral: true });
+    await interaction.user.send({ embeds: [contract], components: [row] }).catch(() => null);
   }
 };
