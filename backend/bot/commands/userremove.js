@@ -2,7 +2,8 @@ const { SlashCommandBuilder, PermissionsBitField, EmbedBuilder, userMention } = 
 const Wallet = require('../../models/Wallet');
 const Inventory = require('../../models/Inventory');
 const StoreItem = require('../../models/StoreItem');
-const { sendFinancialLogEmbed } = require('../index');
+const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
+
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -40,7 +41,8 @@ async execute(interaction) {
         .setDescription(`Removed $${amount.toFixed(2)} from ${userMention(discordId)}'s wallet.`)
         .addFields({ name: 'New Balance', value: `$${wallet.balance.toFixed(2)}` })
         .setTimestamp();
-      await sendFinancialLogEmbed(EmbedBuilder.from(embed).setTitle('➖ Money Removed'));
+      await sendFinancialLogEmbed(interaction.client, EmbedBuilder.from(embed).setTitle('➖ Money Removed'));
+
       return interaction.reply({ embeds: [embed], ephemeral: true });
     }
 
@@ -61,7 +63,8 @@ async execute(interaction) {
         .setTitle('📦 Item Removed')
         .setDescription(`Removed **${removed.name}** from ${userMention(discordId)}'s inventory.`)
         .setTimestamp();
-      await sendFinancialLogEmbed(EmbedBuilder.from(embed));
+      await sendFinancialLogEmbed(interaction.client, EmbedBuilder.from(embed));
+
       return interaction.reply({ embeds: [embed], ephemeral: true });
     }
   },

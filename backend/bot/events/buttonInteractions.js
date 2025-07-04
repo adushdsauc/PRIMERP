@@ -7,7 +7,8 @@ const StoreItem = require('../../models/StoreItem');
 const ClockSession = require('../../models/ClockSession');
 const Officer = require('../../models/Officer');
 const formatStorePage = require('../utils/formatStorePage');
-const { sendFinancialLogEmbed } = require('../index');
+const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
+
 
 module.exports = async function handleButtonInteractions(interaction) {
   const customId = interaction.customId;
@@ -139,7 +140,8 @@ module.exports = async function handleButtonInteractions(interaction) {
         { name: 'Report ID', value: reportId, inline: true }
       )
       .setTimestamp();
-    await sendFinancialLogEmbed(logEmbed);
+    await sendFinancialLogEmbed(interaction.client, logEmbed);
+
   }
 
   if (customId.startsWith('bid_')) {
@@ -187,7 +189,8 @@ module.exports = async function handleButtonInteractions(interaction) {
         { name: 'Amount', value: `$${auction.buyoutPrice}`, inline: true }
       )
       .setTimestamp();
-    await sendFinancialLogEmbed(buyoutEmbed);
+    await sendFinancialLogEmbed(interaction.client, buyoutEmbed);
+
 
     return interaction.reply({ content: '✅ Buyout successful.', ephemeral: true });
   }

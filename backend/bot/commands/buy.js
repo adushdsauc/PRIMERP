@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { sendFinancialLogEmbed } = require('../index');
+const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
+
 const StoreItem = require('../../models/StoreItem');
 const Civilian = require('../../models/Civilian');
 const Wallet = require('../../models/Wallet');
@@ -58,7 +59,8 @@ module.exports = {
         { name: 'Price', value: `$${item.price.toFixed(2)}`, inline: true }
       )
       .setTimestamp();
-    await sendFinancialLogEmbed(logEmbed);
+    await sendFinancialLogEmbed(interaction.client, logEmbed);
+
 
     const embed = new EmbedBuilder()
       .setTitle('🛒 Purchase Successful')

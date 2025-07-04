@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, userMention, EmbedBuilder } = require('discord.js');
-const { sendFinancialLogEmbed } = require('../index');
+const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
+
 const Wallet = require('../../models/Wallet');
 const Civilian = require('../../models/Civilian');
 
@@ -52,7 +53,8 @@ module.exports = {
         { name: 'Amount', value: `$${amount}`, inline: true }
       )
       .setTimestamp();
-    await sendFinancialLogEmbed(embed);
+    await sendFinancialLogEmbed(interaction.client, embed);
+
 
     return interaction.reply({ content: `✅ Transferred $${amount} to ${userMention(recipient.id)}.`, ephemeral: true });
   }

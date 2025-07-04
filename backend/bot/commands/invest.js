@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { sendFinancialLogEmbed } = require('../index');
+const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
+
 const InvestmentAsset = require('../../models/InvestmentAsset');
 const InvestmentHolding = require('../../models/InvestmentHolding');
 const Wallet = require('../../models/Wallet');
@@ -66,7 +67,8 @@ module.exports = {
           { name: 'Total Cost', value: `$${cost}`, inline: true }
         )
         .setTimestamp();
-      await sendFinancialLogEmbed(buyEmbed);
+      await sendFinancialLogEmbed(interaction.client, buyEmbed);
+
       return interaction.reply({ content: `✅ Bought ${quantity} ${identifier} for $${cost}.`, ephemeral: true });
     } else {
       if (!holding) {
@@ -99,7 +101,8 @@ module.exports = {
           { name: 'Total Revenue', value: `$${revenue}`, inline: true }
         )
         .setTimestamp();
-      await sendFinancialLogEmbed(sellEmbed);
+      await sendFinancialLogEmbed(interaction.client, sellEmbed);
+
       return interaction.reply({ content: `✅ Sold ${quantity} ${identifier} for $${revenue}.`, ephemeral: true });
     }
   },
