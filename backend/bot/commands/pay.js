@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, userMention, EmbedBuilder } = require('discord.js');
 const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
+
 const Wallet = require('../../models/Wallet');
 const Civilian = require('../../models/Civilian');
 
@@ -53,6 +54,7 @@ module.exports = {
       )
       .setTimestamp();
     await sendFinancialLogEmbed(interaction.client, embed);
+
 
     return interaction.reply({ content: `✅ Transferred $${amount} to ${userMention(recipient.id)}.`, ephemeral: true });
   }

@@ -9,6 +9,7 @@ const Officer = require('../../models/Officer');
 const formatStorePage = require('../utils/formatStorePage');
 const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
 
+
 module.exports = async function handleButtonInteractions(interaction) {
   const customId = interaction.customId;
 
@@ -140,6 +141,7 @@ module.exports = async function handleButtonInteractions(interaction) {
       )
       .setTimestamp();
     await sendFinancialLogEmbed(interaction.client, logEmbed);
+
   }
 
   if (customId.startsWith('bid_')) {
@@ -188,6 +190,7 @@ module.exports = async function handleButtonInteractions(interaction) {
       )
       .setTimestamp();
     await sendFinancialLogEmbed(interaction.client, buyoutEmbed);
+
 
     return interaction.reply({ content: '✅ Buyout successful.', ephemeral: true });
   }

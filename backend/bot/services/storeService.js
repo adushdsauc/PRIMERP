@@ -1,6 +1,7 @@
 const StoreItem = require('../../models/StoreItem');
 const Inventory = require('../../models/Inventory');
 const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
+
 const { EmbedBuilder } = require('discord.js');
 const { deductFunds, getWallet } = require('./walletService');
 
@@ -42,6 +43,7 @@ async function purchaseItem(discordId, item, member) {
     )
     .setTimestamp();
   await sendFinancialLogEmbed(member.client, embed);
+
   return item;
 }
 

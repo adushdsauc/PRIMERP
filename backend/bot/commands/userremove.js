@@ -4,6 +4,7 @@ const Inventory = require('../../models/Inventory');
 const StoreItem = require('../../models/StoreItem');
 const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
 
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('userremove')
@@ -41,6 +42,7 @@ async execute(interaction) {
         .addFields({ name: 'New Balance', value: `$${wallet.balance.toFixed(2)}` })
         .setTimestamp();
       await sendFinancialLogEmbed(interaction.client, EmbedBuilder.from(embed).setTitle('➖ Money Removed'));
+
       return interaction.reply({ embeds: [embed], ephemeral: true });
     }
 
@@ -62,6 +64,7 @@ async execute(interaction) {
         .setDescription(`Removed **${removed.name}** from ${userMention(discordId)}'s inventory.`)
         .setTimestamp();
       await sendFinancialLogEmbed(interaction.client, EmbedBuilder.from(embed));
+
       return interaction.reply({ embeds: [embed], ephemeral: true });
     }
   },

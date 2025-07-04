@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
+
 const StoreItem = require('../../models/StoreItem');
 const Civilian = require('../../models/Civilian');
 const Wallet = require('../../models/Wallet');
@@ -59,6 +60,7 @@ module.exports = {
       )
       .setTimestamp();
     await sendFinancialLogEmbed(interaction.client, logEmbed);
+
 
     const embed = new EmbedBuilder()
       .setTitle('🛒 Purchase Successful')
