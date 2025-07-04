@@ -54,6 +54,7 @@ const jailUserUtil = require('./utils/jailUser');
 const formatStorePage = require('./utils/formatStorePage');
 const scheduleFineCheckUtil = require('./utils/scheduleFineCheck');
 const sendClockEmbedUtil = require("./utils/sendClockEmbed");
+const sendFinancialLogEmbedUtil = require('./utils/sendFinancialLogEmbed');
 
 module.exports = {
   client,
@@ -63,5 +64,6 @@ module.exports = {
   jailUser: (...args) => jailUserUtil(client, ...args),
   formatStorePage,
   scheduleFineCheck: (...args) => scheduleFineCheckUtil(client, ...args),
-  sendClockEmbed: (...args) => sendClockEmbedUtil(client, ...args)
+  sendClockEmbed: (...args) => sendClockEmbedUtil(client, ...args),
+  sendFinancialLogEmbed: (...args) => sendFinancialLogEmbedUtil(client, ...args)
 };

@@ -6,7 +6,8 @@ const BankAccount = require("../models/BankAccount");
 const Transaction = require("../models/Transaction");
 const Civilian = mongoose.models.Civilian || require("../models/Civilian");
 const Wallet = require("../models/Wallet");
-const { sendBankApprovalEmbed } = require("../bot");
+const { sendBankApprovalEmbed, sendFinancialLogEmbed } = require("../bot");
+const { EmbedBuilder } = require('discord.js');
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -77,6 +78,20 @@ router.post("/deposit", async (req, res) => {
     await Promise.all([wallet.save(), account.save()]);
 
     await Transaction.create({ accountId, type: "Deposit", amount, description });
+
+    const actor = req.user ? `${req.user.globalName || req.user.username}#${req.user.discriminator}` : 'Unknown';
+    const embed = new EmbedBuilder()
+      .setTitle('💰 Deposit')
+      .setColor('Green')
+      .addFields(
+        { name: 'Account', value: `#${account.accountNumber}`, inline: true },
+        { name: 'Amount', value: `$${amount}`, inline: true },
+        { name: 'Civilian', value: `${civilian.firstName} ${civilian.lastName}`, inline: true },
+        { name: 'By', value: actor, inline: false }
+      )
+      .setTimestamp();
+    await sendFinancialLogEmbed(embed);
+
     res.json({ success: true, newBalance: account.balance });
   } catch (err) {
     console.error("❌ Deposit failed:", err);
@@ -104,6 +119,20 @@ router.post("/withdraw", async (req, res) => {
     await Promise.all([account.save(), wallet.save()]);
 
     await Transaction.create({ accountId, type: "Withdrawal", amount: -amount, description });
+
+    const actor = req.user ? `${req.user.globalName || req.user.username}#${req.user.discriminator}` : 'Unknown';
+    const embed = new EmbedBuilder()
+      .setTitle('💸 Withdrawal')
+      .setColor('Orange')
+      .addFields(
+        { name: 'Account', value: `#${account.accountNumber}`, inline: true },
+        { name: 'Amount', value: `$${amount}`, inline: true },
+        { name: 'Civilian', value: `${civilian.firstName} ${civilian.lastName}`, inline: true },
+        { name: 'By', value: actor, inline: false }
+      )
+      .setTimestamp();
+    await sendFinancialLogEmbed(embed);
+
     res.json({ success: true, newBalance: account.balance });
   } catch (err) {
     console.error("❌ Withdraw failed:", err);
@@ -131,6 +160,19 @@ router.post("/transfer", async (req, res) => {
       { accountId: fromAccount._id, type: "Transfer", amount: -amount, description: `Transfer to ${toAccount.accountNumber} - ${description || ""}` },
       { accountId: toAccount._id, type: "Transfer", amount, description: `Transfer from ${fromAccount.accountNumber} - ${description || ""}` }
     ]);
+
+    const actor = req.user ? `${req.user.globalName || req.user.username}#${req.user.discriminator}` : 'Unknown';
+    const embed = new EmbedBuilder()
+      .setTitle('🔄 Transfer')
+      .setColor('Blue')
+      .addFields(
+        { name: 'From', value: `#${fromAccount.accountNumber}`, inline: true },
+        { name: 'To', value: `#${toAccount.accountNumber}`, inline: true },
+        { name: 'Amount', value: `$${amount}`, inline: true },
+        { name: 'By', value: actor, inline: false }
+      )
+      .setTimestamp();
+    await sendFinancialLogEmbed(embed);
 
     res.json({ success: true });
   } catch (err) {

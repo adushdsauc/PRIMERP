@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionsBitField, EmbedBuilder, userMention } = require('discord.js');
 const Wallet = require('../../models/Wallet');
 const Inventory = require('../../models/Inventory');
+const { sendFinancialLogEmbed } = require('../index');
 const StoreItem = require('../../models/StoreItem');
 
 module.exports = {
@@ -39,6 +40,7 @@ async execute(interaction) {
         .setDescription(`Added $${amount.toFixed(2)} to ${userMention(discordId)}'s wallet.`)
         .addFields({ name: 'New Balance', value: `$${wallet.balance.toFixed(2)}` })
         .setTimestamp();
+      await sendFinancialLogEmbed(EmbedBuilder.from(embed).setTitle('➕ Money Added'));
       return interaction.reply({ embeds: [embed], ephemeral: true });
     }
 
@@ -58,6 +60,7 @@ async execute(interaction) {
         .setTitle('📦 Item Added')
         .setDescription(`Added **${item.name}** to ${userMention(discordId)}'s inventory.`)
         .setTimestamp();
+      await sendFinancialLogEmbed(EmbedBuilder.from(embed));
       return interaction.reply({ embeds: [embed], ephemeral: true });
     }
   },
