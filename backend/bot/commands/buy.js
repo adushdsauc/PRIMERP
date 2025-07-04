@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { sendFinancialLogEmbed } = require('../index');
 const StoreItem = require('../../models/StoreItem');
 const Civilian = require('../../models/Civilian');
 const Wallet = require('../../models/Wallet');
@@ -47,6 +48,17 @@ module.exports = {
       { $push: { items: { name: item.name, price: item.price, purchasedAt: new Date() } } },
       { upsert: true, new: true }
     );
+
+    const logEmbed = new EmbedBuilder()
+      .setTitle('🛒 Item Purchased')
+      .setColor('Green')
+      .addFields(
+        { name: 'User', value: interaction.user.tag, inline: true },
+        { name: 'Item', value: item.name, inline: true },
+        { name: 'Price', value: `$${item.price.toFixed(2)}`, inline: true }
+      )
+      .setTimestamp();
+    await sendFinancialLogEmbed(logEmbed);
 
     const embed = new EmbedBuilder()
       .setTitle('🛒 Purchase Successful')

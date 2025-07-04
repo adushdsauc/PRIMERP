@@ -1,5 +1,7 @@
 const StoreItem = require('../../models/StoreItem');
 const Inventory = require('../../models/Inventory');
+const { sendFinancialLogEmbed } = require('../index');
+const { EmbedBuilder } = require('discord.js');
 const { deductFunds, getWallet } = require('./walletService');
 
 async function getItems() {
@@ -30,6 +32,16 @@ async function purchaseItem(discordId, item, member) {
     { $push: { items: { name: item.name, price: item.price, purchasedAt: new Date() } } },
     { upsert: true, new: true }
   );
+  const embed = new EmbedBuilder()
+    .setTitle('🛒 Item Purchased')
+    .setColor('Green')
+    .addFields(
+      { name: 'User ID', value: discordId, inline: true },
+      { name: 'Item', value: item.name, inline: true },
+      { name: 'Price', value: `$${item.price.toFixed(2)}`, inline: true }
+    )
+    .setTimestamp();
+  await sendFinancialLogEmbed(embed);
   return item;
 }
 
