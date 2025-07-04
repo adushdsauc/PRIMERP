@@ -44,6 +44,13 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
+const { schedulePayment } = require('./services/loanService');
+mongoose.connection.on('open', async () => {
+  const Loan = require('../models/Loan');
+  const loans = await Loan.find({ status: 'active' });
+  for (const loan of loans) schedulePayment(client, loan);
+});
+
 client.login(process.env.DISCORD_BOT_TOKEN);
 
 // Utils
@@ -65,5 +72,6 @@ module.exports = {
   formatStorePage,
   scheduleFineCheck: (...args) => scheduleFineCheckUtil(client, ...args),
   sendClockEmbed: (...args) => sendClockEmbedUtil(client, ...args),
-  sendFinancialLogEmbed: (...args) => sendFinancialLogEmbedUtil(client, ...args)
+  sendFinancialLogEmbed: (...args) => sendFinancialLogEmbedUtil(client, ...args),
+  scheduleLoanPayment: (...args) => schedulePayment(client, ...args)
 };
