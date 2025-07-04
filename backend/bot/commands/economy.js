@@ -98,6 +98,6 @@ module.exports = {
       });
     }
 
-    return interaction.reply({ embeds: [walletEmbed, bankEmbed, portfolioEmbed, inventoryEmbed], ephemeral: true });
+    return interaction.reply({ embeds: [walletEmbed, bankEmbed, portfolioEmbed, inventoryEmbed] });
   }
 };
