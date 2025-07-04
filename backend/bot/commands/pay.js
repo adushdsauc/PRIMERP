@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, userMention } = require('discord.js');
+const { SlashCommandBuilder, userMention, EmbedBuilder } = require('discord.js');
+const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
 const Wallet = require('../../models/Wallet');
 const Civilian = require('../../models/Civilian');
 
@@ -41,6 +42,17 @@ module.exports = {
     senderWallet.balance -= amount;
     recipientWallet.balance += amount;
     await Promise.all([senderWallet.save(), recipientWallet.save()]);
+
+    const embed = new EmbedBuilder()
+      .setTitle('💸 Wallet Transfer')
+      .setColor('Blue')
+      .addFields(
+        { name: 'From', value: userMention(senderId), inline: true },
+        { name: 'To', value: userMention(recipient.id), inline: true },
+        { name: 'Amount', value: `$${amount}`, inline: true }
+      )
+      .setTimestamp();
+    await sendFinancialLogEmbed(interaction.client, embed);
 
     return interaction.reply({ content: `✅ Transferred $${amount} to ${userMention(recipient.id)}.`, ephemeral: true });
   }

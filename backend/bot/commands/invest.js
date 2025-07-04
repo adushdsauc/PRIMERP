@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
 const InvestmentAsset = require('../../models/InvestmentAsset');
 const InvestmentHolding = require('../../models/InvestmentHolding');
 const Wallet = require('../../models/Wallet');
@@ -55,6 +56,17 @@ module.exports = {
       asset.netDemand += quantity;
       await asset.save();
       await wallet.save();
+      const buyEmbed = new EmbedBuilder()
+        .setTitle('📈 Investment Purchase')
+        .setColor('Green')
+        .addFields(
+          { name: 'User', value: interaction.user.tag, inline: true },
+          { name: 'Asset', value: identifier, inline: true },
+          { name: 'Quantity', value: String(quantity), inline: true },
+          { name: 'Total Cost', value: `$${cost}`, inline: true }
+        )
+        .setTimestamp();
+      await sendFinancialLogEmbed(interaction.client, buyEmbed);
       return interaction.reply({ content: `✅ Bought ${quantity} ${identifier} for $${cost}.`, ephemeral: true });
     } else {
       if (!holding) {
@@ -77,6 +89,17 @@ module.exports = {
       } else {
         await holding.save();
       }
+      const sellEmbed = new EmbedBuilder()
+        .setTitle('📉 Investment Sale')
+        .setColor('Orange')
+        .addFields(
+          { name: 'User', value: interaction.user.tag, inline: true },
+          { name: 'Asset', value: identifier, inline: true },
+          { name: 'Quantity', value: String(quantity), inline: true },
+          { name: 'Total Revenue', value: `$${revenue}`, inline: true }
+        )
+        .setTimestamp();
+      await sendFinancialLogEmbed(interaction.client, sellEmbed);
       return interaction.reply({ content: `✅ Sold ${quantity} ${identifier} for $${revenue}.`, ephemeral: true });
     }
   },

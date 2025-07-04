@@ -7,6 +7,7 @@ const StoreItem = require('../../models/StoreItem');
 const ClockSession = require('../../models/ClockSession');
 const Officer = require('../../models/Officer');
 const formatStorePage = require('../utils/formatStorePage');
+const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
 
 module.exports = async function handleButtonInteractions(interaction) {
   const customId = interaction.customId;
@@ -128,6 +129,17 @@ module.exports = async function handleButtonInteractions(interaction) {
       .setColor('Green');
 
     await interaction.update({ embeds: [updatedEmbed], components: [] });
+
+    const logEmbed = new EmbedBuilder()
+      .setTitle('💰 Fine Paid')
+      .setColor('Blue')
+      .addFields(
+        { name: 'User', value: interaction.user.tag, inline: true },
+        { name: 'Amount', value: `$${report.fine}`, inline: true },
+        { name: 'Report ID', value: reportId, inline: true }
+      )
+      .setTimestamp();
+    await sendFinancialLogEmbed(interaction.client, logEmbed);
   }
 
   if (customId.startsWith('bid_')) {
@@ -166,6 +178,16 @@ module.exports = async function handleButtonInteractions(interaction) {
     auction.highestBid = { amount: auction.buyoutPrice, bidderId: interaction.user.id };
     await auction.save();
     await closeAuction(interaction.client, auction._id);
+    const buyoutEmbed = new EmbedBuilder()
+      .setTitle('🏷️ Auction Buyout')
+      .setColor('Purple')
+      .addFields(
+        { name: 'User', value: interaction.user.tag, inline: true },
+        { name: 'Auction ID', value: auctionId, inline: true },
+        { name: 'Amount', value: `$${auction.buyoutPrice}`, inline: true }
+      )
+      .setTimestamp();
+    await sendFinancialLogEmbed(interaction.client, buyoutEmbed);
 
     return interaction.reply({ content: '✅ Buyout successful.', ephemeral: true });
   }
