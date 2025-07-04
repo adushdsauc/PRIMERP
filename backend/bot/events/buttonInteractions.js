@@ -219,6 +219,13 @@ module.exports = async function handleButtonInteractions(interaction) {
       .addComponents(
         new ActionRowBuilder().addComponents(
           new TextInputBuilder()
+            .setCustomId('loan_type')
+            .setLabel('Loan Type (Personal/Home/Auto/Business)')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+        ),
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder()
             .setCustomId('loan_amount')
             .setLabel('Loan Amount')
             .setStyle(TextInputStyle.Short)
@@ -249,14 +256,78 @@ module.exports = async function handleButtonInteractions(interaction) {
     return interaction.showModal(modal);
   }
 
+  if (customId.startsWith('loan_app_accept_')) {
+    const [, , userId, amt, term, rate, type] = customId.split('_');
+    const user = await interaction.client.users.fetch(userId).catch(() => null);
+    if (user) {
+      const amount = parseFloat(amt);
+      const termWeeks = parseInt(term);
+      const interest = parseFloat(rate);
+      const total = amount * (1 + interest / 100);
+      const weekly = (total / termWeeks).toFixed(2);
+      const contract = new EmbedBuilder()
+        .setTitle('📜 Loan Contract')
+        .setColor('Blue')
+        .addFields(
+          { name: 'Loan Type', value: type, inline: true },
+          { name: 'Loan Amount', value: `$${amount}`, inline: true },
+          { name: 'Term Length', value: `${termWeeks} weeks`, inline: true },
+          { name: 'Interest %', value: `${interest}%`, inline: true },
+          { name: 'Total Repayment', value: `$${total.toFixed(2)}`, inline: true },
+          { name: 'Weekly Payment', value: `$${weekly}`, inline: true }
+        );
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`loan_sign_${userId}_${amount}_${termWeeks}_${interest}_${type}`)
+          .setLabel('Sign Loan')
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId('loan_decline').setLabel('Decline').setStyle(ButtonStyle.Danger)
+      );
+      await user.send({ embeds: [contract], components: [row] }).catch(() => null);
+    }
+    const logEmbed = new EmbedBuilder()
+      .setTitle('✅ Loan Application Approved')
+      .setColor('Green')
+      .addFields(
+        { name: 'Applicant', value: `<@${userId}>`, inline: true },
+        { name: 'Staff', value: `<@${interaction.user.id}>`, inline: true },
+        { name: 'Amount', value: `$${amt}`, inline: true },
+        { name: 'Type', value: type, inline: true }
+      )
+      .setTimestamp();
+    await sendFinancialLogEmbed(interaction.client, logEmbed);
+    return interaction.update({ content: 'Application approved.', components: [], embeds: interaction.message.embeds });
+  }
+
+  if (customId.startsWith('loan_app_deny_')) {
+    const [, , userId, amt, term, rate, type] = customId.split('_');
+    const modal = new ModalBuilder()
+      .setCustomId(`loan_deny_reason_${userId}_${amt}_${term}_${rate}_${type}`)
+      .setTitle('Deny Reason')
+      .addComponents(
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder()
+            .setCustomId('deny_reason')
+            .setLabel('Reason for denial')
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(true)
+        )
+      );
+    return interaction.showModal(modal);
+  }
+
   if (customId.startsWith('loan_sign_')) {
-    const [, , amt, term, rate] = customId.split('_');
+    const [, , userId, amt, term, rate, type] = customId.split('_');
+
+    if (interaction.user.id !== userId) {
+      return interaction.reply({ content: '❌ This contract is not for you.', ephemeral: true });
+    }
 
     const { createLoan } = require('../services/loanService');
     const amount = parseFloat(amt);
     const termWeeks = parseInt(term);
     const interest = parseFloat(rate);
-    await createLoan(interaction.client, interaction.user.id, amount, termWeeks, interest);
+    await createLoan(interaction.client, userId, amount, termWeeks, interest, type);
     await interaction.update({ content: '✅ Loan signed and stored.', embeds: [], components: [] });
   }
 

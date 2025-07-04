@@ -24,7 +24,24 @@ async function adjustCredit(client, discordId, delta, reason) {
   return profile;
 }
 
-async function createLoan(client, discordId, amount, termWeeks, interest) {
+async function sendPaymentEmbed(client, loan) {
+  const user = await client.users.fetch(loan.userId).catch(() => null);
+  if (!user) return;
+  const embed = new EmbedBuilder()
+    .setTitle('💰 Loan Payment Due')
+    .setColor('Blue')
+    .setDescription(`You owe **$${loan.weeklyPayment}**. Click **Pay** within 24h to avoid penalties.`)
+    .addFields(
+      { name: 'Payments Left', value: String(loan.paymentsRemaining) },
+      { name: 'Next Due', value: `<t:${Math.floor(loan.nextPaymentDue.getTime() / 1000)}:F>` }
+    );
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId(`loan_pay_${loan._id}`).setLabel('Pay').setStyle(ButtonStyle.Success)
+  );
+  await user.send({ embeds: [embed], components: [row] }).catch(() => null);
+}
+
+async function createLoan(client, discordId, amount, termWeeks, interest, type = 'Personal') {
   const total = amount * (1 + interest / 100);
   const weeklyPayment = Number((total / termWeeks).toFixed(2));
   const profile = await getCredit(discordId);
@@ -36,11 +53,23 @@ async function createLoan(client, discordId, amount, termWeeks, interest) {
     termWeeks,
     paymentsRemaining: termWeeks,
     creditScoreAtApproval: profile.score,
+    type,
     nextPaymentDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   });
 
   await adjustCredit(client, discordId, 15, 'Loan approved');
   schedulePayment(client, loan);
+
+  const user = await client.users.fetch(discordId).catch(() => null);
+  if (user) {
+    const dm = new EmbedBuilder()
+      .setTitle('✅ Loan Started')
+      .setColor('Green')
+      .setDescription(`Your ${type} loan for **$${amount}** has been activated.`)
+      .addFields({ name: 'Next Payment', value: `<t:${Math.floor(loan.nextPaymentDue.getTime() / 1000)}:F>` });
+    await user.send({ embeds: [dm] }).catch(() => null);
+    await sendPaymentEmbed(client, loan);
+  }
 
   const embed = new EmbedBuilder()
     .setTitle('✅ Loan Signed')
@@ -68,6 +97,34 @@ async function payLoan(client, loanId) {
   }
   await loan.save();
   if (loan.status === 'active') schedulePayment(client, loan);
+  const user = await client.users.fetch(loan.userId).catch(() => null);
+  if (user) {
+    const dm = new EmbedBuilder()
+      .setTitle('✅ Payment Received')
+      .setColor('Green')
+      .setDescription(`We received your payment of **$${loan.weeklyPayment}**.`)
+      .addFields({ name: 'Next Due', value: `<t:${Math.floor(loan.nextPaymentDue.getTime() / 1000)}:F>` });
+    await user.send({ embeds: [dm] }).catch(() => null);
+  }
+  const logEmbed = new EmbedBuilder()
+    .setTitle('💸 Loan Payment')
+    .setColor('Blue')
+    .addFields(
+      { name: 'User', value: `<@${loan.userId}>`, inline: true },
+      { name: 'Amount', value: `$${loan.weeklyPayment}`, inline: true },
+      { name: 'Loan ID', value: loan._id.toString(), inline: true }
+    )
+    .setTimestamp();
+  await sendFinancialLogEmbed(client, logEmbed);
+  if (loan.status === 'paid') {
+    const finish = new EmbedBuilder()
+      .setTitle('🏁 Loan Paid Off')
+      .setColor('Green')
+      .setDescription(`Loan **${loan._id.toString()}** has been fully repaid.`)
+      .setTimestamp();
+    if (user) await user.send({ embeds: [finish] }).catch(() => null);
+    await sendFinancialLogEmbed(client, finish);
+  }
   return loan;
 }
 
@@ -89,18 +146,7 @@ function schedulePayment(client, loan) {
   setTimeout(async () => {
     const fresh = await Loan.findById(loan._id);
     if (!fresh || fresh.status !== 'active') return;
-    const user = await client.users.fetch(fresh.userId).catch(() => null);
-    if (!user) return;
-
-    const embed = new EmbedBuilder()
-      .setTitle('💰 Loan Payment Due')
-      .setColor('Blue')
-      .setDescription(`You owe **$${fresh.weeklyPayment}**. Click **Pay** within 24h to avoid penalties.`)
-      .addFields({ name: 'Payments Left', value: String(fresh.paymentsRemaining) });
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder().setCustomId(`loan_pay_${fresh._id}`).setLabel('Pay').setStyle(ButtonStyle.Success)
-    );
-    await user.send({ embeds: [embed], components: [row] }).catch(() => null);
+    await sendPaymentEmbed(client, fresh);
 
     setTimeout(async () => {
       const check = await Loan.findById(fresh._id);
@@ -119,4 +165,5 @@ module.exports = {
   createLoan,
   payLoan,
   schedulePayment,
+  sendPaymentEmbed,
 };
