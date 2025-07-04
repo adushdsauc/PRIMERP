@@ -20,18 +20,21 @@ async function updatePrices(client) {
     }
     for (const asset of assets) {
       // base change based on risk
-      const volatility = asset.risk / 50; // risk 10 -> 0.2
+      const volatility = asset.risk / 100; // risk 10 -> 0.1
       let changePercent = (Math.random() * volatility * 2 - volatility) * 100; // -volatility..volatility percent
       // apply event modifier if present
       if (asset.eventModifier) {
-        changePercent += asset.eventModifier * asset.risk * 2;
+        changePercent += asset.eventModifier * asset.risk; // slightly less impactful
         asset.eventModifier = 0;
       }
       // apply demand modifier from user trading
       if (asset.netDemand) {
-        changePercent += asset.netDemand * asset.risk * 0.05;
+        changePercent += asset.netDemand * asset.risk * 0.01; // reduce impact of trading volume
         asset.netDemand = 0;
       }
+
+      // limit extreme swings
+      changePercent = Math.max(-20, Math.min(20, changePercent));
 
       const newPrice = Math.max(1, Math.round(asset.price * (1 + changePercent / 100)));
       asset.price = newPrice;
