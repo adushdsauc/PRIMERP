@@ -69,6 +69,7 @@ module.exports = async function handleModalSubmissions(interaction) {
   }
 
   if (interaction.customId === 'loan_application') {
+    const type = interaction.fields.getTextInputValue('loan_type');
     const amount = parseFloat(interaction.fields.getTextInputValue('loan_amount'));
     const termWeeks = parseInt(interaction.fields.getTextInputValue('loan_term'));
     const agree = interaction.fields.getTextInputValue('loan_terms').toLowerCase();
@@ -89,6 +90,8 @@ module.exports = async function handleModalSubmissions(interaction) {
       return 3;
     };
 
+    const modifiers = { personal: 0, home: -2, auto: -1, business: 1 };
+
     if (profile.score < 580) {
       const warn = new EmbedBuilder()
         .setTitle('Collateral Required')
@@ -103,33 +106,74 @@ module.exports = async function handleModalSubmissions(interaction) {
       return;
     }
 
-    const rate = getRate(profile.score);
+    const base = getRate(profile.score);
+    const rate = base + (modifiers[type.toLowerCase()] ?? 0);
     const total = amount * (1 + rate / 100);
     const weeklyPayment = Number((total / termWeeks).toFixed(2));
 
-    const contract = new EmbedBuilder()
-      .setTitle('📜 Loan Contract')
-      .setColor('Blue')
-      .addFields(
-        { name: 'Loan Type', value: 'Personal', inline: true },
-        { name: 'Loan Amount', value: `$${amount}`, inline: true },
-        { name: 'Term Length', value: `${termWeeks} weeks`, inline: true },
-        { name: 'Interest %', value: `${rate}%`, inline: true },
-        { name: 'Total Repayment', value: `$${total.toFixed(2)}`, inline: true },
-        { name: 'Weekly Payment', value: `$${weeklyPayment}`, inline: true }
+    const reviewChannel = await interaction.client.channels.fetch('1390762518837989496').catch(() => null);
+    if (reviewChannel) {
+      const appEmbed = new EmbedBuilder()
+        .setTitle('📄 Loan Application')
+        .setColor('Blue')
+        .addFields(
+          { name: 'Applicant', value: `<@${interaction.user.id}>` },
+          { name: 'Type', value: type, inline: true },
+          { name: 'Amount', value: `$${amount}`, inline: true },
+          { name: 'Term', value: `${termWeeks} weeks`, inline: true },
+          { name: 'Purpose', value: purpose },
+          { name: 'Credit Score', value: String(profile.score), inline: true },
+          { name: 'Interest %', value: `${rate}%`, inline: true }
+        )
+        .setTimestamp();
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`loan_app_accept_${interaction.user.id}_${amount}_${termWeeks}_${rate}_${type}`)
+          .setLabel('Approve')
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+          .setCustomId(`loan_app_deny_${interaction.user.id}_${amount}_${termWeeks}_${rate}_${type}`)
+          .setLabel('Deny')
+          .setStyle(ButtonStyle.Danger)
       );
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`loan_sign_${amount}_${termWeeks}_${rate}`)
-        .setLabel('Sign Loan')
-        .setStyle(ButtonStyle.Success),
-      new ButtonBuilder()
-        .setCustomId('loan_decline')
-        .setLabel('Decline')
-        .setStyle(ButtonStyle.Danger)
-    );
+      await reviewChannel.send({ embeds: [appEmbed], components: [row] });
+    }
+    await interaction.reply({ content: '✅ Application submitted for review.', ephemeral: true });
+  }
 
-    await interaction.reply({ content: '📑 Contract sent to your DMs.', ephemeral: true });
-    await interaction.user.send({ embeds: [contract], components: [row] }).catch(() => null);
+  if (interaction.customId.startsWith('loan_deny_reason_')) {
+    const parts = interaction.customId.split('_');
+    const userId = parts[3];
+    const amount = parts[4];
+    const term = parts[5];
+    const rate = parts[6];
+    const type = parts[7];
+    const reason = interaction.fields.getTextInputValue('deny_reason');
+
+    const user = await interaction.client.users.fetch(userId).catch(() => null);
+    if (user) {
+      const embed = new EmbedBuilder()
+        .setTitle('❌ Loan Application Denied')
+        .setColor('Red')
+        .setDescription(`Your ${type} loan request for **$${amount}** was denied.`)
+        .addFields({ name: 'Reason', value: reason });
+      await user.send({ embeds: [embed] }).catch(() => null);
+    }
+
+    const sendFinancialLogEmbed = require('../utils/sendFinancialLogEmbed');
+    const log = new EmbedBuilder()
+      .setTitle('❌ Loan Denied')
+      .setColor('Red')
+      .addFields(
+        { name: 'Applicant', value: `<@${userId}>`, inline: true },
+        { name: 'Staff', value: `<@${interaction.user.id}>`, inline: true },
+        { name: 'Amount', value: `$${amount}`, inline: true },
+        { name: 'Type', value: type, inline: true },
+        { name: 'Reason', value: reason }
+      )
+      .setTimestamp();
+    await sendFinancialLogEmbed(interaction.client, log);
+
+    await interaction.update({ content: 'Application denied.', components: [], embeds: interaction.message.embeds });
   }
 };

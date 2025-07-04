@@ -8,6 +8,7 @@ const LoanSchema = new mongoose.Schema({
   termWeeks: { type: Number, required: true },
   paymentsRemaining: { type: Number, required: true },
   creditScoreAtApproval: { type: Number, required: true },
+  type: { type: String, default: 'Personal' },
   strikes: { type: Number, default: 0 },
   nextPaymentDue: { type: Date, required: true },
   createdAt: { type: Date, default: Date.now },
