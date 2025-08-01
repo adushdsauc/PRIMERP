@@ -22,8 +22,8 @@ export default function CreateReport() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6">Create Report</h2>
+    <div className="max-w-3xl mx-auto p-4 sm:p-6">
+      <h2 className="text-3xl sm:text-4xl font-bold mb-6">Create Report</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           name="title"
@@ -60,7 +60,7 @@ export default function CreateReport() {
         />
         <button
           type="submit"
-          className="bg-green-600 hover:bg-green-700 px-6 py-2 rounded text-white"
+          className="bg-green-600 hover:bg-green-700 px-6 py-2 rounded text-white w-full sm:w-auto"
         >
           Submit Report
         </button>

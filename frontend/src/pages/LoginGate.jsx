@@ -31,12 +31,12 @@ const LoginGate = () => {
   }
 
   return (
-    <div className="w-full h-screen bg-gray-900 flex flex-col items-center justify-center text-white">
-      <h1 className="text-3xl font-bold mb-6">Welcome to Prime RolePlay CAD!</h1>
+    <div className="w-full h-screen bg-gray-900 flex flex-col items-center justify-center text-white px-4 sm:px-6 text-center">
+      <h1 className="text-3xl sm:text-4xl font-bold mb-6">Welcome to Prime RolePlay CAD!</h1>
       <p className="mb-4 text-gray-300">You must log in with Discord to continue</p>
       <button
         onClick={handleLogin}
-        className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg"
+        className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg w-full sm:w-auto"
       >
         Login with Discord
       </button>
