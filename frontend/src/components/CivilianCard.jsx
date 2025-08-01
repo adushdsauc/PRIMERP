@@ -12,10 +12,10 @@ const CivilianCard = ({
   const [showLicenseModal, setShowLicenseModal] = useState(false);
 
   return (
-    <div className="bg-gray-800 text-white p-6 rounded-xl shadow-lg max-w-2xl mx-auto mt-6">
+    <div className="bg-gray-800 text-white p-4 sm:p-6 rounded-xl shadow-lg max-w-2xl mx-auto mt-6">
       <h2 className="text-2xl font-bold mb-2">{civilian.firstName} {civilian.lastName}</h2>
 
-      <div className="grid grid-cols-2 gap-y-1 text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1 text-sm">
         <p><strong>DOB:</strong> {civilian.dob || civilian.dateOfBirth || "N/A"}</p>
         <p><strong>Age:</strong> {civilian.age || "N/A"}</p>
         <p><strong>Sex:</strong> {civilian.sex || "N/A"}</p>

@@ -53,7 +53,7 @@ const EditWeaponModal = ({ weaponId, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <div className="bg-gray-900 p-6 rounded-xl text-white w-full max-w-md border border-gray-700">
+      <div className="bg-gray-900 p-4 sm:p-6 rounded-xl text-white w-full max-w-md border border-gray-700">
         <h2 className="text-xl font-semibold mb-4 text-center">Edit Weapon</h2>
         <div className="space-y-3">
           <input
@@ -81,7 +81,7 @@ const EditWeaponModal = ({ weaponId, onClose, onSuccess }) => {
         {message && (
           <p className="text-center text-sm mt-2 text-red-400">{message}</p>
         )}
-        <div className="flex justify-end gap-2 mt-4">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 space-y-2 sm:space-y-0 mt-4">
           <button
             onClick={onClose}
             className="bg-gray-700 px-4 py-2 rounded text-sm"

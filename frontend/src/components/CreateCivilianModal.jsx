@@ -75,7 +75,7 @@ const CreateCivilianModal = ({ onClose, onSuccess = () => {} }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-gray-800 p-6 rounded-lg w-full max-w-3xl text-white overflow-y-auto max-h-[90vh]">
+      <div className="bg-gray-800 p-4 sm:p-6 rounded-lg w-full max-w-3xl text-white overflow-y-auto max-h-[90vh]">
         <h2 className="text-2xl font-semibold mb-6">Register New Civilian</h2>
         <form
           onSubmit={handleSubmit}
@@ -213,7 +213,7 @@ const CreateCivilianModal = ({ onClose, onSuccess = () => {} }) => {
             <div className="col-span-2 text-red-400 mt-2">{error}</div>
           )}
 
-          <div className="col-span-1 md:col-span-2 flex justify-end gap-4 mt-6">
+          <div className="col-span-1 md:col-span-2 flex flex-col sm:flex-row justify-end gap-4 space-y-2 sm:space-y-0 mt-6">
             <button
               type="button"
               onClick={onClose}

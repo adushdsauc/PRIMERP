@@ -125,7 +125,7 @@ export default function CreateReportModal({ civilian, onClose }) {
   return (
     <Dialog open={true} onClose={onClose} className="fixed z-50 inset-0 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen">
-        <Dialog.Panel className="bg-gray-900 p-6 rounded-lg shadow-lg max-w-md w-full mx-auto">
+        <Dialog.Panel className="bg-gray-900 p-4 sm:p-6 rounded-lg shadow-lg max-w-md w-full mx-auto">
           <Dialog.Title className="text-white text-xl mb-4 text-left">Create Report</Dialog.Title>
           <div className="space-y-4">
             <div>
@@ -190,7 +190,7 @@ export default function CreateReportModal({ civilian, onClose }) {
               )}
             </div>
 
-            <div className="flex space-x-2">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
               <div className="flex-1">
                 <label className="text-white block text-left">Fine ($)</label>
                 <input
@@ -229,7 +229,7 @@ export default function CreateReportModal({ civilian, onClose }) {
               <p className={`text-left text-sm font-medium ${message.includes("✅") ? "text-green-400" : "text-red-400"}`}>{message}</p>
             )}
 
-            <div className="flex justify-end">
+            <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0">
               <button
                 onClick={handleSubmit}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
