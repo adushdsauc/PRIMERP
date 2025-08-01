@@ -41,7 +41,7 @@ export default function SelectPoliceCharacter({ discordId, onSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-900 p-6 rounded-lg w-full max-w-md border border-gray-700 shadow">
+      <div className="bg-gray-900 p-6 sm:p-8 rounded-lg w-full max-w-md border border-gray-700 shadow">
         <h2 className="text-xl font-bold mb-4">Select Police Character</h2>
 
         <select

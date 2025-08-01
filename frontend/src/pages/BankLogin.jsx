@@ -27,14 +27,14 @@ export default function BankLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      <div className="w-full max-w-md p-6">
+    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4 sm:px-6">
+      <div className="w-full max-w-md p-6 sm:p-8">
         {/* Maze Bank Logo */}
         <div className="flex justify-center mb-8">
           <img src="/Mazebank.png" alt="Mazebank" className="h-60 object-contain" />
         </div>
 
-        <h2 className="text-2xl font-bold text-center mb-6">Account Login</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6">Account Login</h2>
 
         {/* Civilian Dropdown */}
         <label className="block mb-2 text-sm font-medium text-gray-300">Select Civilian</label>

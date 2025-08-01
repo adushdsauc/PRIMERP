@@ -46,10 +46,10 @@ export default function SearchDatabase() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <h2 className="text-3xl font-bold text-white mb-6 text-center">Search Database</h2>
 
-      <div className="flex justify-center space-x-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-center sm:space-x-4 space-y-4 sm:space-y-0 mb-6">
         <div className="flex flex-col">
           <label className="text-purple-400 font-semibold mb-1">Name Search</label>
           <input
@@ -119,7 +119,7 @@ export default function SearchDatabase() {
 
       {civilian && showFullCivilian && (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="bg-gray-900 p-4 rounded-md h-full">
               <h4 className="text-white font-semibold mb-2">Personal Information</h4>
               <p className="text-white">Name: {civilian.firstName} {civilian.middleInitial} {civilian.lastName}</p>
@@ -147,7 +147,7 @@ export default function SearchDatabase() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="bg-gray-900 p-4 rounded-md">
               <h4 className="text-white font-semibold mb-2">Licenses</h4>
               {civilian.licenses?.length > 0 ? (
@@ -174,6 +174,7 @@ export default function SearchDatabase() {
           <div className="bg-gray-900 p-4 rounded-md">
             <h4 className="text-white font-semibold mb-2">Registered Vehicles</h4>
             {civilian.vehicles?.length > 0 ? (
+              <div className="overflow-x-auto">
               <table className="w-full text-sm text-left text-white">
                 <thead className="text-xs text-gray-400 uppercase bg-gray-800">
                   <tr>
@@ -202,12 +203,14 @@ export default function SearchDatabase() {
                   ))}
                 </tbody>
               </table>
+              </div>
             ) : <p className="text-white">No vehicles registered.</p>}
           </div>
 
           <div className="bg-gray-900 p-4 rounded-md">
             <h4 className="text-white font-semibold mb-2">Registered Firearms</h4>
             {civilian.weapons?.length > 0 ? (
+              <div className="overflow-x-auto">
               <table className="w-full text-sm text-left text-white">
                 <thead className="text-xs text-gray-400 uppercase bg-gray-800">
                   <tr>
@@ -226,6 +229,7 @@ export default function SearchDatabase() {
                   ))}
                 </tbody>
               </table>
+              </div>
             ) : <p className="text-white">No firearms registered.</p>}
           </div>
 

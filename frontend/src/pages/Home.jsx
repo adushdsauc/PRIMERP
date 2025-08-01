@@ -48,14 +48,14 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-white flex flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold mb-4">Begin Your Journey</h1>
+    <div className="min-h-screen bg-[#0e0e0e] text-white flex flex-col items-center justify-center px-4 sm:px-6">
+      <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-center">Begin Your Journey</h1>
       <p className="text-gray-400 mb-6">
         Create your first civilian character to get started.
       </p>
       <button
         onClick={() => setShowModal(true)}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg w-full sm:w-auto"
       >
         Create Civilian
       </button>
@@ -63,11 +63,11 @@ export default function Home() {
       {(roles?.includes(POLICE_ROLE_ID) || roles?.includes(FIRE_EMS_ROLE_ID)) && (
         <div className="mt-10">
           <p className="text-gray-400 mb-2">You also have department access:</p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {roles.includes(POLICE_ROLE_ID) && (
               <button
                 onClick={() => navigate("/dashboard/pso")}
-                className="bg-red-700 hover:bg-red-800 px-4 py-2 rounded"
+                className="bg-red-700 hover:bg-red-800 px-4 py-2 rounded w-full sm:w-auto"
               >
                 Public Safety Office
               </button>
@@ -75,7 +75,7 @@ export default function Home() {
             {roles.includes(FIRE_EMS_ROLE_ID) && (
               <button
                 onClick={() => navigate("/dashboard/safr")}
-                className="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded"
+                className="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded w-full sm:w-auto"
               >
                 SAFR Dashboard
               </button>

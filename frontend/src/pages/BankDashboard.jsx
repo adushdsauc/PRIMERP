@@ -249,7 +249,7 @@ const [withdrawError, setWithdrawError] = useState("");
   };  
 
   return (
-    <div className="min-h-screen bg-[#101214] text-white flex flex-col">
+    <div className="min-h-screen bg-[#101214] text-white flex flex-col px-4 sm:px-6">
       {/* TOAST */}
       {showToast && (
         <div className="absolute top-4 right-4 bg-zinc-800 text-white border border-green-500 px-4 py-3 rounded shadow-lg z-50">

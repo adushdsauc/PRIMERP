@@ -107,10 +107,10 @@ export default function PoliceDashboard() {
 
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
 
       {/* Officer Information */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-gray-900 p-6 rounded-xl shadow-md">
           <h4 className="text-white text-xl font-semibold mb-2">Officer Information</h4>
           <p className="text-white text-5xl font-mono mb-2">{time}</p>
@@ -149,6 +149,7 @@ export default function PoliceDashboard() {
       {/* Active Calls */}
       <div className="bg-gray-900 p-6 rounded-xl shadow-md mb-6">
         <h4 className="text-white text-xl font-semibold mb-2">Your Calls</h4>
+        <div className="overflow-x-auto">
         <table className="w-full text-sm text-left text-white">
           <thead className="text-xs text-gray-400 uppercase bg-gray-800">
             <tr>
@@ -173,11 +174,13 @@ export default function PoliceDashboard() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Active BOLOs */}
       <div className="bg-gray-900 p-6 rounded-xl shadow-md mb-6">
         <h4 className="text-white text-xl font-semibold mb-2">Active BOLOs</h4>
+        <div className="overflow-x-auto">
         <table className="w-full text-sm text-left text-white">
           <thead className="text-xs text-gray-400 uppercase bg-gray-800">
             <tr>
@@ -203,6 +206,7 @@ export default function PoliceDashboard() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Live Units */}
