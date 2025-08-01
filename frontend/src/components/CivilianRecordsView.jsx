@@ -6,7 +6,7 @@ const CivilianRecordsView = ({ civilian, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center">
       <div
-        className="bg-gray-800 text-white p-6 rounded-lg w-full max-w-2xl shadow-lg"
+        className="bg-gray-800 text-white p-4 sm:p-6 rounded-lg w-full max-w-2xl shadow-lg"
         data-ignore-click
       >
         <h2 className="text-2xl font-semibold mb-4">
@@ -17,7 +17,7 @@ const CivilianRecordsView = ({ civilian, onClose }) => {
           This section is reserved for future records and citations.
         </p>
 
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0">
           <button
             onClick={(e) => {
               e.stopPropagation();

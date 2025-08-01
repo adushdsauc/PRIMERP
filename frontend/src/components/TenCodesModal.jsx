@@ -73,7 +73,7 @@ const CODES = [
 export default function TenCodesModal({ onClose }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <div className="bg-gray-900 text-white p-6 rounded-xl w-full max-w-3xl border border-gray-700 max-h-[90vh] overflow-y-auto">
+      <div className="bg-gray-900 text-white p-4 sm:p-6 rounded-xl w-full max-w-3xl border border-gray-700 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">10 Codes Reference</h2>
           <button

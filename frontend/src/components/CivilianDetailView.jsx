@@ -105,7 +105,7 @@ const CivilianDetailView = ({ civilian, onEdit, onDelete, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center">
-      <div className="bg-gray-900 text-white p-6 rounded-2xl w-full max-w-6xl shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-gray-900 text-white p-4 sm:p-6 rounded-2xl w-full max-w-6xl shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b border-gray-700 pb-2">
           <h2 className="text-3xl font-bold">{civilian.firstName} {civilian.lastName}</h2>
           <div className="relative">
@@ -177,6 +177,7 @@ const CivilianDetailView = ({ civilian, onEdit, onDelete, onClose }) => {
             <button onClick={() => setShowAddVehicle(true)} className="text-xs bg-blue-600 hover:bg-blue-500 px-2 py-1 rounded">Add Vehicle</button>
           </div>
           {vehicles.length > 0 ? (
+            <div className="overflow-x-auto">
             <table className="w-full text-sm text-left text-gray-300">
               <thead className="text-xs text-gray-400 uppercase bg-gray-700">
                 <tr>
@@ -214,6 +215,7 @@ onClick={() => setEditVehicle(v)}  className="bg-green-600 hover:bg-green-500 te
                 ))}
               </tbody>
             </table>
+            </div>
           ) : (
             <p className="text-sm italic">No vehicles registered yet.</p>
           )}
@@ -226,6 +228,7 @@ onClick={() => setEditVehicle(v)}  className="bg-green-600 hover:bg-green-500 te
             <button onClick={() => setShowAddWeapon(true)} className="text-xs bg-red-600 hover:bg-red-500 px-2 py-1 rounded">Add Weapon</button>
           </div>
           {weapons.length > 0 ? (
+            <div className="overflow-x-auto">
             <table className="w-full text-sm text-left text-gray-300">
               <thead className="text-xs text-gray-400 uppercase bg-gray-700">
                 <tr>
@@ -260,6 +263,7 @@ onClick={() => setEditVehicle(v)}  className="bg-green-600 hover:bg-green-500 te
                 ))}
               </tbody>
             </table>
+            </div>
           ) : (
             <p className="text-sm italic">No weapons registered yet.</p>
           )}
@@ -274,7 +278,7 @@ onClick={() => setEditVehicle(v)}  className="bg-green-600 hover:bg-green-500 te
           </div>
         </div>
 
-        <div className="flex justify-end pt-2">
+        <div className="flex flex-col sm:flex-row justify-end pt-2 space-y-2 sm:space-y-0">
           <button onClick={onClose} className="bg-gray-600 hover:bg-gray-500 px-4 py-1 rounded text-sm">Close</button>
         </div>
       </div>

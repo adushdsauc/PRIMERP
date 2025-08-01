@@ -59,7 +59,7 @@ export default function OfficerSetupModal({ onCreated }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-      <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md text-white">
+      <div className="bg-gray-800 p-4 sm:p-6 rounded-lg w-full max-w-md text-white">
         <h2 className="text-xl font-bold mb-4">Officer Registration</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -124,7 +124,7 @@ export default function OfficerSetupModal({ onCreated }) {
 
           {error && <p className="text-red-400 text-sm">{error}</p>}
 
-          <div className="flex justify-end gap-2">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 space-y-2 sm:space-y-0">
             <button
               type="button"
               onClick={() => window.location.reload()}

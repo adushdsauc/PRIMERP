@@ -72,7 +72,7 @@ const DMVLicenseTestModal = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <div className="bg-gray-900 text-white p-6 rounded-xl w-full max-w-3xl shadow-xl overflow-y-auto max-h-[90vh]">
+      <div className="bg-gray-900 text-white p-4 sm:p-6 rounded-xl w-full max-w-3xl shadow-xl overflow-y-auto max-h-[90vh]">
         <h2 className="text-2xl font-bold mb-4 text-center">📋 Take DMV Test</h2>
 
         <Listbox value={licenseType} onChange={(val) => {

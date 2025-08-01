@@ -50,7 +50,7 @@ export default function CreateCallModal({ onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <div className="bg-gray-900 text-white p-6 rounded-xl w-full max-w-md border border-gray-700">
+      <div className="bg-gray-900 text-white p-4 sm:p-6 rounded-xl w-full max-w-md border border-gray-700">
         <h2 className="text-xl font-semibold mb-4 text-center">Create New Call</h2>
 
         <div className="space-y-3">
@@ -117,7 +117,7 @@ export default function CreateCallModal({ onClose, onSuccess }) {
 
         {message && <p className="text-red-400 text-sm text-center mt-2">{message}</p>}
 
-        <div className="flex justify-end mt-4 space-x-2">
+        <div className="flex flex-col sm:flex-row justify-end mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
           <button
             onClick={onClose}
             className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-sm"

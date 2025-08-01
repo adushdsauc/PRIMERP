@@ -57,9 +57,9 @@ const AddVehicleModal = ({ civilianId, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <div className="bg-gray-900 text-white p-6 rounded-2xl w-full max-w-lg border border-gray-700">
+      <div className="bg-gray-900 text-white p-4 sm:p-6 rounded-2xl w-full max-w-lg border border-gray-700">
         <h2 className="text-xl font-semibold mb-4 text-center">Register New Vehicle</h2>
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <input name="plate" value={formData.plate} onChange={handleChange} placeholder="Plate Number" className="bg-gray-800 rounded px-3 py-2" />
           <input name="make" value={formData.make} onChange={handleChange} placeholder="Make" className="bg-gray-800 rounded px-3 py-2" />
           <input name="model" value={formData.model} onChange={handleChange} placeholder="Model" className="bg-gray-800 rounded px-3 py-2" />
@@ -96,7 +96,7 @@ const AddVehicleModal = ({ civilianId, onClose, onSuccess }) => {
 
         {message && <p className="text-red-400 text-sm text-center mt-2">{message}</p>}
 
-        <div className="flex justify-end mt-4 space-x-3">
+        <div className="flex flex-col sm:flex-row justify-end mt-4 space-y-3 sm:space-y-0 sm:space-x-3">
           <button onClick={onClose} className="px-4 py-2 rounded bg-gray-600 hover:bg-gray-500 text-sm">Cancel</button>
           <button onClick={handleSubmit} className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 text-sm" disabled={loading}>
             {loading ? "Submitting..." : "Register Vehicle"}

@@ -57,8 +57,8 @@ export default function CreateSceneReportModal({ onClose, onSubmit }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-start justify-center p-6 z-50 overflow-y-auto">
-      <div className="bg-[#1E1F24] text-white p-6 rounded-lg w-full max-w-md shadow-lg">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-start justify-center p-4 sm:p-6 z-50 overflow-y-auto">
+      <div className="bg-[#1E1F24] text-white p-4 sm:p-6 rounded-lg w-full max-w-md shadow-lg">
         <h2 className="text-lg font-semibold mb-4">Scene Report</h2>
         {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
 
@@ -121,7 +121,7 @@ export default function CreateSceneReportModal({ onClose, onSubmit }) {
           />
         </div>
 
-        <div className="flex justify-end gap-2 mt-6">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 space-y-2 sm:space-y-0 mt-6">
           <button onClick={onClose} className="px-4 py-2 rounded bg-[#3B3C42] hover:bg-[#4A4B50] text-sm">Cancel</button>
           <button onClick={handleSubmit} className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 text-sm">Submit</button>
         </div>

@@ -32,10 +32,10 @@ const EditCivilianModal = ({ civilian, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center">
-      <div className="bg-gray-900 p-6 rounded-lg w-full max-w-xl text-white shadow-lg">
+      <div className="bg-gray-900 p-4 sm:p-6 rounded-lg w-full max-w-xl text-white shadow-lg">
         <h2 className="text-2xl font-bold mb-4">✏️ Edit Civilian</h2>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <input name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} className="p-2 rounded bg-gray-700" />
           <input name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} className="p-2 rounded bg-gray-700" />
           <input name="middleInitial" placeholder="Middle Initial" value={formData.middleInitial || ""} onChange={handleChange} className="p-2 rounded bg-gray-700" />
@@ -62,7 +62,7 @@ const EditCivilianModal = ({ civilian, onClose, onSuccess }) => {
           {error && <p className="text-red-400 col-span-2">{error}</p>}
           {success && <p className="text-green-400 col-span-2">{success}</p>}
 
-          <div className="col-span-2 flex justify-end gap-3 mt-4">
+          <div className="col-span-2 flex flex-col sm:flex-row justify-end gap-3 space-y-2 sm:space-y-0 mt-4">
             <button onClick={onClose} type="button" className="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded">
               Cancel
             </button>

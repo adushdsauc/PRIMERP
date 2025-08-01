@@ -80,7 +80,7 @@ export default function CreateWarrantModal({ onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1e1f24] text-white p-6 rounded-lg max-w-md w-full border border-gray-700">
+      <div className="bg-[#1e1f24] text-white p-4 sm:p-6 rounded-lg max-w-md w-full border border-gray-700">
         <h2 className="text-xl font-semibold mb-4">Create Warrant</h2>
         {error && <p className="text-red-400 text-sm mb-2">{error}</p>}
 
@@ -159,7 +159,7 @@ export default function CreateWarrantModal({ onClose, onSuccess }) {
           />
         </div>
 
-        <div className="flex justify-end gap-2 mt-6">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 space-y-2 sm:space-y-0 mt-6">
           <button
             onClick={onClose}
             className="px-4 py-2 rounded bg-gray-600 hover:bg-gray-500 text-sm"
