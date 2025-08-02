@@ -81,24 +81,10 @@ router.get("/weapons", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const { name, plate, weapon } = req.query;
+  const { name, plate, weapon, id } = req.query;
 
   try {
     let civilian = null;
-
-    // 🔍 Name-based search
-    if (name) {
-      const regex = new RegExp(name, "i");
-      civilian = await Civilian.findOne({
-        $or: [
-          { firstName: regex },
-          { lastName: regex },
-          { knownAliases: regex },
-        ],
-      }).lean();
-
-      if (!civilian) return res.status(404).json({ error: "Civilian not found." });
-    }
 
     // 🚗 Plate-based search
     if (plate) {
@@ -134,8 +120,23 @@ router.get("/", async (req, res) => {
       return res.json({ weapon: foundWeapon, civilian: { ...civilian, vehicles, weapons } });
     }
 
-    // Only do this if name-based search succeeded
-    if (civilian) {
+    // 🔍 ID or name-based search
+    if (id || name) {
+      if (id) {
+        civilian = await Civilian.findById(id).lean();
+      } else {
+        const regex = new RegExp(name, "i");
+        civilian = await Civilian.findOne({
+          $or: [
+            { firstName: regex },
+            { lastName: regex },
+            { knownAliases: regex },
+          ],
+        }).lean();
+      }
+
+      if (!civilian) return res.status(404).json({ error: "Civilian not found." });
+
       const vehicles = await Vehicle.find({ civilianId: civilian._id }).lean();
       const weapons = await Weapon.find({ civilianId: civilian._id }).lean();
 

@@ -17,11 +17,13 @@ export default function SearchDatabase() {
   const [plateSuggestions, setPlateSuggestions] = useState([]);
   const [weaponSuggestions, setWeaponSuggestions] = useState([]);
 
-  const handleSearch = async (
+  const handleSearch = async ({
     name = nameQuery,
     plate = plateQuery,
-    weapon = weaponQuery
-  ) => {
+    weapon = weaponQuery,
+    id = null,
+  } = {}) => {
+
     try {
       setCivilian(null);
       setVehicleResult(null);
@@ -33,7 +35,8 @@ export default function SearchDatabase() {
       setWeaponSuggestions([]);
 
       const res = await axios.get("/api/search", {
-        params: { name, plate, weapon },
+        params: { name, plate, weapon, id },
+
       });
 
       if (plate) {
@@ -44,12 +47,13 @@ export default function SearchDatabase() {
         setSearchType("weapon");
         setWeaponResult(res.data.weapon);
         setCivilian(res.data.civilian || null);
-      } else if (name) {
+      } else if (name || id) {
+
         setSearchType("name");
         setCivilian(res.data);
         setShowFullCivilian(true);
       }
-      
+
     } catch (err) {
       console.error("Search failed:", err);
     }
@@ -120,7 +124,8 @@ export default function SearchDatabase() {
                       setNameQuery(s.name);
                       setPlateQuery("");
                       setWeaponQuery("");
-                      handleSearch(s.name, "", "");
+                      handleSearch({ id: s._id });
+
                     }}
                   >
                     {s.name}
@@ -150,7 +155,8 @@ export default function SearchDatabase() {
                       setPlateQuery(s.plate);
                       setNameQuery("");
                       setWeaponQuery("");
-                      handleSearch("", s.plate, "");
+                      handleSearch({ plate: s.plate });
+
                     }}
                   >
                     {s.plate}
@@ -180,7 +186,8 @@ export default function SearchDatabase() {
                       setWeaponQuery(s.serialNumber);
                       setNameQuery("");
                       setPlateQuery("");
-                      handleSearch("", "", s.serialNumber);
+                      handleSearch({ weapon: s.serialNumber });
+
                     }}
                   >
                     {s.serialNumber} - {s.weaponType}
@@ -191,7 +198,7 @@ export default function SearchDatabase() {
           </div>
         </div>
         <button
-          onClick={handleSearch}
+          onClick={() => handleSearch()}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded h-10 self-end"
         >Search</button>
       </div>
