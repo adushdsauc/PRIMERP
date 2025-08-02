@@ -13,28 +13,38 @@ export default function SearchDatabase() {
   const [searchType, setSearchType] = useState(null);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showFullCivilian, setShowFullCivilian] = useState(false);
+  const [nameSuggestions, setNameSuggestions] = useState([]);
+  const [plateSuggestions, setPlateSuggestions] = useState([]);
+  const [weaponSuggestions, setWeaponSuggestions] = useState([]);
 
-  const handleSearch = async () => {
+  const handleSearch = async (
+    name = nameQuery,
+    plate = plateQuery,
+    weapon = weaponQuery
+  ) => {
     try {
       setCivilian(null);
       setVehicleResult(null);
       setWeaponResult(null);
       setSearchType(null);
       setShowFullCivilian(false);
+      setNameSuggestions([]);
+      setPlateSuggestions([]);
+      setWeaponSuggestions([]);
 
       const res = await axios.get("/api/search", {
-        params: { name: nameQuery, plate: plateQuery, weapon: weaponQuery },
+        params: { name, plate, weapon },
       });
 
-      if (plateQuery) {
+      if (plate) {
         setSearchType("plate");
         setVehicleResult(res.data.vehicle);
         setCivilian(res.data.civilian || null);
-      } else if (weaponQuery) {
+      } else if (weapon) {
         setSearchType("weapon");
         setWeaponResult(res.data.weapon);
         setCivilian(res.data.civilian || null);
-      } else if (nameQuery) {
+      } else if (name) {
         setSearchType("name");
         setCivilian(res.data);
         setShowFullCivilian(true);
@@ -45,6 +55,46 @@ export default function SearchDatabase() {
     }
   };
 
+  // Fetch suggestion lists as the user types
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (nameQuery.trim().length < 2) return setNameSuggestions([]);
+      try {
+        const res = await axios.get("/api/search/names", { params: { q: nameQuery } });
+        setNameSuggestions(res.data);
+      } catch (err) {
+        console.error("Name suggestion failed:", err);
+      }
+    };
+    fetchSuggestions();
+  }, [nameQuery]);
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (!plateQuery) return setPlateSuggestions([]);
+      try {
+        const res = await axios.get("/api/search/vehicles", { params: { q: plateQuery } });
+        setPlateSuggestions(res.data);
+      } catch (err) {
+        console.error("Plate suggestion failed:", err);
+      }
+    };
+    fetchSuggestions();
+  }, [plateQuery]);
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (!weaponQuery) return setWeaponSuggestions([]);
+      try {
+        const res = await axios.get("/api/search/weapons", { params: { q: weaponQuery } });
+        setWeaponSuggestions(res.data);
+      } catch (err) {
+        console.error("Weapon suggestion failed:", err);
+      }
+    };
+    fetchSuggestions();
+  }, [weaponQuery]);
+
   return (
     <div className="p-4 sm:p-6">
       <h2 className="text-3xl font-bold text-white mb-6 text-center">Search Database</h2>
@@ -52,33 +102,93 @@ export default function SearchDatabase() {
       <div className="flex flex-col sm:flex-row justify-center sm:space-x-4 space-y-4 sm:space-y-0 mb-6">
         <div className="flex flex-col">
           <label className="text-purple-400 font-semibold mb-1">Name Search</label>
-          <input
-            type="text"
-            placeholder="Search Name or SSN"
-            value={nameQuery}
-            onChange={(e) => setNameQuery(e.target.value)}
-            className="bg-gray-800 text-white px-4 py-2 rounded-md"
-          />
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search Name or SSN"
+              value={nameQuery}
+              onChange={(e) => setNameQuery(e.target.value)}
+              className="bg-gray-800 text-white px-4 py-2 rounded-md w-full"
+            />
+            {nameSuggestions.length > 0 && (
+              <ul className="absolute z-10 bg-gray-800 text-white w-full mt-1 rounded-md max-h-40 overflow-y-auto">
+                {nameSuggestions.map((s) => (
+                  <li
+                    key={s._id}
+                    className="px-4 py-1 hover:bg-gray-700 cursor-pointer"
+                    onClick={() => {
+                      setNameQuery(s.name);
+                      setPlateQuery("");
+                      setWeaponQuery("");
+                      handleSearch(s.name, "", "");
+                    }}
+                  >
+                    {s.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
         <div className="flex flex-col">
           <label className="text-green-400 font-semibold mb-1">Plate Search</label>
-          <input
-            type="text"
-            placeholder="Search Plate or VIN"
-            value={plateQuery}
-            onChange={(e) => setPlateQuery(e.target.value)}
-            className="bg-gray-800 text-white px-4 py-2 rounded-md"
-          />
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search Plate or VIN"
+              value={plateQuery}
+              onChange={(e) => setPlateQuery(e.target.value)}
+              className="bg-gray-800 text-white px-4 py-2 rounded-md w-full"
+            />
+            {plateSuggestions.length > 0 && (
+              <ul className="absolute z-10 bg-gray-800 text-white w-full mt-1 rounded-md max-h-40 overflow-y-auto">
+                {plateSuggestions.map((s) => (
+                  <li
+                    key={s._id}
+                    className="px-4 py-1 hover:bg-gray-700 cursor-pointer"
+                    onClick={() => {
+                      setPlateQuery(s.plate);
+                      setNameQuery("");
+                      setWeaponQuery("");
+                      handleSearch("", s.plate, "");
+                    }}
+                  >
+                    {s.plate}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
         <div className="flex flex-col">
           <label className="text-yellow-400 font-semibold mb-1">Weapon Search</label>
-          <input
-            type="text"
-            placeholder="Search Name or Serial"
-            value={weaponQuery}
-            onChange={(e) => setWeaponQuery(e.target.value)}
-            className="bg-gray-800 text-white px-4 py-2 rounded-md"
-          />
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search Name or Serial"
+              value={weaponQuery}
+              onChange={(e) => setWeaponQuery(e.target.value)}
+              className="bg-gray-800 text-white px-4 py-2 rounded-md w-full"
+            />
+            {weaponSuggestions.length > 0 && (
+              <ul className="absolute z-10 bg-gray-800 text-white w-full mt-1 rounded-md max-h-40 overflow-y-auto">
+                {weaponSuggestions.map((s) => (
+                  <li
+                    key={s._id}
+                    className="px-4 py-1 hover:bg-gray-700 cursor-pointer"
+                    onClick={() => {
+                      setWeaponQuery(s.serialNumber);
+                      setNameQuery("");
+                      setPlateQuery("");
+                      handleSearch("", "", s.serialNumber);
+                    }}
+                  >
+                    {s.serialNumber} - {s.weaponType}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
         <button
           onClick={handleSearch}

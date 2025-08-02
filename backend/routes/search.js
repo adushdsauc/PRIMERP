@@ -4,6 +4,82 @@ const Civilian = require("../models/Civilian");
 const Vehicle = require("../models/Vehicle");
 const Weapon = require("../models/Weapon");
 
+// Autocomplete endpoints for names, vehicles and weapons
+router.get("/names", async (req, res) => {
+  const { q } = req.query;
+  if (!q) return res.json([]);
+  try {
+    const regex = new RegExp(q, "i");
+    const civilians = await Civilian.find({
+      $or: [
+        { firstName: regex },
+        { lastName: regex },
+        { knownAliases: regex },
+      ],
+    })
+      .limit(10)
+      .lean();
+
+    const results = civilians.map((c) => ({
+      _id: c._id,
+      name: `${c.firstName} ${c.lastName}`.trim(),
+    }));
+
+    res.json(results);
+  } catch (err) {
+    console.error("Name suggestion error:", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+router.get("/vehicles", async (req, res) => {
+  const { q } = req.query;
+  if (!q) return res.json([]);
+  try {
+    const regex = new RegExp(q, "i");
+    const vehicles = await Vehicle.find({ plate: regex })
+      .limit(10)
+      .lean();
+
+    const results = vehicles.map((v) => ({
+      _id: v._id,
+      plate: v.plate,
+    }));
+
+    res.json(results);
+  } catch (err) {
+    console.error("Vehicle suggestion error:", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+router.get("/weapons", async (req, res) => {
+  const { q } = req.query;
+  if (!q) return res.json([]);
+  try {
+    const regex = new RegExp(q, "i");
+    const weapons = await Weapon.find({
+      $or: [
+        { serialNumber: regex },
+        { weaponType: regex },
+      ],
+    })
+      .limit(10)
+      .lean();
+
+    const results = weapons.map((w) => ({
+      _id: w._id,
+      serialNumber: w.serialNumber,
+      weaponType: w.weaponType,
+    }));
+
+    res.json(results);
+  } catch (err) {
+    console.error("Weapon suggestion error:", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
 router.get("/", async (req, res) => {
   const { name, plate, weapon } = req.query;
 
