@@ -23,6 +23,7 @@ export default function SearchDatabase() {
     weapon = weaponQuery,
     id = null,
   } = {}) => {
+
     try {
       setCivilian(null);
       setVehicleResult(null);
@@ -35,6 +36,7 @@ export default function SearchDatabase() {
 
       const res = await axios.get("/api/search", {
         params: { name, plate, weapon, id },
+
       });
 
       if (plate) {
@@ -46,6 +48,7 @@ export default function SearchDatabase() {
         setWeaponResult(res.data.weapon);
         setCivilian(res.data.civilian || null);
       } else if (name || id) {
+
         setSearchType("name");
         setCivilian(res.data);
         setShowFullCivilian(true);
@@ -122,6 +125,7 @@ export default function SearchDatabase() {
                       setPlateQuery("");
                       setWeaponQuery("");
                       handleSearch({ id: s._id });
+
                     }}
                   >
                     {s.name}
@@ -152,6 +156,7 @@ export default function SearchDatabase() {
                       setNameQuery("");
                       setWeaponQuery("");
                       handleSearch({ plate: s.plate });
+
                     }}
                   >
                     {s.plate}
@@ -182,6 +187,7 @@ export default function SearchDatabase() {
                       setNameQuery("");
                       setPlateQuery("");
                       handleSearch({ weapon: s.serialNumber });
+
                     }}
                   >
                     {s.serialNumber} - {s.weaponType}
