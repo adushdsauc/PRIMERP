@@ -143,7 +143,10 @@ const [withdrawError, setWithdrawError] = useState("");
   const handleDeposit = () => setShowDepositModal(true);
   const handleWithdraw = () => setShowWithdrawModal(true);
   const handleTransfer = () => setShowTransferModal(true);
-  const handleRename = () => setShowRenameModal(true);
+  const handleRename = () => {
+    setNewAccountName(selectedAccount?.name || "");
+    setShowRenameModal(true);
+  };
 
   const submitDeposit = async () => {
     const name = civilian?.firstName || "Unknown";
@@ -246,7 +249,28 @@ const [withdrawError, setWithdrawError] = useState("");
     } catch (err) {
       setError(err.response?.data?.error || "Transfer failed.");
     }
-  };  
+  };
+
+  const submitRename = async () => {
+    if (!newAccountName.trim()) {
+      setError("Please provide a new account name.");
+      return;
+    }
+    try {
+      await api.post("/api/bank/rename", {
+        accountId: selectedAccount._id,
+        newName: newAccountName.trim(),
+      });
+      const updatedAccounts = await api.get(`/api/bank/accounts/${civilianId}`);
+      setAccounts(updatedAccounts.data);
+      const updatedSelected = updatedAccounts.data.find(acc => acc._id === selectedAccount._id);
+      setSelectedAccount(updatedSelected);
+      setShowRenameModal(false);
+      setNewAccountName("");
+    } catch (err) {
+      setError("Failed to rename account.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#101214] text-white flex flex-col px-4 sm:px-6">
@@ -327,7 +351,7 @@ const [withdrawError, setWithdrawError] = useState("");
 {showDepositModal && (
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
     <div className="bg-zinc-900 p-6 rounded shadow-lg w-full max-w-sm">
-      <h2 className="text-xl mb-4">Deposit into {selectedAccount?.accountType} #{selectedAccount?.accountNumber}</h2>
+      <h2 className="text-xl mb-4">Deposit into {selectedAccount?.name || selectedAccount?.accountType} #{selectedAccount?.accountNumber}</h2>
       {depositError && <p className="text-red-500 mb-2 text-sm">{depositError}</p>}
       <input
         type="number"
@@ -357,7 +381,7 @@ const [withdrawError, setWithdrawError] = useState("");
 {showWithdrawModal && (
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
     <div className="bg-zinc-900 p-6 rounded shadow-lg w-full max-w-sm">
-      <h2 className="text-xl mb-4">Withdraw from {selectedAccount?.accountType} #{selectedAccount?.accountNumber}</h2>
+      <h2 className="text-xl mb-4">Withdraw from {selectedAccount?.name || selectedAccount?.accountType} #{selectedAccount?.accountNumber}</h2>
       {withdrawError && <p className="text-red-500 mb-2 text-sm">{withdrawError}</p>}
       <input
         type="number"
@@ -393,14 +417,14 @@ const [withdrawError, setWithdrawError] = useState("");
       <Listbox value={fromAccount} onChange={setFromAccount}>
         <div className="relative mb-4">
           <Listbox.Button className="w-full bg-black border border-gray-700 text-white rounded px-4 py-2 text-left">
-            {fromAccount ? `${fromAccount.accountType} ••••${fromAccount.accountNumber.slice(-4)}` : "-- Select --"}
+            {fromAccount ? `${fromAccount.name || fromAccount.accountType} ••••${fromAccount.accountNumber.slice(-4)}` : "-- Select --"}
           </Listbox.Button>
           <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto bg-zinc-900 rounded shadow-lg border border-zinc-700 z-10">
-            {accounts.map((acc) => (
-              <Listbox.Option key={acc._id} value={acc} className={({ active }) => `cursor-pointer select-none px-4 py-2 ${active ? 'bg-red-700 text-white' : 'text-white'}`}>
-                {acc.accountType} ••••{acc.accountNumber.slice(-4)} (${acc.balance.toFixed(2)})
-              </Listbox.Option>
-            ))}
+              {accounts.map((acc) => (
+                <Listbox.Option key={acc._id} value={acc} className={({ active }) => `cursor-pointer select-none px-4 py-2 ${active ? 'bg-red-700 text-white' : 'text-white'}`}>
+                  {(acc.name || acc.accountType)} ••••{acc.accountNumber.slice(-4)} (${acc.balance.toFixed(2)})
+                </Listbox.Option>
+              ))}
           </Listbox.Options>
         </div>
       </Listbox>
@@ -431,7 +455,7 @@ const [withdrawError, setWithdrawError] = useState("");
       />
       <div className="flex justify-end gap-2">
         <button onClick={() => setShowRenameModal(false)} className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600">Cancel</button>
-        <button onClick={() => setShowRenameModal(false)} className="px-4 py-2 rounded bg-green-600 hover:bg-green-500 text-white">Rename</button>
+        <button onClick={submitRename} className="px-4 py-2 rounded bg-green-600 hover:bg-green-500 text-white">Rename</button>
       </div>
     </div>
   </div>
@@ -481,7 +505,7 @@ className="bg-[#e30908] hover:bg-red-600 px-4 py-2 rounded shadow text-sm"
                   className={`w-full text-left rounded-md bg-neutral-800 px-4 py-2 mb-2 hover:bg-neutral-700 transition border text-sm ${selectedAccount?._id === acc._id ? 'border-red-500' : 'border-neutral-700'}`}
                 >
                   <p className="font-semibold text-white">
-                    {acc.accountType}
+                    {acc.name || acc.accountType}
                   </p>
                   <p className="text-neutral-400 text-xs">{acc.accountNumber}</p>
                   <p className="text-emerald-400 font-bold">${acc.balance.toFixed(2)}</p>
@@ -510,7 +534,7 @@ className="bg-[#e30908] hover:bg-red-600 px-4 py-2 rounded shadow text-sm"
                   onClick={() => setSelectedAccount(acc)}
                   className={`w-full text-left rounded-md bg-neutral-800 px-4 py-2 mb-2 hover:bg-neutral-700 transition border text-sm ${selectedAccount?._id === acc._id ? 'border-red-500' : 'border-neutral-700'}`}
                 >
-                  <p className="font-semibold text-white">{acc.accountType.replace('Business ', '')}</p>
+                  <p className="font-semibold text-white">{acc.name || acc.accountType.replace('Business ', '')}</p>
                   <p className="text-neutral-400 text-xs">{acc.accountNumber}</p>
                   <p className="text-emerald-400 font-bold">${acc.balance.toFixed(2)}</p>
                 </button>
@@ -648,12 +672,12 @@ className="bg-[#e30908] hover:bg-red-600 px-4 py-2 rounded shadow text-sm"
               <Listbox value={fromAccount} onChange={setFromAccount}>
                 <div className="relative mb-4">
                   <Listbox.Button className="w-full bg-black border border-gray-700 text-white rounded px-4 py-2 text-left">
-                    {fromAccount ? `${fromAccount.accountType} ••••${fromAccount.accountNumber.slice(-4)}` : "-- Select --"}
+                    {fromAccount ? `${fromAccount.name || fromAccount.accountType} ••••${fromAccount.accountNumber.slice(-4)}` : "-- Select --"}
                   </Listbox.Button>
                   <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto bg-zinc-900 rounded shadow-lg border border-zinc-700 z-10">
                     {accounts.map((acc) => (
                       <Listbox.Option key={acc._id} value={acc} className={({ active }) => `cursor-pointer select-none px-4 py-2 ${active ? 'bg-red-700 text-white' : 'text-white'}`}>
-                        {acc.accountType} ••••{acc.accountNumber.slice(-4)} (${acc.balance.toFixed(2)})
+                        {(acc.name || acc.accountType)} ••••{acc.accountNumber.slice(-4)} (${acc.balance.toFixed(2)})
                       </Listbox.Option>
                     ))}
                   </Listbox.Options>

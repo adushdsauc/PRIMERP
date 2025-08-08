@@ -11,6 +11,10 @@ const BankAccountSchema = new mongoose.Schema({
     enum: ["Checking", "Savings", "Business Checking", "Business Savings"],
     required: true,
   },
+  name: {
+    type: String,
+    default: null,
+  },
   accountNumber: {
     type: String,
     unique: true,

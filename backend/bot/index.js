@@ -62,6 +62,7 @@ const formatStorePage = require('./utils/formatStorePage');
 const scheduleFineCheckUtil = require('./utils/scheduleFineCheck');
 const sendClockEmbedUtil = require("./utils/sendClockEmbed");
 const sendFinancialLogEmbedUtil = require('./utils/sendFinancialLogEmbed');
+const sendAccountRenameEmbedUtil = require('./utils/sendAccountRenameEmbed');
 
 module.exports = {
   client,
@@ -73,5 +74,6 @@ module.exports = {
   scheduleFineCheck: (...args) => scheduleFineCheckUtil(client, ...args),
   sendClockEmbed: (...args) => sendClockEmbedUtil(client, ...args),
   sendFinancialLogEmbed: (...args) => sendFinancialLogEmbedUtil(client, ...args),
+  sendAccountRenameEmbed: (...args) => sendAccountRenameEmbedUtil(client, ...args),
   scheduleLoanPayment: (...args) => schedulePayment(client, ...args)
 };

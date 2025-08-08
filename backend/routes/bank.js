@@ -6,7 +6,7 @@ const BankAccount = require("../models/BankAccount");
 const Transaction = require("../models/Transaction");
 const Civilian = mongoose.models.Civilian || require("../models/Civilian");
 const Wallet = require("../models/Wallet");
-const { sendBankApprovalEmbed, sendFinancialLogEmbed } = require("../bot");
+const { sendBankApprovalEmbed, sendFinancialLogEmbed, sendAccountRenameEmbed } = require("../bot");
 const { EmbedBuilder } = require('discord.js');
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
@@ -35,6 +35,7 @@ router.post("/create", async (req, res) => {
     const newAccount = await BankAccount.create({
       civilianId,
       accountType,
+      name: accountType,
       reason,
       accountNumber,
       balance: 0,
@@ -178,6 +179,41 @@ router.post("/transfer", async (req, res) => {
   } catch (err) {
     console.error("❌ Transfer failed:", err);
     res.status(500).json({ error: "Failed to transfer." });
+  }
+});
+
+router.post("/rename", async (req, res) => {
+  const { accountId, newName } = req.body;
+  try {
+    if (!isValidObjectId(accountId)) return res.status(400).json({ error: "Invalid account ID" });
+    if (!newName || typeof newName !== "string" || !newName.trim()) {
+      return res.status(400).json({ error: "Invalid account name" });
+    }
+
+    const account = await BankAccount.findById(accountId);
+    if (!account) return res.status(404).json({ error: "Account not found." });
+
+    const oldName = account.name || account.accountType;
+    account.name = newName.trim();
+    await account.save();
+
+    const actor = req.user ? `${req.user.globalName || req.user.username}#${req.user.discriminator}` : "Unknown";
+    const embed = new EmbedBuilder()
+      .setTitle('✏️ Account Renamed')
+      .setColor('Purple')
+      .addFields(
+        { name: 'Account', value: `#${account.accountNumber}`, inline: true },
+        { name: 'Old Name', value: oldName, inline: true },
+        { name: 'New Name', value: newName, inline: true },
+        { name: 'By', value: actor, inline: false }
+      )
+      .setTimestamp();
+    await sendAccountRenameEmbed(embed);
+
+    res.json({ success: true, account });
+  } catch (err) {
+    console.error("❌ Rename account failed:", err);
+    res.status(500).json({ error: "Failed to rename account." });
   }
 });
 
