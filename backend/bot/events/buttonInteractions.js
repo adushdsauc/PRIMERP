@@ -122,6 +122,7 @@ module.exports = async function handleButtonInteractions(interaction) {
       return interaction.reply({ content: '❌ Report not found.', ephemeral: true });
     }
     console.debug('[pay_fine] report found', report.reportId || report._id);
+
     if (report.paid) return interaction.reply({ content: '✅ Fine already paid.', ephemeral: true });
 
     const wallet = await Wallet.findOne({ discordId });

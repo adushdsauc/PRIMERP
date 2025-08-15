@@ -18,6 +18,7 @@ async function trackFine(client, { civilianId, reportId, messageId, channelId, p
     }
     console.debug('[trackFine] report found', report.reportId || report._id);
 
+
     const channel = await client.channels.fetch(channelId);
     const message = await channel.messages.fetch(messageId).catch(() => null);
     if (!message) return false;
