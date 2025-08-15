@@ -110,12 +110,19 @@ module.exports = async function handleButtonInteractions(interaction) {
 
     const civilian = await Civilian.findOne({ discordId });
     if (!civilian) return interaction.reply({ content: '❌ Civilian not found.', ephemeral: true });
+    console.debug('[pay_fine] looking for report', reportId, 'for civilian', civilian._id);
 
     const report = civilian.reports.find(r => {
       const id = r.reportId || r._id;
+      console.debug('[pay_fine] checking report id', id?.toString());
       return id && id.toString() === reportId;
     });
-    if (!report) return interaction.reply({ content: '❌ Report not found.', ephemeral: true });
+    if (!report) {
+      console.warn('[pay_fine] report not found. Available reports:', civilian.reports.map(r => r.reportId || r._id));
+      return interaction.reply({ content: '❌ Report not found.', ephemeral: true });
+    }
+    console.debug('[pay_fine] report found', report.reportId || report._id);
+
     if (report.paid) return interaction.reply({ content: '✅ Fine already paid.', ephemeral: true });
 
     const wallet = await Wallet.findOne({ discordId });
