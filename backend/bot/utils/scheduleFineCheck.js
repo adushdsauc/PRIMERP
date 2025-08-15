@@ -1,10 +1,9 @@
 const { EmbedBuilder } = require('discord.js');
 const logError = require('./logError');
 
-const warrantChannels = {
-  xbox: '1376269149785034842',
-  playstation: '1376268932691787786',
-};
+// IDs for the Discord server and channel where unpaid fine alerts should be sent
+const GUILD_ID = '1377040243735400550';
+const WARRANT_CHANNEL_ID = '1406032481198538843';
 
 function scheduleFineCheck(client, civilian, report, message, platform) {
   setTimeout(async () => {
@@ -17,14 +16,23 @@ function scheduleFineCheck(client, civilian, report, message, platform) {
 
       await message.edit({ embeds: [updatedEmbed], components: [] });
 
+      const user = await client.users.fetch(civilian.discordId).catch(() => null);
+
       const warrantEmbed = new EmbedBuilder()
-        .setTitle('🚨 Warrant Issued')
-        .setDescription(`**${civilian.firstName} ${civilian.lastName}** failed to pay a fine of **$${report.fine}**.`)
+        .setTitle('🚨 Unpaid Fine')
         .setColor('Red')
+        .addFields(
+          { name: 'Civilian Name', value: `${civilian.firstName} ${civilian.lastName}`, inline: true },
+          { name: 'Discord User', value: user ? `${user.tag} (<@${user.id}>)` : `<@${civilian.discordId}>`, inline: true },
+          { name: 'Issuing Officer', value: report.officerName || 'Unknown', inline: true },
+          { name: 'Fine Amount', value: `$${report.fine}`, inline: true },
+          { name: 'Charges', value: report.offense || 'N/A', inline: false },
+          { name: 'Platform', value: platform, inline: true },
+        )
         .setTimestamp();
 
-      const channelId = warrantChannels[platform];
-      const channel = await client.channels.fetch(channelId);
+      const guild = await client.guilds.fetch(GUILD_ID);
+      const channel = await guild.channels.fetch(WARRANT_CHANNEL_ID);
       await channel.send({ embeds: [warrantEmbed] });
     } catch (err) {
       logError('Schedule fine check', err);
