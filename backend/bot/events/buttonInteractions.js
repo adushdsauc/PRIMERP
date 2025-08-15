@@ -105,14 +105,25 @@ module.exports = async function handleButtonInteractions(interaction) {
   }
 
   if (customId.startsWith('pay_fine_')) {
-    const reportId = customId.split('pay_fine_')[1];
+    const reportId = customId.slice('pay_fine_'.length);
     const discordId = interaction.user.id;
 
-    const civilian = await Civilian.findOne({ discordId });
-    if (!civilian) return interaction.reply({ content: '❌ Civilian not found.', ephemeral: true });
+    const civilian = await Civilian.findOne({
+      discordId,
+      'reports.reportId': reportId
+    });
+    if (!civilian) {
+      console.warn('[pay_fine] report', reportId, 'not found for user', discordId);
+      return interaction.reply({ content: '❌ Report not found.', ephemeral: true });
+    }
+    console.debug('[pay_fine] located civilian', civilian._id, 'for report', reportId);
 
-    const report = civilian.reports.find(r => r.reportId?.toString() === reportId);
-    if (!report) return interaction.reply({ content: '❌ Report not found.', ephemeral: true });
+    const report = civilian.reports.find(r => r.reportId.toString() === reportId);
+    if (!report) {
+      console.warn('[pay_fine] report', reportId, 'missing in civilian', civilian._id);
+      return interaction.reply({ content: '❌ Report not found.', ephemeral: true });
+    }
+    console.debug('[pay_fine] report found', report.reportId);
     if (report.paid) return interaction.reply({ content: '✅ Fine already paid.', ephemeral: true });
 
     const wallet = await Wallet.findOne({ discordId });
