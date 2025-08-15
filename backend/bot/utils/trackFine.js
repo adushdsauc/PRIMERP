@@ -6,7 +6,10 @@ async function trackFine(client, { civilianId, reportId, messageId, channelId, p
     const civilian = await Civilian.findById(civilianId);
     if (!civilian) return false;
 
-    const report = civilian.reports.find(r => r.reportId?.toString() === reportId);
+    const report = civilian.reports.find(r => {
+      const id = r.reportId || r._id;
+      return id && id.toString() === reportId;
+    });
     if (!report) return false;
 
     const channel = await client.channels.fetch(channelId);

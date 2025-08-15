@@ -105,13 +105,16 @@ module.exports = async function handleButtonInteractions(interaction) {
   }
 
   if (customId.startsWith('pay_fine_')) {
-    const reportId = customId.split('pay_fine_')[1];
+    const reportId = customId.slice('pay_fine_'.length);
     const discordId = interaction.user.id;
 
     const civilian = await Civilian.findOne({ discordId });
     if (!civilian) return interaction.reply({ content: '❌ Civilian not found.', ephemeral: true });
 
-    const report = civilian.reports.find(r => r.reportId?.toString() === reportId);
+    const report = civilian.reports.find(r => {
+      const id = r.reportId || r._id;
+      return id && id.toString() === reportId;
+    });
     if (!report) return interaction.reply({ content: '❌ Report not found.', ephemeral: true });
     if (report.paid) return interaction.reply({ content: '✅ Fine already paid.', ephemeral: true });
 
