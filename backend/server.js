@@ -40,6 +40,7 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS
   : [FRONTEND_URL]
 ).map((origin) => origin.trim());
 
+
 // ✅ Required for Railway & HTTPS proxies (fixes cookie not setting)
 app.set("trust proxy", 1);
 
@@ -53,6 +54,7 @@ app.use(
         return callback(null, true);
       }
       return callback(null, false);
+
     },
     credentials: true,
   })
