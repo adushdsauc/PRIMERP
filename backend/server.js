@@ -35,6 +35,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8080";
+const ALLOWED_ORIGINS = FRONTEND_URL.split(",");
 
 // ✅ Required for Railway & HTTPS proxies (fixes cookie not setting)
 app.set("trust proxy", 1);
@@ -42,10 +43,18 @@ app.set("trust proxy", 1);
 // Middleware
 app.use(express.json());
 
-app.use(cors({
-  origin: FRONTEND_URL,
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 app.use(
   session({
