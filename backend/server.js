@@ -1,4 +1,6 @@
+// server.js
 require("dotenv").config();
+
 const express = require("express");
 const session = require("express-session");
 const cors = require("cors");
@@ -7,9 +9,11 @@ const passport = require("passport");
 const DiscordStrategy = require("passport-discord").Strategy;
 const fetch = require("node-fetch");
 const MemoryStore = require("memorystore")(session);
+
+// Your Discord bot client
 const { client } = require("./bot/index.js");
 
-// Models and Routes
+// Models & Routes
 const User = require("./models/User");
 const civilianRoutes = require("./routes/civilians");
 const licenseRoutes = require("./routes/licenses");
@@ -32,46 +36,83 @@ const warrantRoutes = require("./routes/warrants");
 const adminRoutes = require("./routes/admin");
 
 const app = express();
+
+/* =========================
+   Core Config / Environment
+   ========================= */
 const PORT = process.env.PORT || 8080;
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
-const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8080";
+const NODE_ENV = process.env.NODE_ENV || "development";
+
+// Frontend (site shown to users)
+const FRONTEND_URL =
+  process.env.FRONTEND_URL ||
+  (NODE_ENV === "production" ? "https://primerpcad.com" : "http://localhost:3000");
+
+// Public API base (used to build OAuth callback URL)
+const API_BASE_URL =
+  process.env.API_BASE_URL ||
+  (NODE_ENV === "production" ? "https://api.primerpcad.com" : "http://localhost:8080");
+
+// Allowed CORS origins (comma-separated in env) or sensible defaults
+const DEFAULT_ORIGINS = [
+  "https://primerpcad.com",
+  "https://www.primerpcad.com",
+  "http://localhost:3000",
+];
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
-  : [FRONTEND_URL]
-).map((origin) => origin.trim());
+  : DEFAULT_ORIGINS
+).map((o) => o.trim());
 
+// Cookie settings
+const IS_PROD = NODE_ENV === "production";
+// If you are proxying via Vercel (frontend calls /api) you can use "lax"; if calling the api subdomain directly, use "none".
+const COOKIE_SAMESITE =
+  process.env.COOKIE_SAMESITE || (process.env.PROXY_MODE === "true" ? "lax" : "none");
+const COOKIE_DOMAIN = IS_PROD ? ".primerpcad.com" : undefined; // don't set a domain for localhost
 
-// ✅ Required for Railway & HTTPS proxies (fixes cookie not setting)
-app.set("trust proxy", 1);
-
-// Middleware
+/* =========================
+   Trust Proxy & Parsers
+   ========================= */
+app.set("trust proxy", 1); // needed for secure cookies behind Railway/Proxies
 app.use(express.json());
 
+/* =========================
+   CORS (must be before routes)
+   ========================= */
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(null, false);
-
+    origin: (origin, cb) => {
+      // Allow non-browser requests (no Origin) and whitelisted origins
+      if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+      return cb(new Error(`Not allowed by CORS: ${origin}`));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+// Preflight
+app.options("*", cors());
 
+/* =========================
+   Session & Passport
+   ========================= */
 app.use(
   session({
     name: "sid",
-    store: new MemoryStore({ checkPeriod: 86400000 }),
-    secret: process.env.SESSION_SECRET,
+    store: new MemoryStore({ checkPeriod: 86400000 }), // prune expired entries every 24h
+    secret: process.env.SESSION_SECRET || "change-me",
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: {
-      domain: ".primerpcad.com", // ✅ forces cookie to your root domain (including www)
+      domain: COOKIE_DOMAIN,  // .primerpcad.com in prod, unset in dev
+      secure: IS_PROD,        // secure cookies over HTTPS only in prod
       httpOnly: true,
-      secure: true,               // ✅ required on HTTPS
-      sameSite: "none",           // ✅ required for cross-origin cookies
+      sameSite: COOKIE_SAMESITE, // "none" for true cross-site; "lax" if using proxy
+      path: "/",
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
     },
   })
 );
@@ -79,7 +120,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ✅ Discord OAuth Strategy
+/* =========================
+   Discord OAuth
+   ========================= */
 passport.use(
   new DiscordStrategy(
     {
@@ -90,16 +133,16 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const guildIds = process.env.DISCORD_GUILD_IDS.split(",");
+        const guildIds = (process.env.DISCORD_GUILD_IDS || "").split(",").map((g) => g.trim()).filter(Boolean);
         const botToken = process.env.DISCORD_BOT_TOKEN;
         let allRoles = [];
 
         for (const guildId of guildIds) {
-          const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${profile.id}`, {
-            headers: { Authorization: `Bot ${botToken}` },
-          });
+          const res = await fetch(
+            `https://discord.com/api/v10/guilds/${guildId}/members/${profile.id}`,
+            { headers: { Authorization: `Bot ${botToken}` } }
+          );
           if (!res.ok) continue;
-
           const member = await res.json();
           if (Array.isArray(member.roles)) {
             allRoles = [...new Set([...allRoles, ...member.roles])];
@@ -135,16 +178,19 @@ passport.use(
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
 
-// Auth Routes
+/* =========================
+   Auth Endpoints
+   ========================= */
 app.get("/auth/discord", passport.authenticate("discord"));
 
 app.get(
   "/auth/discord/callback",
   passport.authenticate("discord", { failureRedirect: "/auth/failure" }),
   (req, res) => {
-    console.log("✅ Callback reached");
+    console.log("✅ OAuth callback reached");
     console.log("✅ Session:", req.sessionID);
     console.log("✅ User:", req.user);
+    // after login, send user back to the app
     res.redirect(`${FRONTEND_URL}/home`);
   }
 );
@@ -165,14 +211,23 @@ app.get("/auth/resync", (req, res) => {
 
 app.get("/auth/failure", (req, res) => res.send("❌ Discord login failed"));
 
+/* =========================
+   Health & WhoAmI
+   ========================= */
+app.get("/api/health", (_req, res) => {
+  res.json({ ok: true, env: NODE_ENV, time: new Date().toISOString() });
+});
+
 app.get("/api/auth/me", (req, res) => {
-  console.log("🧪 Cookies received:", req.headers.cookie);
-  console.log("🧪 User on session:", req.user);
+  console.log("🧪 Cookies:", req.headers.cookie || "(none)");
+  console.log("🧪 User:", req.user || "(none)");
   if (!req.user) return res.status(401).json({ message: "Not logged in" });
   res.json(req.user);
 });
 
-// Routes
+/* =========================
+   Mount Routes
+   ========================= */
 app.use("/api/civilians", civilianRoutes);
 app.use("/api/licenses", licenseRoutes);
 app.use("/api/vehicles", vehicleRoutes);
@@ -188,7 +243,9 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/dm", dmRoutes);
 app.use("/api/calls", callRoutes);
 app.use("/api/bolos", boloRoutes);
-app.use((req, res, next) => {
+
+// make discord client available to routes that need it
+app.use((req, _res, next) => {
   req.client = client;
   next();
 });
@@ -197,14 +254,20 @@ app.use("/api/psoreports", psoReportRoutes);
 app.use("/api/warrants", warrantRoutes);
 app.use("/admin", adminRoutes);
 
-// DB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB connected");
-  })
+/* =========================
+   Database & Server
+   ========================= */
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB error:", err));
 
-// Server
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Server live at port ${PORT}`);
+  console.log(`✅ Server live on port ${PORT}`);
+  console.log(`   NODE_ENV=${NODE_ENV}`);
+  console.log(`   FRONTEND_URL=${FRONTEND_URL}`);
+  console.log(`   API_BASE_URL=${API_BASE_URL}`);
+  console.log(`   ALLOWED_ORIGINS=${ALLOWED_ORIGINS.join(", ")}`);
+  console.log(`   COOKIE_DOMAIN=${COOKIE_DOMAIN || "(host-only)"}`);
+  console.log(`   COOKIE_SAMESITE=${COOKIE_SAMESITE}`);
 });
